@@ -1,6 +1,7 @@
 using LanzaTuIdea.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Text; // Necesario para Encoding
 
 namespace LanzaTuIdea.Api.Data;
 
@@ -94,15 +95,15 @@ public static class SeedData
             return;
         }
 
-        // Leer con Encoding por defecto (UTF8)
-        var lines = await File.ReadAllLinesAsync(path);
+        // CORRECCIÓN DE ENCODING: Usamos Latin1 para soportar archivos de Excel/Windows en español
+        var lines = await File.ReadAllLinesAsync(path, Encoding.Latin1);
+        
         if (lines.Length <= 1)
         {
             Console.WriteLine("--> [SeedData] El archivo CSV está vacío o solo tiene cabecera.");
             return;
         }
 
-        // DETECCIÓN INTELIGENTE DE DELIMITADOR
         var header = lines[0];
         char delimiter = header.Contains(';') ? ';' : ',';
         Console.WriteLine($"--> [SeedData] Delimitador detectado: ' {delimiter} '");
@@ -114,23 +115,18 @@ public static class SeedData
         {
             if (string.IsNullOrWhiteSpace(line)) continue;
 
-            // Intento 1: Parser que respeta comillas
             var parts = ParseCsvLine(line, delimiter);
 
-            // Intento 2 (Fallback): Si el parser devuelve 1 sola parte pero la línea tiene el delimitador,
-            // usamos Split simple. Esto arregla casos donde el formato es sencillo pero el parser falla.
+            // Fallback simple
             if (parts.Count <= 1 && line.Contains(delimiter))
             {
                 parts = line.Split(delimiter).Select(p => p.Trim()).ToList();
             }
 
-            // Validación de columnas
             if (parts.Count < 5) 
             {
                 skipped++;
-                // LOG DE ERROR PARA VER QUÉ ESTÁ PASANDO REALMENTE
-                Console.WriteLine($"--> [ERROR FORMATO] Línea omitida. Se esperaban 5+ columnas, se encontraron {parts.Count}.");
-                Console.WriteLine($"    Contenido: '{line}'");
+                Console.WriteLine($"--> [ERROR FORMATO] Línea omitida. Se encontraron {parts.Count} columnas.");
                 continue;
             }
 
@@ -171,7 +167,6 @@ public static class SeedData
         if (skipped > 0) Console.WriteLine($"--> [SeedData] Se omitieron {skipped} líneas por errores.");
     }
 
-    // Parser manual que respeta comillas y acepta delimitador dinámico
     private static List<string> ParseCsvLine(string line, char delimiter)
     {
         var result = new List<string>();
@@ -181,31 +176,30 @@ public static class SeedData
         for (int i = 0; i < line.Length; i++)
         {
             char ch = line[i];
-
             if (ch == '"')
             {
                 inQuotes = !inQuotes;
-                continue; // Omitir las comillas en el valor final
+                continue;
             }
-
             if (ch == delimiter && !inQuotes)
             {
                 result.Add(current.Trim());
                 current = "";
                 continue;
             }
-
             current += ch;
         }
-
         result.Add(current.Trim());
         return result;
     }
 
+    // CORRECCIÓN DEL BUG LÓGICO AQUÍ
     private static string Truncate(string? value, int maxLength)
     {
         if (string.IsNullOrEmpty(value)) return "";
         var val = value.Trim();
-        return val.Length <= maxLength ? val.Substring(0, maxLength) : val;
+        // Si la longitud es menor o igual al máximo, devolvemos el valor COMPLETO.
+        // Solo si es mayor, cortamos.
+        return val.Length <= maxLength ? val : val.Substring(0, maxLength);
     }
 }
