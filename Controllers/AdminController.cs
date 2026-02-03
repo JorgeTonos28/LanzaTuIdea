@@ -137,6 +137,8 @@ public class AdminController : ControllerBase
             return Unauthorized();
         }
 
+        await UpsertEmployeeAsync(request, cancellationToken);
+
         var idea = new Idea
         {
             CreatedAt = DateTime.UtcNow,
@@ -380,6 +382,95 @@ public class AdminController : ControllerBase
         }
 
         return await _context.AppUsers.FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+    }
+
+    private async Task UpsertEmployeeAsync(IdeaManualRequest request, CancellationToken cancellationToken)
+    {
+        var codigo = request.CodigoEmpleado.Trim();
+        if (string.IsNullOrWhiteSpace(codigo))
+        {
+            return;
+        }
+
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Codigo_Empleado == codigo, cancellationToken);
+        var nombreCompleto = request.NombreCompleto ?? string.Empty;
+        var parsed = ParseNombreCompleto(nombreCompleto);
+        var email = request.Email ?? string.Empty;
+        var departamento = request.Departamento ?? string.Empty;
+
+        if (employee is null)
+        {
+            employee = new Employee
+            {
+                Codigo_Empleado = codigo,
+                Nombre = parsed.Nombre,
+                Apellido1 = parsed.Apellido1,
+                Apellido2 = parsed.Apellido2,
+                E_Mail = email,
+                Departamento = departamento,
+                Estatus = "A"
+            };
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
+        var updated = false;
+        if (string.IsNullOrWhiteSpace(employee.Nombre) && !string.IsNullOrWhiteSpace(parsed.Nombre))
+        {
+            employee.Nombre = parsed.Nombre;
+            updated = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(employee.Apellido1) && !string.IsNullOrWhiteSpace(parsed.Apellido1))
+        {
+            employee.Apellido1 = parsed.Apellido1;
+            updated = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(employee.Apellido2) && !string.IsNullOrWhiteSpace(parsed.Apellido2))
+        {
+            employee.Apellido2 = parsed.Apellido2;
+            updated = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(employee.E_Mail) && !string.IsNullOrWhiteSpace(email))
+        {
+            employee.E_Mail = email;
+            updated = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(employee.Departamento) && !string.IsNullOrWhiteSpace(departamento))
+        {
+            employee.Departamento = departamento;
+            updated = true;
+        }
+
+        if (updated)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    private static (string Nombre, string Apellido1, string Apellido2) ParseNombreCompleto(string nombreCompleto)
+    {
+        if (string.IsNullOrWhiteSpace(nombreCompleto))
+        {
+            return ("", "", "");
+        }
+
+        var parts = nombreCompleto.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1)
+        {
+            return (parts[0], "", "");
+        }
+
+        if (parts.Length == 2)
+        {
+            return (parts[0], parts[1], "");
+        }
+
+        return (parts[0], parts[1], string.Join(" ", parts.Skip(2)));
     }
 
     private async Task AssignRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)

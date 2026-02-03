@@ -560,6 +560,29 @@
             navIdeador('formulario');
         }
 
+        function setFieldEditable(id, isEditable) {
+            const input = document.getElementById(id);
+            input.readOnly = !isEditable;
+            if (isEditable) {
+                input.classList.remove('bg-slate-200', 'border-slate-300', 'text-slate-600');
+                input.classList.add('bg-white', 'border-slate-300', 'text-slate-700');
+            } else {
+                input.classList.add('bg-slate-200', 'border-slate-300', 'text-slate-600');
+                input.classList.remove('bg-white', 'text-slate-700');
+            }
+        }
+
+        function ajustarCamposIdeador(data) {
+            const hasEmployee = data.employeeExists;
+            const hasNombre = Boolean(data.nombreCompleto);
+            const hasCorreo = Boolean(data.email);
+            const hasDepartamento = Boolean(data.departamento);
+
+            setFieldEditable('nombreEmpleado', !hasEmployee || !hasNombre);
+            setFieldEditable('correoEmpleado', !hasEmployee || !hasCorreo);
+            setFieldEditable('direccionEmpleado', !hasEmployee || !hasDepartamento);
+        }
+
         async function cargarEmpleadoIdeador() {
             let data = currentUser;
             if (!data) {
@@ -575,6 +598,7 @@
             document.getElementById('nombreEmpleado').value = data.nombreCompleto || '';
             document.getElementById('correoEmpleado').value = data.email || '';
             document.getElementById('direccionEmpleado').value = data.departamento || '';
+            ajustarCamposIdeador(data);
         }
 
         function limpiarCampo(id) {
@@ -608,9 +632,17 @@
             const desc = document.getElementById('descIdea').value.trim();
             const detalle = document.getElementById('detalleIdea').value.trim();
 
+            const payload = {
+                descripcion: desc,
+                detalle,
+                nombreCompleto: document.getElementById('nombreEmpleado').value.trim(),
+                email: document.getElementById('correoEmpleado').value.trim(),
+                departamento: document.getElementById('direccionEmpleado').value.trim()
+            };
+
             const response = await apiFetch('/api/ideas', {
                 method: 'POST',
-                body: JSON.stringify({ descripcion: desc, detalle })
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
@@ -630,7 +662,10 @@
                 descripcion: document.getElementById('adminDesc').value.trim(),
                 detalle: document.getElementById('adminDetalle').value.trim(),
                 via: document.getElementById('adminVia').value,
-                adminComment: 'Carga manual'
+                adminComment: 'Carga manual',
+                nombreCompleto: document.getElementById('adminNomEmp').value.trim(),
+                email: document.getElementById('adminMailEmp').value.trim(),
+                departamento: document.getElementById('adminDirEmp').value.trim()
             };
 
             const response = await apiFetch('/api/admin/ideas/manual', {
@@ -992,12 +1027,28 @@
             loadAdminUsers();
         }
 
+        function ajustarCamposAdmin(empleado) {
+            const hasNombre = Boolean(empleado?.nombreCompleto);
+            const hasCorreo = Boolean(empleado?.email);
+            const hasDepartamento = Boolean(empleado?.departamento);
+            setFieldEditable('adminNomEmp', !hasNombre);
+            setFieldEditable('adminMailEmp', !hasCorreo);
+            setFieldEditable('adminDirEmp', !hasDepartamento);
+        }
+
         async function buscarEmpleadoAdmin(valor) {
             const codigo = valor.trim();
             if (codigo.length < 3) {
                 return;
             }
             const response = await apiFetch(`/api/admin/employees/search?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
+            if (response.status === 404) {
+                document.getElementById('adminNomEmp').value = '';
+                document.getElementById('adminMailEmp').value = '';
+                document.getElementById('adminDirEmp').value = '';
+                ajustarCamposAdmin(null);
+                return;
+            }
             if (!response.ok) {
                 return;
             }
@@ -1005,6 +1056,7 @@
             document.getElementById('adminNomEmp').value = empleado.nombreCompleto || '';
             document.getElementById('adminMailEmp').value = empleado.email || '';
             document.getElementById('adminDirEmp').value = empleado.departamento || '';
+            ajustarCamposAdmin(empleado);
         }
 
         function showSuccess(title, text) {

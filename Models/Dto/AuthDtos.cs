@@ -8,5 +8,6 @@ public record UserInfoDto(
     string? NombreCompleto,
     IReadOnlyList<string> Roles,
     string? Email,
-    string? Departamento
+    string? Departamento,
+    bool EmployeeExists
 );
