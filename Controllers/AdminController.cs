@@ -204,6 +204,7 @@ public class AdminController : ControllerBase
     {
         var user = await _context.AppUsers
             .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
 
         if (user is null)
