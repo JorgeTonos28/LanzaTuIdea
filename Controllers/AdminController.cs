@@ -279,8 +279,10 @@ public class AdminController : ControllerBase
 
     private IQueryable<IdeaAdminSummaryDto> GetAdminIdeaQuery()
     {
-        return from idea in _context.Ideas.Include(i => i.CreatedByUser)
-               join employee in _context.Employees on idea.CodigoEmpleado equals employee.Codigo_Empleado into empGroup
+        return from idea in _context.Ideas.AsNoTracking()
+               join user in _context.AppUsers.AsNoTracking() on idea.CreatedByUserId equals user.Id into userGroup
+               from user in userGroup.DefaultIfEmpty()
+               join employee in _context.Employees.AsNoTracking() on idea.CodigoEmpleado equals employee.Codigo_Empleado into empGroup
                from employee in empGroup.DefaultIfEmpty()
                select new IdeaAdminSummaryDto(
                    idea.Id,
@@ -288,7 +290,9 @@ public class AdminController : ControllerBase
                    idea.Descripcion,
                    idea.Status,
                    idea.CodigoEmpleado,
-                   employee != null ? employee.NombreCompleto : idea.CreatedByUser.NombreCompleto,
+                   employee != null ? employee.NombreCompleto : user != null ? user.NombreCompleto : null,
+                   employee != null ? employee.E_Mail : null,
+                   employee != null ? employee.Departamento : null,
                    idea.Clasificacion
                );
     }

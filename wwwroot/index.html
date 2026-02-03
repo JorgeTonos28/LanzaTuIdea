@@ -470,13 +470,18 @@
         }
 
         async function cargarEmpleadoIdeador() {
-            const response = await apiFetch('/api/employees/me', { method: 'GET' });
-            if (!response.ok) {
-                return;
+            let data = currentUser;
+            if (!data) {
+                const response = await apiFetch('/api/auth/me', { method: 'GET' });
+                if (!response.ok) {
+                    return;
+                }
+                data = await response.json();
+                currentUser = data;
             }
-            const data = await response.json();
-            document.getElementById('idEmpleado').value = data.codigoEmpleado || currentUser.codigoEmpleado || '';
-            document.getElementById('nombreEmpleado').value = data.nombreCompleto || currentUser.nombreCompleto || '';
+
+            document.getElementById('idEmpleado').value = data.codigoEmpleado || '';
+            document.getElementById('nombreEmpleado').value = data.nombreCompleto || '';
             document.getElementById('correoEmpleado').value = data.email || '';
             document.getElementById('direccionEmpleado').value = data.departamento || '';
         }

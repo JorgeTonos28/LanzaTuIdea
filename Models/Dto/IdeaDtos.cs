@@ -16,6 +16,8 @@ public record IdeaAdminSummaryDto(
     string Status,
     string CodigoEmpleado,
     string? NombreCompleto,
+    string? Email,
+    string? Departamento,
     string? Clasificacion
 );
 
