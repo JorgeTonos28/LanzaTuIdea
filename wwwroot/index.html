@@ -57,7 +57,7 @@
                     <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu contraseña" required>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">Entrar</button>
-                <p class="text-xs text-slate-400 text-center">El rol (Ideador o Admin) se asigna automáticamente según tus permisos.</p>
+                <p class="text-xs text-slate-400 text-center">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
             </form>
         </div>
     </div>
@@ -168,6 +168,15 @@
         </div>
     </main>
 
+    <main id="viewGestor" class="hidden max-w-4xl mx-auto w-full p-6 space-y-6 fade-in">
+        <div class="bg-white rounded-3xl shadow-lg border border-slate-200 p-8 space-y-6 text-center">
+            <div class="text-6xl">🧭</div>
+            <h2 class="text-2xl font-bold text-slate-700">Panel de Gestores en construcción</h2>
+            <p class="text-slate-500">Estamos trabajando en un panel exclusivo para gestores. Mientras tanto, puedes registrar ideas como ideador.</p>
+            <button onclick="abrirFormularioGestor()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700">Registrar una idea</button>
+        </div>
+    </main>
+
     <main id="viewAdmin" class="hidden max-w-7xl mx-auto w-full p-6 space-y-6 fade-in">
 
         <div id="adminDashboard">
@@ -177,6 +186,7 @@
                     <button onclick="navAdmin('registrar')" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Registrar Idea (Manual)</button>
                     <button onclick="navAdmin('inbox')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">📥 Ideas Registradas</button>
                     <button onclick="navAdmin('revisadas')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">✅ Ideas Revisadas</button>
+                    <button onclick="navAdmin('usuarios')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">👥 Usuarios y Roles</button>
                 </div>
             </div>
 
@@ -305,6 +315,31 @@
                 <button type="submit" class="w-full bg-sky-600 text-white py-3 rounded-lg font-bold hover:bg-sky-700">Registrar Idea Manual</button>
             </form>
         </div>
+
+        <div id="adminUsers" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-700">👥 Usuarios y Roles</h3>
+                <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
+            </div>
+            <div class="p-8">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-slate-500">
+                                <th class="p-3">Usuario</th>
+                                <th class="p-3">Código</th>
+                                <th class="p-3">Nombre</th>
+                                <th class="p-3">Rol</th>
+                                <th class="p-3">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaUsuarios">
+                            <tr><td colspan="5" class="p-6 text-center text-slate-400">Cargando usuarios...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </main>
 
     <div id="modalDetalle" class="hidden fixed inset-0 bg-black/50 items-center justify-center z-50">
@@ -411,16 +446,24 @@
             document.getElementById('btnLogout').classList.remove('hidden');
 
             const roles = user.roles || [];
-            const roleLabel = roles.includes('Admin') ? '🛡️ Admin' : '👤 Ideador';
+            const isAdmin = roles.includes('Admin');
+            const isGestor = roles.includes('Gestor');
+            const roleLabel = isAdmin ? '🛡️ Admin' : isGestor ? '🧭 Gestor' : '👤 Ideador';
             document.getElementById('userInfo').innerText = `${roleLabel} · ${user.nombreCompleto || user.userName}`;
 
-            if (roles.includes('Admin')) {
+            if (isAdmin) {
                 document.getElementById('viewAdmin').classList.remove('hidden');
                 document.getElementById('viewIdeador').classList.add('hidden');
+                document.getElementById('viewGestor').classList.add('hidden');
                 navAdmin('dashboard');
+            } else if (isGestor) {
+                document.getElementById('viewGestor').classList.remove('hidden');
+                document.getElementById('viewIdeador').classList.add('hidden');
+                document.getElementById('viewAdmin').classList.add('hidden');
             } else {
                 document.getElementById('viewIdeador').classList.remove('hidden');
                 document.getElementById('viewAdmin').classList.add('hidden');
+                document.getElementById('viewGestor').classList.add('hidden');
                 navIdeador('home');
             }
         }
@@ -434,11 +477,20 @@
             document.getElementById('viewLogin').classList.remove('hidden');
             document.getElementById('viewIdeador').classList.add('hidden');
             document.getElementById('viewAdmin').classList.add('hidden');
+            document.getElementById('viewGestor').classList.add('hidden');
             document.getElementById('btnLogout').classList.add('hidden');
             document.getElementById('userInfo').innerText = '';
         }
 
         function navIdeador(view) {
+            const roles = currentUser?.roles || [];
+            if (view === 'home' && roles.includes('Gestor')) {
+                document.getElementById('viewGestor').classList.remove('hidden');
+                document.getElementById('viewIdeador').classList.add('hidden');
+                return;
+            }
+            document.getElementById('viewIdeador').classList.remove('hidden');
+            document.getElementById('viewGestor').classList.add('hidden');
             ['ideadorHome', 'ideadorForm', 'ideadorLista'].forEach(id => document.getElementById(id).classList.add('hidden'));
             if(view === 'home') document.getElementById('ideadorHome').classList.remove('hidden');
             if(view === 'formulario') {
@@ -453,7 +505,7 @@
         }
 
         function navAdmin(view) {
-            ['adminDashboard', 'adminInbox', 'adminRevisadas', 'adminForm'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['adminDashboard', 'adminInbox', 'adminRevisadas', 'adminForm', 'adminUsers'].forEach(id => document.getElementById(id).classList.add('hidden'));
             if(view === 'dashboard') {
                 document.getElementById('adminDashboard').classList.remove('hidden');
                 actualizarDashboard();
@@ -466,7 +518,15 @@
                 document.getElementById('adminRevisadas').classList.remove('hidden');
                 loadAdminRevisadas();
             }
+            if(view === 'usuarios') {
+                document.getElementById('adminUsers').classList.remove('hidden');
+                loadAdminUsers();
+            }
             if(view === 'registrar') document.getElementById('adminForm').classList.remove('hidden');
+        }
+
+        function abrirFormularioGestor() {
+            navIdeador('formulario');
         }
 
         async function cargarEmpleadoIdeador() {
@@ -768,6 +828,62 @@
                     }]
                 }
             });
+        }
+
+        async function loadAdminUsers() {
+            const response = await apiFetch('/api/admin/users', { method: 'GET' });
+            if (!response.ok) {
+                return;
+            }
+            const users = await response.json();
+            renderAdminUsers(users);
+        }
+
+        function renderAdminUsers(users) {
+            const tbody = document.getElementById('tablaUsuarios');
+            tbody.innerHTML = '';
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400">No hay usuarios registrados.</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const roles = user.roles || [];
+                const currentRole = roles.includes('Admin') ? 'Admin' : roles.includes('Gestor') ? 'Gestor' : '';
+                const estado = user.isActive ? 'Activo' : 'Inactivo';
+                const row = document.createElement('tr');
+                row.className = 'border-t border-slate-100';
+                row.innerHTML = `
+                    <td class="p-3 font-medium text-slate-700">${user.userName}</td>
+                    <td class="p-3 text-slate-500">${user.codigoEmpleado || '-'}</td>
+                    <td class="p-3 text-slate-500">${user.nombreCompleto || '-'}</td>
+                    <td class="p-3">
+                        <select class="w-full p-2 border rounded-lg text-sm">
+                            <option value="">Ideador (sin rol)</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Gestor">Gestor</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-slate-500">${estado}</td>
+                `;
+                const select = row.querySelector('select');
+                select.value = currentRole;
+                select.addEventListener('change', () => actualizarRolUsuario(user.userName, select.value));
+                tbody.appendChild(row);
+            });
+        }
+
+        async function actualizarRolUsuario(userName, role) {
+            const roles = role ? [role] : [];
+            const response = await apiFetch(`/api/admin/users/${encodeURIComponent(userName)}/roles`, {
+                method: 'PUT',
+                body: JSON.stringify({ roles })
+            });
+            if (!response.ok) {
+                showError('Error', 'No fue posible actualizar el rol del usuario.');
+                return;
+            }
+            loadAdminUsers();
         }
 
         async function buscarEmpleadoAdmin(valor) {

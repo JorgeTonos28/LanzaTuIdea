@@ -210,7 +210,7 @@ public class AdminController : ControllerBase
             return NotFound();
         }
 
-        var allowedRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Admin", "Ideador" };
+        var allowedRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Admin", "Gestor" };
         var requestedRoles = request.Roles.Where(r => allowedRoles.Contains(r)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
         var roles = await _context.Roles.Where(r => allowedRoles.Contains(r.Name)).ToListAsync(cancellationToken);

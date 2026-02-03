@@ -6,7 +6,7 @@ namespace LanzaTuIdea.Api.Data;
 
 public static class SeedData
 {
-    private static readonly string[] DefaultRoles = ["Admin", "Ideador"];
+    private static readonly string[] DefaultRoles = ["Admin", "Gestor"];
 
     public static async Task InitializeAsync(AppDbContext context, IConfiguration configuration, IHostEnvironment environment)
     {

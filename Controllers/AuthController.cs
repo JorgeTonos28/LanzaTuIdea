@@ -74,8 +74,6 @@ public class AuthController : ControllerBase
         user.NombreCompleto = adData.NombreCompleto;
         user.LastLoginAt = DateTime.UtcNow;
 
-        await EnsureRoleAsync(user, "Ideador", cancellationToken);
-
         if (_environment.IsDevelopment())
         {
             var bootstrapAdmins = _configuration.GetSection("BootstrapAdmins").Get<string[]>() ?? Array.Empty<string>();
