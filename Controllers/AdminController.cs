@@ -23,8 +23,7 @@ public class AdminController : ControllerBase
     [HttpGet("ideas/pending")]
     public async Task<ActionResult<IReadOnlyList<IdeaAdminSummaryDto>>> PendingIdeas(CancellationToken cancellationToken)
     {
-        var ideas = await GetAdminIdeaQuery()
-            .Where(i => i.Status == "Registrada")
+        var ideas = await GetAdminIdeaQuery(_context.Ideas.AsNoTracking().Where(i => i.Status == "Registrada"))
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync(cancellationToken);
 
@@ -34,8 +33,7 @@ public class AdminController : ControllerBase
     [HttpGet("ideas/reviewed")]
     public async Task<ActionResult<IReadOnlyList<IdeaAdminSummaryDto>>> ReviewedIdeas(CancellationToken cancellationToken)
     {
-        var ideas = await GetAdminIdeaQuery()
-            .Where(i => i.Status != "Registrada")
+        var ideas = await GetAdminIdeaQuery(_context.Ideas.AsNoTracking().Where(i => i.Status != "Registrada"))
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync(cancellationToken);
 
@@ -277,9 +275,9 @@ public class AdminController : ControllerBase
             employee.Departamento);
     }
 
-    private IQueryable<IdeaAdminSummaryDto> GetAdminIdeaQuery()
+    private IQueryable<IdeaAdminSummaryDto> GetAdminIdeaQuery(IQueryable<Idea> ideas)
     {
-        return from idea in _context.Ideas.AsNoTracking()
+        return from idea in ideas
                join user in _context.AppUsers.AsNoTracking() on idea.CreatedByUserId equals user.Id into userGroup
                from user in userGroup.DefaultIfEmpty()
                join employee in _context.Employees.AsNoTracking() on idea.CodigoEmpleado equals employee.Codigo_Empleado into empGroup
