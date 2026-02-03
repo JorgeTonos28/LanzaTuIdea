@@ -1,6 +1,7 @@
 using LanzaTuIdea.Api.Data;
 using LanzaTuIdea.Api.Models;
 using LanzaTuIdea.Api.Models.Dto;
+using LanzaTuIdea.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,12 @@ namespace LanzaTuIdea.Api.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IAdServiceClient _adServiceClient;
 
-    public AdminController(AppDbContext context)
+    public AdminController(AppDbContext context, IAdServiceClient adServiceClient)
     {
         _context = context;
+        _adServiceClient = adServiceClient;
     }
 
     [HttpGet("ideas/pending")]
@@ -197,6 +200,73 @@ public class AdminController : ControllerBase
         return result;
     }
 
+    [HttpPost("users")]
+    public async Task<ActionResult<UserSummaryDto>> CreateUser([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.UserName))
+        {
+            return BadRequest(new { message = "El nombre de usuario es requerido." });
+        }
+
+        var normalized = request.UserName.Trim();
+        var existing = await _context.AppUsers.FirstOrDefaultAsync(u => u.UserName == normalized, cancellationToken);
+        if (existing is not null)
+        {
+            return Conflict(new { message = "El usuario ya existe." });
+        }
+
+        var adData = await _adServiceClient.GetUserDataAsync(normalized, cancellationToken);
+        if (adData is null)
+        {
+            return BadRequest(new { message = "No fue posible obtener los datos del usuario desde AD." });
+        }
+
+        var user = new AppUser
+        {
+            UserName = normalized,
+            IsActive = true,
+            Codigo_Empleado = adData.CodigoEmpleado,
+            NombreCompleto = adData.NombreCompleto,
+            LastLoginAt = null
+        };
+
+        _context.AppUsers.Add(user);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(request.Role))
+        {
+            await AssignRoleAsync(user, request.Role.Trim(), cancellationToken);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var roles = user.UserRoles.Select(ur => ur.Role.Name).Distinct().ToList();
+        return new UserSummaryDto(user.UserName, user.Codigo_Empleado, user.NombreCompleto, user.IsActive, roles);
+    }
+
+    [HttpDelete("users/{userName}")]
+    public async Task<IActionResult> DeleteUser(string userName, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            return BadRequest(new { message = "El nombre de usuario es requerido." });
+        }
+
+        var user = await _context.AppUsers
+            .Include(u => u.UserRoles)
+            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        user.IsActive = false;
+        user.UserRoles.Clear();
+        await _context.SaveChangesAsync(cancellationToken);
+        return Ok();
+    }
+
     [HttpPut("users/{userName}/roles")]
     public async Task<IActionResult> UpdateRoles(string userName, [FromBody] UpdateRolesRequest request, CancellationToken cancellationToken)
     {
@@ -304,5 +374,27 @@ public class AdminController : ControllerBase
         }
 
         return await _context.AppUsers.FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+    }
+
+    private async Task AssignRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+    {
+        var allowedRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Admin", "Gestor" };
+        if (!allowedRoles.Contains(roleName))
+        {
+            return;
+        }
+
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken);
+        if (role is null)
+        {
+            role = new Role { Name = roleName };
+            _context.Roles.Add(role);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        if (!user.UserRoles.Any(ur => ur.RoleId == role.Id))
+        {
+            user.UserRoles.Add(new UserRole { RoleId = role.Id, UserId = user.Id });
+        }
     }
 }

@@ -319,7 +319,10 @@
         <div id="adminUsers" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
             <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
                 <h3 class="text-xl font-bold text-slate-700">👥 Usuarios y Roles</h3>
-                <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
+                <div class="flex items-center gap-3">
+                    <button onclick="abrirModalCrearUsuario()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">➕ Agregar usuario</button>
+                    <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
+                </div>
             </div>
             <div class="p-8">
                 <div class="overflow-x-auto">
@@ -331,12 +334,40 @@
                                 <th class="p-3">Nombre</th>
                                 <th class="p-3">Rol</th>
                                 <th class="p-3">Estado</th>
+                                <th class="p-3 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tablaUsuarios">
-                            <tr><td colspan="5" class="p-6 text-center text-slate-400">Cargando usuarios...</td></tr>
+                            <tr><td colspan="6" class="p-6 text-center text-slate-400">Cargando usuarios...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="modalCrearUsuario" class="hidden fixed inset-0 bg-black/40 items-center justify-center z-50">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h4 class="text-lg font-bold text-slate-700">➕ Nuevo usuario</h4>
+                    <button onclick="cerrarModalCrearUsuario()" class="text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre de usuario</label>
+                        <input type="text" id="nuevoUserName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="usuario" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Rol</label>
+                        <select id="nuevoUserRole" class="w-full p-3 border rounded-xl bg-white">
+                            <option value="">Ideador (sin rol)</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Gestor">Gestor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
+                    <button onclick="cerrarModalCrearUsuario()" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700">Cancelar</button>
+                    <button onclick="crearUsuarioAdmin()" class="px-4 py-2 rounded-lg text-sm font-bold bg-blue-600 text-white hover:bg-blue-700">Guardar</button>
                 </div>
             </div>
         </div>
@@ -843,7 +874,7 @@
             const tbody = document.getElementById('tablaUsuarios');
             tbody.innerHTML = '';
             if (!users || users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400">No hay usuarios registrados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400">No hay usuarios registrados.</td></tr>';
                 return;
             }
 
@@ -865,10 +896,23 @@
                         </select>
                     </td>
                     <td class="p-3 text-slate-500">${estado}</td>
+                    <td class="p-3">
+                        <div class="flex items-center justify-end gap-2">
+                            <button class="px-3 py-1 rounded-lg text-xs font-bold ${user.isActive ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
+                                ${user.isActive ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700">Eliminar</button>
+                        </div>
+                    </td>
                 `;
                 const select = row.querySelector('select');
                 select.value = currentRole;
                 select.addEventListener('change', () => actualizarRolUsuario(user.userName, select.value));
+                const buttons = row.querySelectorAll('button');
+                const toggleButton = buttons[0];
+                const deleteButton = buttons[1];
+                toggleButton.addEventListener('click', () => actualizarEstadoUsuario(user.userName, !user.isActive));
+                deleteButton.addEventListener('click', () => eliminarUsuario(user.userName));
                 tbody.appendChild(row);
             });
         }
@@ -881,6 +925,68 @@
             });
             if (!response.ok) {
                 showError('Error', 'No fue posible actualizar el rol del usuario.');
+                return;
+            }
+            loadAdminUsers();
+        }
+
+        function abrirModalCrearUsuario() {
+            document.getElementById('nuevoUserName').value = '';
+            document.getElementById('nuevoUserRole').value = '';
+            document.getElementById('modalCrearUsuario').classList.remove('hidden');
+            document.getElementById('modalCrearUsuario').classList.add('flex');
+        }
+
+        function cerrarModalCrearUsuario() {
+            document.getElementById('modalCrearUsuario').classList.add('hidden');
+            document.getElementById('modalCrearUsuario').classList.remove('flex');
+        }
+
+        async function crearUsuarioAdmin() {
+            const userName = document.getElementById('nuevoUserName').value.trim();
+            const role = document.getElementById('nuevoUserRole').value;
+            if (!userName) {
+                showError('Error', 'El nombre de usuario es requerido.');
+                return;
+            }
+
+            const response = await apiFetch('/api/admin/users', {
+                method: 'POST',
+                body: JSON.stringify({ userName, role })
+            });
+
+            if (!response.ok) {
+                showError('Error', 'No fue posible crear el usuario.');
+                return;
+            }
+
+            cerrarModalCrearUsuario();
+            loadAdminUsers();
+            showSuccess('Usuario creado', 'El usuario fue agregado correctamente.');
+        }
+
+        async function actualizarEstadoUsuario(userName, isActive) {
+            const response = await apiFetch(`/api/admin/users/${encodeURIComponent(userName)}/active`, {
+                method: 'PUT',
+                body: JSON.stringify({ isActive })
+            });
+            if (!response.ok) {
+                showError('Error', 'No fue posible actualizar el estado del usuario.');
+                return;
+            }
+            loadAdminUsers();
+        }
+
+        async function eliminarUsuario(userName) {
+            if (!confirm(`¿Eliminar el usuario ${userName}?`)) {
+                return;
+            }
+
+            const response = await apiFetch(`/api/admin/users/${encodeURIComponent(userName)}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                showError('Error', 'No fue posible eliminar el usuario.');
                 return;
             }
             loadAdminUsers();
