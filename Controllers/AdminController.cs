@@ -243,11 +243,13 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("dashboard/timeline")]
-    public async Task<ActionResult<TimelineResponse>> Timeline([FromBody] TimelineFilterRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<TimelineResponse>> Timeline([FromBody] TimelineFilterRequest? request, CancellationToken cancellationToken)
     {
+        request ??= new TimelineFilterRequest("1M", null, null, null, null);
         var ideasQuery = _context.Ideas.AsNoTracking().AsQueryable();
         var now = DateTime.UtcNow;
-        var startDate = request.Periodo switch
+        var periodo = string.IsNullOrWhiteSpace(request.Periodo) ? "1M" : request.Periodo;
+        var startDate = periodo switch
         {
             "1M" => now.AddMonths(-1),
             "3M" => now.AddMonths(-3),
@@ -298,11 +300,15 @@ public class AdminController : ControllerBase
 
         var totalFiltrado = await ideasQuery.CountAsync(cancellationToken);
 
-        var puntos = await ideasQuery
-            .GroupBy(i => i.CreatedAt.Date)
-            .Select(g => new TimePointDto(g.Key, g.Count()))
-            .OrderBy(p => p.Fecha)
+        var fechas = await ideasQuery
+            .Select(i => i.CreatedAt)
             .ToListAsync(cancellationToken);
+
+        var puntos = fechas
+            .GroupBy(fecha => fecha.Date)
+            .OrderBy(g => g.Key)
+            .Select(g => new TimePointDto(g.Key, g.Count()))
+            .ToList();
 
         return new TimelineResponse(puntos, totalFiltrado);
     }
