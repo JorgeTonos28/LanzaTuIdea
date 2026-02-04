@@ -726,6 +726,7 @@
             }
 
             const user = await response.json();
+            await apiFetch('/api/csrf/token', { method: 'GET' });
             setCurrentUser(user);
         }
 
