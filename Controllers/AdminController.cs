@@ -269,6 +269,7 @@ public class AdminController : ControllerBase
             IsActive = true,
             Codigo_Empleado = adData.CodigoEmpleado,
             NombreCompleto = adData.NombreCompleto,
+            Instancia = string.IsNullOrWhiteSpace(request.Instancia) ? null : request.Instancia.Trim(),
             LastLoginAt = null
         };
 
@@ -329,7 +330,14 @@ public class AdminController : ControllerBase
         }
 
         _context.Ideas.Remove(idea);
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "No fue posible eliminar la idea." });
+        }
         return Ok();
     }
 

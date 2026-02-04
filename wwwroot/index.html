@@ -357,13 +357,14 @@
                                         <th class="p-3">Usuario</th>
                                         <th class="p-3">Código</th>
                                         <th class="p-3">Nombre</th>
+                                        <th class="p-3">Instancia</th>
                                         <th class="p-3">Rol</th>
                                         <th class="p-3">Estado</th>
                                         <th class="p-3 text-right">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaUsuarios">
-                                    <tr><td colspan="6" class="p-6 text-center text-slate-400">Cargando usuarios...</td></tr>
+                                    <tr><td colspan="7" class="p-6 text-center text-slate-400">Cargando usuarios...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -430,6 +431,12 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre de usuario</label>
                         <input type="text" id="nuevoUserName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="usuario" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Instancia</label>
+                        <select id="nuevoUserInstancia" class="w-full p-3 border rounded-xl bg-white">
+                            <option value="">Seleccione una instancia</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Rol</label>
@@ -586,6 +593,16 @@
                     option.value = item.nombre;
                     option.textContent = item.nombre;
                     adminSelect.appendChild(option);
+                });
+            }
+            const newUserInstancia = document.getElementById('nuevoUserInstancia');
+            if (newUserInstancia) {
+                newUserInstancia.innerHTML = '<option value="">Seleccione una instancia</option>';
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.nombre;
+                    option.textContent = item.nombre;
+                    newUserInstancia.appendChild(option);
                 });
             }
         }
@@ -988,7 +1005,11 @@
         }
 
         async function eliminarIdea(id) {
-            if (!confirm('¿Eliminar esta idea?')) {
+            const confirmed = await showConfirm(
+                'Eliminar idea',
+                '¿Deseas eliminar esta idea? Esta acción no se puede deshacer.'
+            );
+            if (!confirmed) {
                 return;
             }
             const response = await apiFetch(`/api/admin/ideas/${id}`, { method: 'DELETE' });
@@ -996,9 +1017,9 @@
                 showError('Error', 'No fue posible eliminar la idea.');
                 return;
             }
-            loadAdminInbox();
-            loadAdminRevisadas();
-            actualizarDashboard();
+            await loadAdminInbox();
+            await loadAdminRevisadas();
+            await actualizarDashboard();
         }
 
         function renderAdminInbox() {
@@ -1125,7 +1146,7 @@
             const tbody = document.getElementById('tablaUsuarios');
             tbody.innerHTML = '';
             if (!users || users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400">No hay usuarios registrados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">No hay usuarios registrados.</td></tr>';
                 return;
             }
 
@@ -1139,6 +1160,7 @@
                     <td class="p-3 font-medium text-slate-700">${user.userName}</td>
                     <td class="p-3 text-slate-500">${user.codigoEmpleado || '-'}</td>
                     <td class="p-3 text-slate-500">${user.nombreCompleto || '-'}</td>
+                    <td class="p-3 text-slate-500">${user.instancia || '-'}</td>
                     <td class="p-3">
                         <select class="w-full p-2 border rounded-lg text-sm">
                             <option value="">Ideador (sin rol)</option>
@@ -1228,7 +1250,11 @@
         }
 
         async function deleteClassification(id, nombre) {
-            if (!confirm(`¿Eliminar la clasificación "${nombre}"?`)) {
+            const confirmed = await showConfirm(
+                'Eliminar clasificación',
+                `¿Deseas eliminar la clasificación "${nombre}"?`
+            );
+            if (!confirmed) {
                 return;
             }
             const response = await apiFetch(`/api/config/classifications/${id}`, { method: 'DELETE' });
@@ -1300,7 +1326,11 @@
         }
 
         async function deleteInstance(id, nombre) {
-            if (!confirm(`¿Eliminar la instancia "${nombre}"?`)) {
+            const confirmed = await showConfirm(
+                'Eliminar instancia',
+                `¿Deseas eliminar la instancia "${nombre}"?`
+            );
+            if (!confirmed) {
                 return;
             }
             const response = await apiFetch(`/api/config/instances/${id}`, { method: 'DELETE' });
@@ -1328,6 +1358,7 @@
         function abrirModalCrearUsuario() {
             document.getElementById('nuevoUserName').value = '';
             document.getElementById('nuevoUserRole').value = '';
+            document.getElementById('nuevoUserInstancia').value = '';
             document.getElementById('modalCrearUsuario').classList.remove('hidden');
             document.getElementById('modalCrearUsuario').classList.add('flex');
         }
@@ -1340,6 +1371,7 @@
         async function crearUsuarioAdmin() {
             const userName = document.getElementById('nuevoUserName').value.trim();
             const role = document.getElementById('nuevoUserRole').value;
+            const instancia = document.getElementById('nuevoUserInstancia').value;
             if (!userName) {
                 showError('Error', 'El nombre de usuario es requerido.');
                 return;
@@ -1347,7 +1379,7 @@
 
             const response = await apiFetch('/api/admin/users', {
                 method: 'POST',
-                body: JSON.stringify({ userName, role })
+                body: JSON.stringify({ userName, role, instancia })
             });
 
             if (!response.ok) {
@@ -1373,7 +1405,11 @@
         }
 
         async function eliminarUsuario(userName) {
-            if (!confirm(`¿Eliminar el usuario ${userName}?`)) {
+            const confirmed = await showConfirm(
+                'Eliminar usuario',
+                `¿Deseas eliminar el usuario ${userName}?`
+            );
+            if (!confirmed) {
                 return;
             }
 
@@ -1381,7 +1417,10 @@
                 method: 'DELETE'
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible eliminar el usuario.');
+                const data = await response.json().catch(() => null);
+                const message = data?.message
+                    || 'No fue posible eliminar el usuario. Asegúrate de que exista al menos otro administrador.';
+                showError('No se puede eliminar', message);
                 return;
             }
             loadAdminUsers();
@@ -1433,6 +1472,22 @@
             } else {
                 alert(`${title} ${text}`);
             }
+        }
+
+        async function showConfirm(title, text) {
+            if (typeof Swal !== 'undefined') {
+                const result = await Swal.fire({
+                    title,
+                    text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                });
+                return result.isConfirmed;
+            }
+            return confirm(`${title}\n${text}`);
         }
     </script>
 </body>
