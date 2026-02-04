@@ -281,9 +281,10 @@ public class AdminController : ControllerBase
         if (includeSinInstancia || instanciaFilters.Count > 0)
         {
             ideasQuery = from idea in ideasQuery
-                         join user in _context.AppUsers.AsNoTracking() on idea.CreatedByUserId equals user.Id
-                         where (includeSinInstancia && string.IsNullOrWhiteSpace(user.Instancia))
-                               || (user.Instancia != null && instanciaFilters.Contains(user.Instancia))
+                         join user in _context.AppUsers.AsNoTracking() on idea.CreatedByUserId equals user.Id into userGroup
+                         from user in userGroup.DefaultIfEmpty()
+                         where (includeSinInstancia && (user == null || string.IsNullOrWhiteSpace(user.Instancia)))
+                               || (user != null && user.Instancia != null && instanciaFilters.Contains(user.Instancia))
                          select idea;
         }
 
@@ -292,9 +293,10 @@ public class AdminController : ControllerBase
         if (includeSinDepartamento || departamentoFilters.Count > 0)
         {
             ideasQuery = from idea in ideasQuery
-                         join employee in _context.Employees.AsNoTracking() on idea.CodigoEmpleado equals employee.Codigo_Empleado
-                         where (includeSinDepartamento && string.IsNullOrWhiteSpace(employee.Departamento))
-                               || (employee.Departamento != null && departamentoFilters.Contains(employee.Departamento))
+                         join employee in _context.Employees.AsNoTracking() on idea.CodigoEmpleado equals employee.Codigo_Empleado into empGroup
+                         from employee in empGroup.DefaultIfEmpty()
+                         where (includeSinDepartamento && (employee == null || string.IsNullOrWhiteSpace(employee.Departamento)))
+                               || (employee != null && employee.Departamento != null && departamentoFilters.Contains(employee.Departamento))
                          select idea;
         }
 
