@@ -60,6 +60,7 @@ public record IdeaManualRequest(
     string Detalle,
     string? Via,
     string? AdminComment,
+    string? Clasificacion,
     string? NombreCompleto,
     string? Email,
     string? Departamento

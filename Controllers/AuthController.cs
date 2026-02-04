@@ -37,14 +37,15 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "Usuario y contraseña son requeridos." });
         }
 
-        var userName = request.UserName.Trim();
-        var authenticated = await _adServiceClient.AuthenticateAsync(userName, request.Password, cancellationToken);
+        var requestUserName = request.UserName.Trim();
+        var normalizedUserName = NormalizeUserName(requestUserName);
+        var authenticated = await _adServiceClient.AuthenticateAsync(requestUserName, request.Password, cancellationToken);
         if (!authenticated)
         {
             return Unauthorized(new { message = "Credenciales inválidas." });
         }
 
-        var adData = await _adServiceClient.GetUserDataAsync(userName, cancellationToken);
+        var adData = await _adServiceClient.GetUserDataAsync(requestUserName, cancellationToken);
         if (adData is null)
         {
             return Unauthorized(new { message = "No fue posible obtener los datos del usuario." });
@@ -53,7 +54,7 @@ public class AuthController : ControllerBase
         var user = await _context.AppUsers
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+            .FirstOrDefaultAsync(u => u.UserName == normalizedUserName, cancellationToken);
 
         if (user is not null && !user.IsActive)
         {
@@ -64,7 +65,7 @@ public class AuthController : ControllerBase
         {
             user = new AppUser
             {
-                UserName = userName,
+                UserName = normalizedUserName,
                 IsActive = true
             };
             _context.AppUsers.Add(user);
@@ -79,7 +80,7 @@ public class AuthController : ControllerBase
         if (_environment.IsDevelopment())
         {
             var bootstrapAdmins = _configuration.GetSection("BootstrapAdmins").Get<string[]>() ?? Array.Empty<string>();
-            if (bootstrapAdmins.Any(admin => string.Equals(admin, userName, StringComparison.OrdinalIgnoreCase)))
+            if (bootstrapAdmins.Any(admin => string.Equals(NormalizeUserName(admin), normalizedUserName, StringComparison.OrdinalIgnoreCase)))
             {
                 await EnsureRoleAsync(user, "Admin", cancellationToken);
             }
@@ -92,7 +93,7 @@ public class AuthController : ControllerBase
         var nombreCompleto = employee?.NombreCompleto ?? user.NombreCompleto;
         var claims = new List<Claim>
         {
-            new(ClaimTypes.Name, user.UserName),
+            new(ClaimTypes.Name, normalizedUserName),
             new("CodigoEmpleado", user.Codigo_Empleado ?? string.Empty),
             new("NombreCompleto", nombreCompleto ?? string.Empty)
         };
@@ -180,5 +181,12 @@ public class AuthController : ControllerBase
         return await _context.Employees
             .AsNoTracking()
             .FirstOrDefaultAsync(e => e.Codigo_Empleado == codigoEmpleado, cancellationToken);
+    }
+
+    private static string NormalizeUserName(string userName)
+    {
+        var trimmed = userName.Trim();
+        var atIndex = trimmed.IndexOf('@');
+        return atIndex > 0 ? trimmed[..atIndex] : trimmed;
     }
 }

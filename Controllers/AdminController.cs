@@ -126,9 +126,12 @@ public class AdminController : ControllerBase
     [HttpPost("ideas/manual")]
     public async Task<IActionResult> ManualIdea([FromBody] IdeaManualRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.CodigoEmpleado) || string.IsNullOrWhiteSpace(request.Descripcion) || string.IsNullOrWhiteSpace(request.Detalle))
+        if (string.IsNullOrWhiteSpace(request.CodigoEmpleado)
+            || string.IsNullOrWhiteSpace(request.Descripcion)
+            || string.IsNullOrWhiteSpace(request.Detalle)
+            || string.IsNullOrWhiteSpace(request.Email))
         {
-            return BadRequest(new { message = "Código de empleado, descripción y detalle son requeridos." });
+            return BadRequest(new { message = "Código de empleado, descripción, detalle y correo son requeridos." });
         }
 
         var adminUser = await GetCurrentUserAsync(cancellationToken);
@@ -139,15 +142,41 @@ public class AdminController : ControllerBase
 
         await UpsertEmployeeAsync(request, cancellationToken);
 
+        var targetUserName = NormalizeUserName(request.Email);
+        if (string.IsNullOrWhiteSpace(targetUserName))
+        {
+            return BadRequest(new { message = "El correo no es válido para generar el usuario." });
+        }
+
+        var targetUser = await _context.AppUsers
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.UserName == targetUserName, cancellationToken);
+
+        if (targetUser is null)
+        {
+            targetUser = new AppUser
+            {
+                UserName = targetUserName,
+                Codigo_Empleado = request.CodigoEmpleado.Trim(),
+                NombreCompleto = request.NombreCompleto?.Trim(),
+                IsActive = true,
+                LastLoginAt = null
+            };
+            _context.AppUsers.Add(targetUser);
+            await EnsureRoleAsync(targetUser, "Ideador", cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
         var idea = new Idea
         {
             CreatedAt = DateTime.UtcNow,
-            CreatedByUserId = adminUser.Id,
+            CreatedByUserId = targetUser.Id,
             CodigoEmpleado = request.CodigoEmpleado.Trim(),
             Descripcion = request.Descripcion.Trim(),
             Detalle = request.Detalle.Trim(),
             Status = "Revisada",
-            Clasificacion = "Manual Admin",
+            Clasificacion = request.Clasificacion?.Trim() ?? "Manual Admin",
             Via = request.Via?.Trim() ?? "Manual",
             AdminComment = request.AdminComment?.Trim() ?? "Carga manual"
         };
@@ -493,5 +522,28 @@ public class AdminController : ControllerBase
         {
             user.UserRoles.Add(new UserRole { RoleId = role.Id, UserId = user.Id });
         }
+    }
+
+    private async Task EnsureRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+    {
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName, cancellationToken);
+        if (role is null)
+        {
+            role = new Role { Name = roleName };
+            _context.Roles.Add(role);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        if (!user.UserRoles.Any(ur => ur.RoleId == role.Id))
+        {
+            user.UserRoles.Add(new UserRole { RoleId = role.Id, UserId = user.Id });
+        }
+    }
+
+    private static string NormalizeUserName(string userName)
+    {
+        var trimmed = userName.Trim();
+        var atIndex = trimmed.IndexOf('@');
+        return atIndex > 0 ? trimmed[..atIndex] : trimmed;
     }
 }

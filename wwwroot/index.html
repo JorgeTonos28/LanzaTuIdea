@@ -305,6 +305,16 @@
                         <textarea id="adminDetalle" rows="4" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" required></textarea>
                     </div>
                     <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Clasificación</label>
+                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm">
+                            <option value="Mejora de Proceso">Mejora de Proceso</option>
+                            <option value="Innovación Tecnológica">Innovación Tecnológica</option>
+                            <option value="Ahorro de Costos">Ahorro de Costos</option>
+                            <option value="Cultura Organizacional">Cultura Organizacional</option>
+                            <option value="Manual Admin">Manual Admin</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Vía de Registro</label>
                         <select id="adminVia" class="w-full p-3 border rounded-xl bg-white text-sm">
                             <option value="Sistema">Sistema</option>
@@ -692,6 +702,7 @@
                 detalle: document.getElementById('adminDetalle').value.trim(),
                 via: document.getElementById('adminVia').value,
                 adminComment: 'Carga manual',
+                clasificacion: document.getElementById('adminClasif').value,
                 nombreCompleto: document.getElementById('adminNomEmp').value.trim(),
                 email: document.getElementById('adminMailEmp').value.trim(),
                 departamento: document.getElementById('adminDirEmp').value.trim()
