@@ -547,13 +547,19 @@
             if (adminSelect) {
                 adminSelect.innerHTML = '<option value="">Seleccione una clasificación</option>';
                 items.forEach(item => {
-                    adminSelect.innerHTML += `<option value="${item.nombre}">${item.nombre}</option>`;
+                    const option = document.createElement('option');
+                    option.value = item.nombre;
+                    option.textContent = item.nombre;
+                    adminSelect.appendChild(option);
                 });
             }
             if (modalSelect) {
                 modalSelect.innerHTML = '<option value="">Sin clasificar</option>';
                 items.forEach(item => {
-                    modalSelect.innerHTML += `<option value="${item.nombre}">${item.nombre}</option>`;
+                    const option = document.createElement('option');
+                    option.value = item.nombre;
+                    option.textContent = item.nombre;
+                    modalSelect.appendChild(option);
                 });
             }
         }
@@ -564,7 +570,10 @@
             if (ideaSelect) {
                 ideaSelect.innerHTML = '<option value="">Seleccione una instancia</option>';
                 items.forEach(item => {
-                    ideaSelect.innerHTML += `<option value="${item.nombre}">${item.nombre}</option>`;
+                    const option = document.createElement('option');
+                    option.value = item.nombre;
+                    option.textContent = item.nombre;
+                    ideaSelect.appendChild(option);
                 });
                 if (currentUser?.instancia) {
                     ideaSelect.value = currentUser.instancia;
@@ -573,7 +582,10 @@
             if (adminSelect) {
                 adminSelect.innerHTML = '<option value="">Seleccione una instancia</option>';
                 items.forEach(item => {
-                    adminSelect.innerHTML += `<option value="${item.nombre}">${item.nombre}</option>`;
+                    const option = document.createElement('option');
+                    option.value = item.nombre;
+                    option.textContent = item.nombre;
+                    adminSelect.appendChild(option);
                 });
             }
         }
@@ -1171,15 +1183,26 @@
             items.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'border-t border-slate-100';
-                row.innerHTML = `
-                    <td class="p-3 text-slate-500">${item.id}</td>
-                    <td class="p-3 text-slate-700">${item.nombre}</td>
-                    <td class="p-3 text-right">
-                        <button class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700">Eliminar</button>
-                    </td>
-                `;
-                const deleteButton = row.querySelector('button');
+
+                const idCell = document.createElement('td');
+                idCell.className = 'p-3 text-slate-500';
+                idCell.textContent = item.id;
+
+                const nameCell = document.createElement('td');
+                nameCell.className = 'p-3 text-slate-700';
+                nameCell.textContent = item.nombre;
+
+                const actionCell = document.createElement('td');
+                actionCell.className = 'p-3 text-right';
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700';
+                deleteButton.textContent = 'Eliminar';
                 deleteButton.addEventListener('click', () => deleteClassification(item.id, item.nombre));
+
+                actionCell.appendChild(deleteButton);
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(actionCell);
                 tbody.appendChild(row);
             });
         }
@@ -1232,15 +1255,26 @@
             items.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = 'border-t border-slate-100';
-                row.innerHTML = `
-                    <td class="p-3 text-slate-500">${item.id}</td>
-                    <td class="p-3 text-slate-700">${item.nombre}</td>
-                    <td class="p-3 text-right">
-                        <button class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700">Eliminar</button>
-                    </td>
-                `;
-                const deleteButton = row.querySelector('button');
+
+                const idCell = document.createElement('td');
+                idCell.className = 'p-3 text-slate-500';
+                idCell.textContent = item.id;
+
+                const nameCell = document.createElement('td');
+                nameCell.className = 'p-3 text-slate-700';
+                nameCell.textContent = item.nombre;
+
+                const actionCell = document.createElement('td');
+                actionCell.className = 'p-3 text-right';
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700';
+                deleteButton.textContent = 'Eliminar';
                 deleteButton.addEventListener('click', () => deleteInstance(item.id, item.nombre));
+
+                actionCell.appendChild(deleteButton);
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(actionCell);
                 tbody.appendChild(row);
             });
         }
