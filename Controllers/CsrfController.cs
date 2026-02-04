@@ -21,11 +21,12 @@ public class CsrfController : ControllerBase
         var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
         if (!string.IsNullOrWhiteSpace(tokens.RequestToken))
         {
+            var isHttps = HttpContext.Request.IsHttps;
             Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions
             {
                 HttpOnly = false,
                 SameSite = SameSiteMode.Strict,
-                Secure = true,
+                Secure = isHttps,
                 Path = "/"
             });
         }
