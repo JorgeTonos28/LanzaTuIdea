@@ -17,6 +17,7 @@ public record AdUserData(string CodigoEmpleado, string NombreCompleto);
 public class AdServiceOptions
 {
     public string BaseUrl { get; set; } = "";
+    public string Token { get; set; } = "";
     public int TimeoutSeconds { get; set; } = 10;
 }
 
@@ -43,7 +44,8 @@ public class AdServiceClient : IAdServiceClient
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["NombreUsuario"] = userName,
-            ["Password"] = password
+            ["Password"] = password,
+            ["Token"] = _options.Token
         });
 
         try
@@ -71,7 +73,8 @@ public class AdServiceClient : IAdServiceClient
 
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
-            ["NombreUsuario"] = userName
+            ["NombreUsuario"] = userName,
+            ["Token"] = _options.Token
         });
 
         try

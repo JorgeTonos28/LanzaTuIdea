@@ -2,7 +2,7 @@
 
 ## Requisitos
 - .NET 8 SDK
-- SQL Server LocalDB (para desarrollo)
+- SQL Server (instancia local) o SQL Server LocalDB para desarrollo
 
 ## Configuración rápida
 1. Ajusta el endpoint del servicio SOAP si aplica:
@@ -39,10 +39,25 @@ Nota para TI/DBA: Antes de activar UseEmployeeView: true, asegúrese de que la v
 dotnet run
 ```
 
+Si no tienes LocalDB instalado, ajusta `ConnectionStrings:DefaultConnection` en `appsettings.json` para apuntar a tu instancia local de SQL Server.
+
 En Development la app:
 - Aplica migraciones automáticamente.
 - Crea roles base (Admin, Ideador).
 - Si existe `seed/empleados.csv`, lo importa cuando la tabla está vacía.
+
+## 🔐 Configuración de Seguridad (Token AD)
+El token de AD no se incluye en el repositorio por motivos de seguridad. En desarrollo debes configurarlo usando .NET User Secrets:
+
+```bash
+# 1. Inicializar los secretos de usuario (si no se ha hecho)
+dotnet user-secrets init
+
+# 2. Establecer el token (Reemplazar con el valor real provisto por TI)
+dotnet user-secrets set "AdService:Token" "VALOR_DEL_TOKEN_AQUI"
+```
+
+Para Producción, se debe configurar la variable de entorno: `AdService__Token`.
 
 ## Flujos principales
 - **Login**: usa el servicio SOAP real.
