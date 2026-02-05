@@ -2,7 +2,7 @@
 
 ## Requisitos
 - .NET 8 SDK
-- SQL Server LocalDB (para desarrollo)
+- SQL Server (instancia local) o SQL Server LocalDB para desarrollo
 
 ## Configuración rápida
 1. Ajusta el endpoint del servicio SOAP si aplica:
@@ -38,6 +38,8 @@ Nota para TI/DBA: Antes de activar UseEmployeeView: true, asegúrese de que la v
 ```bash
 dotnet run
 ```
+
+Si no tienes LocalDB instalado, ajusta `ConnectionStrings:DefaultConnection` en `appsettings.json` para apuntar a tu instancia local de SQL Server.
 
 En Development la app:
 - Aplica migraciones automáticamente.
