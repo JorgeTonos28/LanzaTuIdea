@@ -21,8 +21,8 @@
         .btn-registar:hover { background-color: #15803d; }
         .btn-cancelar { background-color: #dc2626; color: white; } /* Rojo */
         .btn-cancelar:hover { background-color: #b91c1c; }
-        .btn-limpiar { background-color: #facc15; color: #854d0e; } /* Amarillo */
-        .btn-limpiar:hover { background-color: #eab308; }
+        .btn-limpiar { background-color: #e2e8f0; color: #475569; } /* Gris suave */
+        .btn-limpiar:hover { background-color: #cbd5e1; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
@@ -49,14 +49,14 @@
                 <h1 class="text-3xl font-bold text-white mb-2">Bienvenido</h1>
                 <p class="text-blue-100">Ingresa tus credenciales para continuar</p>
             </div>
-            <form id="loginForm" class="p-8 space-y-4">
+            <form id="loginForm" class="p-8 space-y-4" autocomplete="off">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Usuario</label>
-                    <input type="text" id="loginUser" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu usuario" required>
+                    <input type="text" id="loginUser" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu usuario" required autocomplete="off">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Contraseña</label>
-                    <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu contraseña" required>
+                    <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu contraseña" required autocomplete="off">
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">Entrar</button>
                 <p class="text-xs text-slate-400 text-center">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
@@ -92,26 +92,27 @@
                 <h3 class="text-xl font-bold text-slate-700">📝 Formulario de Registro</h3>
                 <button onclick="navIdeador('home')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al inicio</button>
             </div>
-            <form id="formIdea" class="p-8 space-y-6">
+            <form id="formIdea" class="p-8 space-y-6" autocomplete="off">
                 <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-blue-800 uppercase mb-1">No. Empleado <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <input type="text" id="idEmpleado" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                                <input type="text" id="idEmpleado" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" readonly required autocomplete="off">
                             </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly>
+                            <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo Electrónico</label>
-                            <input type="text" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly>
+                            <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="emailHint">Formato de correo inválido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Dirección / Depto</label>
-                            <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly>
+                            <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -129,7 +130,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="ideaInstancia" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <select id="ideaInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
@@ -351,24 +352,27 @@
                 <h3 class="text-xl font-bold text-slate-700">🛡️ Registro Manual Administrativo</h3>
                 <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
             </div>
-            <form id="formAdminManual" class="p-8 space-y-6">
+            <form id="formAdminManual" class="p-8 space-y-6" autocomplete="off">
                 <div class="bg-sky-50 p-6 rounded-2xl border border-sky-100 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-sky-700 uppercase mb-1">No. Empleado</label>
-                            <input type="text" id="adminIdEmp" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" placeholder="Ej: 1010" required>
+                            <input type="text" id="adminIdEmp" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" placeholder="Ej: 1010" required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly>
+                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminNomEmpHint">Nombre requerido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo</label>
-                            <input type="text" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly>
+                            <input type="email" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminMailEmpHint">Formato de correo inválido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Departamento</label>
-                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly>
+                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminDirEmpHint">Departamento requerido</span>
                         </div>
                     </div>
                 </div>
@@ -384,16 +388,18 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Clasificación</label>
-                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
+                        <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="adminInstancia" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <select id="adminInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
+                        <span class="text-xs text-red-500 hidden" id="adminInstanciaHint">Instancia requerida</span>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Vía de Registro</label>
@@ -534,9 +540,11 @@
             </div>
             
             <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-                <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div><span class="block text-xs font-bold text-slate-400 uppercase">Fecha</span><span id="mFecha" class="font-semibold"></span></div>
                     <div><span class="block text-xs font-bold text-slate-400 uppercase">Usuario</span><span id="mUsuario" class="font-semibold"></span></div>
+                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Instancia</span><span id="mInstancia" class="font-semibold"></span></div>
+                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Vía</span><span id="mVia" class="font-semibold"></span></div>
                 </div>
                 
                 <div class="bg-slate-50 p-4 rounded-xl border">
@@ -559,6 +567,12 @@
                             <option value="Registrada">Registrada (Pendiente)</option>
                             <option value="Revisada">Revisada (Completado)</option>
                             <option value="En Ejecución">En Ejecución</option>
+                        </select>
+                        <select id="mAdminVia" class="p-2 border rounded bg-white text-sm">
+                            <option value="">Sin vía</option>
+                            <option value="Sistema">Sistema</option>
+                            <option value="Correo">Correo</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     </div>
 
@@ -586,6 +600,28 @@
             document.getElementById('formIdea').addEventListener('submit', handleIdeaSubmit);
             document.getElementById('formAdminManual').addEventListener('submit', handleManualSubmit);
             document.getElementById('adminIdEmp').addEventListener('input', (e) => buscarEmpleadoAdmin(e.target.value));
+            const correoEmpleadoInput = document.getElementById('correoEmpleado');
+            if (correoEmpleadoInput) {
+                correoEmpleadoInput.addEventListener('input', validateCorreoEmpleado);
+            }
+            const adminMailEmpInput = document.getElementById('adminMailEmp');
+            if (adminMailEmpInput) {
+                adminMailEmpInput.addEventListener('input', validateAdminManualFields);
+            }
+            const adminNomEmpInput = document.getElementById('adminNomEmp');
+            const adminDirEmpInput = document.getElementById('adminDirEmp');
+            const adminClasifInput = document.getElementById('adminClasif');
+            const adminInstanciaInput = document.getElementById('adminInstancia');
+            [adminNomEmpInput, adminDirEmpInput].forEach(input => {
+                if (input) {
+                    input.addEventListener('input', validateAdminManualFields);
+                }
+            });
+            [adminClasifInput, adminInstanciaInput].forEach(select => {
+                if (select) {
+                    select.addEventListener('change', validateAdminManualFields);
+                }
+            });
             const timelineButton = document.getElementById('timelineFilterButton');
             if (timelineButton) {
                 timelineButton.addEventListener('click', () => cargarTimeline());
@@ -600,7 +636,18 @@
                 .find(([key]) => key === name)?.[1] ?? null;
         }
 
+        function getAppBaseHref() {
+            const baseTag = document.querySelector('base');
+            if (baseTag && baseTag.href) {
+                return baseTag.href;
+            }
+            return window.location.href.replace(/\/[^\/?#]*([?#].*)?$/, '/');
+        }
+
         async function apiFetch(url, options = {}) {
+            const endpoint = url.startsWith('/') ? url.substring(1) : url;
+            const baseUrl = getAppBaseHref();
+            const finalUrl = `${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}${endpoint}`;
             const headers = options.headers || {};
             const method = (options.method || 'GET').toUpperCase();
             const finalHeaders = {
@@ -620,7 +667,7 @@
                 ...options,
                 headers: finalHeaders
             };
-            return fetch(url, finalOptions);
+            return fetch(finalUrl, finalOptions);
         }
 
         async function loadCatalogs() {
@@ -686,6 +733,9 @@
                     option.textContent = item.nombre;
                     adminSelect.appendChild(option);
                 });
+                if (currentUser?.instancia) {
+                    adminSelect.value = currentUser.instancia;
+                }
             }
             const newUserInstancia = document.getElementById('nuevoUserInstancia');
             if (newUserInstancia) {
@@ -885,6 +935,7 @@
                 email,
                 departamento
             });
+            validateCorreoEmpleado();
 
             if (userData.instancia) {
                 document.getElementById('ideaInstancia').value = userData.instancia;
@@ -897,7 +948,56 @@
         }
 
         function limpiarFormulario() {
-            document.getElementById('formIdea').reset();
+            document.getElementById('descIdea').value = '';
+            document.getElementById('detalleIdea').value = '';
+            document.getElementById('ideaInstancia').value = '';
+            const emailHint = document.getElementById('emailHint');
+            if (emailHint) {
+                emailHint.classList.add('hidden');
+            }
+        }
+
+        function validateCorreoEmpleado() {
+            const input = document.getElementById('correoEmpleado');
+            const hint = document.getElementById('emailHint');
+            if (!input || !hint) {
+                return true;
+            }
+            const value = input.value.trim();
+            const isValid = value === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            hint.classList.toggle('hidden', isValid);
+            return isValid;
+        }
+
+        function toggleHint(id, isVisible) {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+            element.classList.toggle('hidden', !isVisible);
+        }
+
+        function validateAdminManualFields() {
+            const nombre = document.getElementById('adminNomEmp')?.value.trim() ?? '';
+            const correo = document.getElementById('adminMailEmp')?.value.trim() ?? '';
+            const departamento = document.getElementById('adminDirEmp')?.value.trim() ?? '';
+            const clasificacion = document.getElementById('adminClasif')?.value.trim() ?? '';
+            const instancia = document.getElementById('adminInstancia')?.value.trim() ?? '';
+
+            const correoValido = correo === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+
+            toggleHint('adminNomEmpHint', nombre === '');
+            toggleHint('adminDirEmpHint', departamento === '');
+            toggleHint('adminClasifHint', clasificacion === '');
+            toggleHint('adminInstanciaHint', instancia === '');
+            toggleHint('adminMailEmpHint', correo === '' || !correoValido);
+
+            return nombre !== ''
+                && departamento !== ''
+                && clasificacion !== ''
+                && instancia !== ''
+                && correo !== ''
+                && correoValido;
         }
 
         function cancelarProceso() {
@@ -919,6 +1019,10 @@
 
         async function handleIdeaSubmit(e) {
             e.preventDefault();
+            if (!validateCorreoEmpleado()) {
+                showError('Error', 'Formato de correo inválido.');
+                return;
+            }
             const desc = document.getElementById('descIdea').value.trim();
             const detalle = document.getElementById('detalleIdea').value.trim();
 
@@ -948,6 +1052,10 @@
 
         async function handleManualSubmit(e) {
             e.preventDefault();
+            if (!validateAdminManualFields()) {
+                showError('Error', 'Completa los campos requeridos con un correo válido.');
+                return;
+            }
             const payload = {
                 codigoEmpleado: document.getElementById('adminIdEmp').value.trim(),
                 descripcion: document.getElementById('adminDesc').value.trim(),
@@ -985,6 +1093,22 @@
             renderIdeadorList(ideas);
         }
 
+        async function eliminarIdeaIdeador(id) {
+            const confirmed = await showConfirm(
+                'Eliminar idea',
+                '¿Deseas eliminar esta idea? Esta acción no se puede deshacer.'
+            );
+            if (!confirmed) {
+                return;
+            }
+            const response = await apiFetch(`/api/ideas/${id}`, { method: 'DELETE' });
+            if (!response.ok) {
+                showError('Error', 'No fue posible eliminar la idea.');
+                return;
+            }
+            await loadMyIdeas();
+        }
+
         function renderIdeadorList(ideas) {
             const tbody = document.getElementById('tablaMisIdeas');
             tbody.innerHTML = '';
@@ -995,13 +1119,22 @@
 
             ideas.forEach(idea => {
                 const fecha = new Date(idea.createdAt).toISOString().split('T')[0];
+                const canDelete = idea.status === 'Registrada';
+                const deleteButton = canDelete
+                    ? `<button onclick="eliminarIdeaIdeador(${idea.id})" class="text-rose-600 hover:text-rose-800">🗑️ Eliminar</button>`
+                    : '';
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-4 font-bold text-slate-600">${idea.id}</td>
                         <td class="p-4 text-slate-500">${fecha}</td>
                         <td class="p-4 font-medium text-slate-800">${idea.descripcion}</td>
                         <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${getColorStatus(idea.status)}">${idea.status}</span></td>
-                        <td class="p-4 text-center"><button onclick="mostrarDetalle(${idea.id})" class="text-blue-600 hover:text-blue-800">👁️ Ver</button></td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center gap-3">
+                                <button onclick="mostrarDetalle(${idea.id})" class="text-blue-600 hover:text-blue-800">👁️ Ver</button>
+                                ${deleteButton}
+                            </div>
+                        </td>
                     </tr>`;
             });
         }
@@ -1020,6 +1153,8 @@
             document.getElementById('modalId').innerText = idea.id;
             document.getElementById('mFecha').innerText = new Date(idea.createdAt).toISOString().split('T')[0];
             document.getElementById('mUsuario').innerText = idea.nombreCompleto || idea.codigoEmpleado || '';
+            document.getElementById('mInstancia').innerText = idea.instancia || 'Sin instancia';
+            document.getElementById('mVia').innerText = idea.via || 'Sin vía';
             document.getElementById('mDesc').innerText = idea.descripcion;
             document.getElementById('mDetalle').innerText = idea.detalle;
 
@@ -1038,6 +1173,18 @@
                 // Pre-llenar los inputs del admin
                 document.getElementById('mAdminClasif').value = idea.clasificacion || "";
                 document.getElementById('mAdminStatus').value = idea.status;
+                const adminViaSelect = document.getElementById('mAdminVia');
+                const viaValue = idea.via || '';
+                if (adminViaSelect) {
+                    const existingOption = Array.from(adminViaSelect.options).find(option => option.value === viaValue);
+                    if (!existingOption && viaValue) {
+                        const option = document.createElement('option');
+                        option.value = viaValue;
+                        option.textContent = viaValue;
+                        adminViaSelect.appendChild(option);
+                    }
+                    adminViaSelect.value = viaValue;
+                }
                 document.getElementById('mAdminComentario').value = idea.adminComment || "";
             } else {
                 adminPanel.classList.add('hidden');
@@ -1059,6 +1206,7 @@
             const payload = {
                 status: document.getElementById('mAdminStatus').value,
                 clasificacion: document.getElementById('mAdminClasif').value,
+                via: document.getElementById('mAdminVia').value,
                 adminComment: document.getElementById('mAdminComentario').value
             };
 
@@ -1419,7 +1567,6 @@
                             <button class="px-3 py-1 rounded-lg text-xs font-bold ${user.isActive ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
                                 ${user.isActive ? 'Desactivar' : 'Activar'}
                             </button>
-                            <button class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700">Eliminar</button>
                         </div>
                     </td>
                 `;
@@ -1440,11 +1587,8 @@
                 instanceSelect.addEventListener('change', () => actualizarInstanciaUsuario(user.userName, instanceSelect.value));
                 roleSelect.value = currentRole;
                 roleSelect.addEventListener('change', () => actualizarRolUsuario(user.userName, roleSelect.value));
-                const buttons = row.querySelectorAll('button');
-                const toggleButton = buttons[0];
-                const deleteButton = buttons[1];
+                const toggleButton = row.querySelector('button');
                 toggleButton.addEventListener('click', () => actualizarEstadoUsuario(user.userName, !user.isActive));
-                deleteButton.addEventListener('click', () => eliminarUsuario(user.userName));
                 tbody.appendChild(row);
             });
         }
@@ -1718,6 +1862,7 @@
                 document.getElementById('adminMailEmp').value = '';
                 document.getElementById('adminDirEmp').value = '';
                 ajustarCamposAdmin(null);
+                validateAdminManualFields();
                 return;
             }
             if (!response.ok) {
@@ -1728,6 +1873,7 @@
             document.getElementById('adminMailEmp').value = empleado.email || '';
             document.getElementById('adminDirEmp').value = empleado.departamento || '';
             ajustarCamposAdmin(empleado);
+            validateAdminManualFields();
         }
 
         function showSuccess(title, text) {
