@@ -149,7 +149,9 @@ public class IdeasController : ControllerBase
             .OrderByDescending(h => h.ChangedAt)
             .Select(h => new IdeaHistoryDto(
                 h.ChangedAt,
-                h.ChangedByUser.NombreCompleto ?? h.ChangedByUser.UserName,
+                h.ChangedByUser?.NombreCompleto
+                    ?? h.ChangedByUser?.UserName
+                    ?? "Sistema",
                 h.ChangeType,
                 h.Notes))
             .ToList();
@@ -165,7 +167,7 @@ public class IdeasController : ControllerBase
             idea.Via,
             idea.AdminComment,
             idea.CodigoEmpleado,
-            idea.CreatedByUser.NombreCompleto,
+            idea.CreatedByUser?.NombreCompleto,
             history);
     }
 
