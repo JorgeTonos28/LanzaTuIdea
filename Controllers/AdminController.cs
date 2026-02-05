@@ -83,6 +83,7 @@ public class AdminController : ControllerBase
             idea.Detalle,
             idea.Status,
             idea.Clasificacion,
+            idea.CreatedByUser?.Instancia,
             idea.Via,
             idea.AdminComment,
             idea.CodigoEmpleado,
@@ -106,6 +107,7 @@ public class AdminController : ControllerBase
 
         idea.Status = request.Status.Trim();
         idea.Clasificacion = request.Clasificacion?.Trim();
+        idea.Via = string.IsNullOrWhiteSpace(request.Via) ? null : request.Via.Trim();
         idea.AdminComment = request.AdminComment?.Trim();
 
         var adminUser = await GetCurrentUserAsync(cancellationToken);
@@ -132,9 +134,16 @@ public class AdminController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.CodigoEmpleado)
             || string.IsNullOrWhiteSpace(request.Descripcion)
             || string.IsNullOrWhiteSpace(request.Detalle)
-            || string.IsNullOrWhiteSpace(request.Email))
+            || string.IsNullOrWhiteSpace(request.Email)
+            || string.IsNullOrWhiteSpace(request.Clasificacion)
+            || string.IsNullOrWhiteSpace(request.Instancia)
+            || string.IsNullOrWhiteSpace(request.NombreCompleto)
+            || string.IsNullOrWhiteSpace(request.Departamento))
         {
-            return BadRequest(new { message = "Código de empleado, descripción, detalle y correo son requeridos." });
+            return BadRequest(new
+            {
+                message = "Código de empleado, descripción, detalle, correo, clasificación, instancia, nombre y departamento son requeridos."
+            });
         }
 
         var adminUser = await GetCurrentUserAsync(cancellationToken);
@@ -193,7 +202,7 @@ public class AdminController : ControllerBase
                 Descripcion = TrimTo(request.Descripcion, 500) ?? string.Empty,
                 Detalle = TrimTo(request.Detalle, 4000) ?? string.Empty,
                 Status = AppConstants.Status.Revisada,
-                Clasificacion = TrimTo(request.Clasificacion, 200) ?? "Manual Admin",
+                Clasificacion = TrimTo(request.Clasificacion, 200) ?? string.Empty,
                 Via = TrimTo(request.Via, 100) ?? "Manual",
                 AdminComment = TrimTo(request.AdminComment, 1000) ?? "Carga manual"
             };

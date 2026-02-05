@@ -361,15 +361,18 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly autocomplete="off">
+                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminNomEmpHint">Nombre requerido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo</label>
-                            <input type="text" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly autocomplete="off">
+                            <input type="email" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminMailEmpHint">Formato de correo inválido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Departamento</label>
-                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly autocomplete="off">
+                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminDirEmpHint">Departamento requerido</span>
                         </div>
                     </div>
                 </div>
@@ -385,16 +388,18 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Clasificación</label>
-                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
+                        <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="adminInstancia" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <select id="adminInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
+                        <span class="text-xs text-red-500 hidden" id="adminInstanciaHint">Instancia requerida</span>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Vía de Registro</label>
@@ -535,9 +540,11 @@
             </div>
             
             <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-                <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div><span class="block text-xs font-bold text-slate-400 uppercase">Fecha</span><span id="mFecha" class="font-semibold"></span></div>
                     <div><span class="block text-xs font-bold text-slate-400 uppercase">Usuario</span><span id="mUsuario" class="font-semibold"></span></div>
+                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Instancia</span><span id="mInstancia" class="font-semibold"></span></div>
+                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Vía</span><span id="mVia" class="font-semibold"></span></div>
                 </div>
                 
                 <div class="bg-slate-50 p-4 rounded-xl border">
@@ -560,6 +567,12 @@
                             <option value="Registrada">Registrada (Pendiente)</option>
                             <option value="Revisada">Revisada (Completado)</option>
                             <option value="En Ejecución">En Ejecución</option>
+                        </select>
+                        <select id="mAdminVia" class="p-2 border rounded bg-white text-sm">
+                            <option value="">Sin vía</option>
+                            <option value="Sistema">Sistema</option>
+                            <option value="Correo">Correo</option>
+                            <option value="Otro">Otro</option>
                         </select>
                     </div>
 
@@ -591,6 +604,24 @@
             if (correoEmpleadoInput) {
                 correoEmpleadoInput.addEventListener('input', validateCorreoEmpleado);
             }
+            const adminMailEmpInput = document.getElementById('adminMailEmp');
+            if (adminMailEmpInput) {
+                adminMailEmpInput.addEventListener('input', validateAdminManualFields);
+            }
+            const adminNomEmpInput = document.getElementById('adminNomEmp');
+            const adminDirEmpInput = document.getElementById('adminDirEmp');
+            const adminClasifInput = document.getElementById('adminClasif');
+            const adminInstanciaInput = document.getElementById('adminInstancia');
+            [adminNomEmpInput, adminDirEmpInput].forEach(input => {
+                if (input) {
+                    input.addEventListener('input', validateAdminManualFields);
+                }
+            });
+            [adminClasifInput, adminInstanciaInput].forEach(select => {
+                if (select) {
+                    select.addEventListener('change', validateAdminManualFields);
+                }
+            });
             const timelineButton = document.getElementById('timelineFilterButton');
             if (timelineButton) {
                 timelineButton.addEventListener('click', () => cargarTimeline());
@@ -702,6 +733,9 @@
                     option.textContent = item.nombre;
                     adminSelect.appendChild(option);
                 });
+                if (currentUser?.instancia) {
+                    adminSelect.value = currentUser.instancia;
+                }
             }
             const newUserInstancia = document.getElementById('nuevoUserInstancia');
             if (newUserInstancia) {
@@ -935,6 +969,37 @@
             return isValid;
         }
 
+        function toggleHint(id, isVisible) {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+            element.classList.toggle('hidden', !isVisible);
+        }
+
+        function validateAdminManualFields() {
+            const nombre = document.getElementById('adminNomEmp')?.value.trim() ?? '';
+            const correo = document.getElementById('adminMailEmp')?.value.trim() ?? '';
+            const departamento = document.getElementById('adminDirEmp')?.value.trim() ?? '';
+            const clasificacion = document.getElementById('adminClasif')?.value.trim() ?? '';
+            const instancia = document.getElementById('adminInstancia')?.value.trim() ?? '';
+
+            const correoValido = correo === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+
+            toggleHint('adminNomEmpHint', nombre === '');
+            toggleHint('adminDirEmpHint', departamento === '');
+            toggleHint('adminClasifHint', clasificacion === '');
+            toggleHint('adminInstanciaHint', instancia === '');
+            toggleHint('adminMailEmpHint', correo === '' || !correoValido);
+
+            return nombre !== ''
+                && departamento !== ''
+                && clasificacion !== ''
+                && instancia !== ''
+                && correo !== ''
+                && correoValido;
+        }
+
         function cancelarProceso() {
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
@@ -987,6 +1052,10 @@
 
         async function handleManualSubmit(e) {
             e.preventDefault();
+            if (!validateAdminManualFields()) {
+                showError('Error', 'Completa los campos requeridos con un correo válido.');
+                return;
+            }
             const payload = {
                 codigoEmpleado: document.getElementById('adminIdEmp').value.trim(),
                 descripcion: document.getElementById('adminDesc').value.trim(),
@@ -1084,6 +1153,8 @@
             document.getElementById('modalId').innerText = idea.id;
             document.getElementById('mFecha').innerText = new Date(idea.createdAt).toISOString().split('T')[0];
             document.getElementById('mUsuario').innerText = idea.nombreCompleto || idea.codigoEmpleado || '';
+            document.getElementById('mInstancia').innerText = idea.instancia || 'Sin instancia';
+            document.getElementById('mVia').innerText = idea.via || 'Sin vía';
             document.getElementById('mDesc').innerText = idea.descripcion;
             document.getElementById('mDetalle').innerText = idea.detalle;
 
@@ -1102,6 +1173,18 @@
                 // Pre-llenar los inputs del admin
                 document.getElementById('mAdminClasif').value = idea.clasificacion || "";
                 document.getElementById('mAdminStatus').value = idea.status;
+                const adminViaSelect = document.getElementById('mAdminVia');
+                const viaValue = idea.via || '';
+                if (adminViaSelect) {
+                    const existingOption = Array.from(adminViaSelect.options).find(option => option.value === viaValue);
+                    if (!existingOption && viaValue) {
+                        const option = document.createElement('option');
+                        option.value = viaValue;
+                        option.textContent = viaValue;
+                        adminViaSelect.appendChild(option);
+                    }
+                    adminViaSelect.value = viaValue;
+                }
                 document.getElementById('mAdminComentario').value = idea.adminComment || "";
             } else {
                 adminPanel.classList.add('hidden');
@@ -1123,6 +1206,7 @@
             const payload = {
                 status: document.getElementById('mAdminStatus').value,
                 clasificacion: document.getElementById('mAdminClasif').value,
+                via: document.getElementById('mAdminVia').value,
                 adminComment: document.getElementById('mAdminComentario').value
             };
 
@@ -1778,6 +1862,7 @@
                 document.getElementById('adminMailEmp').value = '';
                 document.getElementById('adminDirEmp').value = '';
                 ajustarCamposAdmin(null);
+                validateAdminManualFields();
                 return;
             }
             if (!response.ok) {
@@ -1788,6 +1873,7 @@
             document.getElementById('adminMailEmp').value = empleado.email || '';
             document.getElementById('adminDirEmp').value = empleado.departamento || '';
             ajustarCamposAdmin(empleado);
+            validateAdminManualFields();
         }
 
         function showSuccess(title, text) {

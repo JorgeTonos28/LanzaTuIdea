@@ -161,6 +161,7 @@ public class IdeasController : ControllerBase
             idea.Detalle,
             idea.Status,
             idea.Clasificacion,
+            idea.CreatedByUser?.Instancia,
             idea.Via,
             idea.AdminComment,
             idea.CodigoEmpleado,

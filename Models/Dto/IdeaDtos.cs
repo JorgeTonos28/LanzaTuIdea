@@ -35,6 +35,7 @@ public record IdeaDetailDto(
     string Detalle,
     string Status,
     string? Clasificacion,
+    string? Instancia,
     string? Via,
     string? AdminComment,
     string CodigoEmpleado,
@@ -52,6 +53,7 @@ public record IdeaHistoryDto(
 public record IdeaReviewRequest(
     string Status,
     string? Clasificacion,
+    string? Via,
     string? AdminComment
 );
 
