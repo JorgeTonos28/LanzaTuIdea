@@ -46,6 +46,19 @@ En Development la app:
 - Crea roles base (Admin, Ideador).
 - Si existe `seed/empleados.csv`, lo importa cuando la tabla está vacía.
 
+## 🔐 Configuración de Seguridad (Token AD)
+El token de AD no se incluye en el repositorio por motivos de seguridad. En desarrollo debes configurarlo usando .NET User Secrets:
+
+```bash
+# 1. Inicializar los secretos de usuario (si no se ha hecho)
+dotnet user-secrets init
+
+# 2. Establecer el token (Reemplazar con el valor real provisto por TI)
+dotnet user-secrets set "AdService:Token" "VALOR_DEL_TOKEN_AQUI"
+```
+
+Para Producción, se debe configurar la variable de entorno: `AdService__Token`.
+
 ## Flujos principales
 - **Login**: usa el servicio SOAP real.
 - **Ideador**: registra ideas y consulta su historial.
