@@ -65,6 +65,11 @@ public static class SeedData
             );
         }
 
+        if (!await context.AppBrandings.AnyAsync())
+        {
+            context.AppBrandings.Add(new AppBranding { UpdatedAt = DateTime.UtcNow });
+        }
+
         await context.SaveChangesAsync();
     }
 
