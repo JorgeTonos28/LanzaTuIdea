@@ -637,11 +637,24 @@
         }
 
         function getAppBaseHref() {
+            // 1. Si existe <base>, lo priorizamos (estándar SPA)
             const baseTag = document.querySelector('base');
-            if (baseTag && baseTag.href) {
-                return baseTag.href;
+            if (baseTag && baseTag.href) return baseTag.href;
+
+            // 2. Detección automática basada en la ubicación actual
+            let path = window.location.pathname;
+
+            // Si la URL termina explícitamente en un archivo (ej: /App/index.html), lo removemos
+            if (path.toLowerCase().endsWith('.html')) {
+                path = path.substring(0, path.lastIndexOf('/'));
             }
-            return window.location.href.replace(/\/[^\/?#]*([?#].*)?$/, '/');
+
+            // Aseguramos que el path base siempre termine en '/' para concatenar correctamente
+            if (!path.endsWith('/')) {
+                path += '/';
+            }
+
+            return window.location.origin + path;
         }
 
         async function apiFetch(url, options = {}) {
