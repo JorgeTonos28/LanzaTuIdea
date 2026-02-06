@@ -105,7 +105,11 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
-app.UsePathBase("/LanzaTuIdea01");
+var pathBase = builder.Configuration["PathBase"];
+if (!string.IsNullOrWhiteSpace(pathBase))
+{
+    app.UsePathBase(pathBase);
+}
 app.UseStaticFiles();
 
 app.UseAuthentication();
