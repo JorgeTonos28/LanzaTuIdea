@@ -637,11 +637,27 @@
         }
 
         function getAppBaseHref() {
+            // 1. Si existe <base>, priorizarlo
             const baseTag = document.querySelector('base');
-            if (baseTag && baseTag.href) {
-                return baseTag.href;
+            if (baseTag && baseTag.href) return baseTag.href;
+
+            // 2. Detección automática para IIS/Subcarpetas
+            // Si la URL termina en .html o no tiene slash final pero parece una carpeta de proyecto
+            const path = window.location.pathname;
+
+            // Si estamos en la raíz o index.html directo
+            if (path === '/' || path.endsWith('/index.html')) {
+                return window.location.origin + '/';
             }
-            return window.location.href.replace(/\/[^\/?#]*([?#].*)?$/, '/');
+
+            // Si termina en slash, es seguro usarlo
+            if (path.endsWith('/')) {
+                return window.location.href;
+            }
+
+            // Si estamos en una subcarpeta sin slash (ej: /LanzaTuIdea01), agregamos el slash
+            // Asumimos que el último segmento es la carpeta del proyecto
+            return window.location.href + '/';
         }
 
         async function apiFetch(url, options = {}) {
