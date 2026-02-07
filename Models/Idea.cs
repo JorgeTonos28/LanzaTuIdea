@@ -15,4 +15,5 @@ public class Idea
     public string? AdminComment { get; set; }
 
     public List<IdeaHistory> History { get; set; } = new();
+    public List<IdeaComment> Comments { get; set; } = new();
 }

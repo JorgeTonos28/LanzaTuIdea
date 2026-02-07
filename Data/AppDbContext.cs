@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<Idea> Ideas => Set<Idea>();
     public DbSet<IdeaHistory> IdeaHistories => Set<IdeaHistory>();
+    public DbSet<IdeaComment> IdeaComments => Set<IdeaComment>();
     public DbSet<Classification> Classifications => Set<Classification>();
     public DbSet<Instance> Instances => Set<Instance>();
     public DbSet<AppBranding> BrandingSettings => Set<AppBranding>();
@@ -97,6 +98,20 @@ public class AppDbContext : DbContext
             entity.HasOne(h => h.ChangedByUser)
                 .WithMany()
                 .HasForeignKey(h => h.ChangedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        modelBuilder.Entity<IdeaComment>(entity =>
+        {
+            entity.Property(c => c.CommentedByRole).HasMaxLength(50).IsRequired();
+            entity.Property(c => c.CommentedByName).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.Comment).HasMaxLength(2000).IsRequired();
+            entity.HasOne(c => c.Idea)
+                .WithMany(i => i.Comments)
+                .HasForeignKey(c => c.IdeaId);
+            entity.HasOne(c => c.CommentedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.CommentedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
 

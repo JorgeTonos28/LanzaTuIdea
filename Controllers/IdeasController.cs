@@ -133,6 +133,8 @@ public class IdeasController : ControllerBase
             .Include(i => i.CreatedByUser)
             .Include(i => i.History)
             .ThenInclude(h => h.ChangedByUser)
+            .Include(i => i.Comments)
+            .ThenInclude(c => c.CommentedByUser)
             .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
 
         if (idea is null)
@@ -156,6 +158,16 @@ public class IdeasController : ControllerBase
                 h.Notes))
             .ToList();
 
+        var comments = idea.Comments
+            .OrderByDescending(c => c.CommentedAt)
+            .Select(c => new IdeaCommentDto(
+                c.Id,
+                c.CommentedAt,
+                c.CommentedByRole,
+                c.CommentedByName,
+                c.Comment))
+            .ToList();
+
         return new IdeaDetailDto(
             idea.Id,
             idea.CreatedAt,
@@ -168,7 +180,66 @@ public class IdeasController : ControllerBase
             idea.AdminComment,
             idea.CodigoEmpleado,
             idea.CreatedByUser?.NombreCompleto,
-            history);
+            history,
+            comments);
+    }
+
+    [HttpPost("{id:int}/comments")]
+    public async Task<ActionResult<IdeaCommentDto>> AddComment(int id, [FromBody] IdeaCommentRequest request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.Comment))
+        {
+            return BadRequest(new { message = "El comentario es requerido." });
+        }
+
+        if (request.Comment.Length > 2000)
+        {
+            return BadRequest(new { message = "El comentario excede el límite permitido." });
+        }
+
+        var currentUser = await GetCurrentUserWithRolesAsync(cancellationToken);
+        if (currentUser is null)
+        {
+            return Unauthorized();
+        }
+
+        var idea = await _context.Ideas
+            .Include(i => i.CreatedByUser)
+            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+
+        if (idea is null)
+        {
+            return NotFound();
+        }
+
+        var isPrivileged = currentUser.UserRoles.Any(ur =>
+            ur.Role.Name.Equals(AppConstants.Roles.Admin, StringComparison.OrdinalIgnoreCase)
+            || ur.Role.Name.Equals(AppConstants.Roles.Gestor, StringComparison.OrdinalIgnoreCase));
+
+        if (!isPrivileged && idea.CreatedByUserId != currentUser.Id)
+        {
+            return Forbid();
+        }
+
+        var comment = new IdeaComment
+        {
+            IdeaId = idea.Id,
+            CommentedAt = DateTime.UtcNow,
+            CommentedByUserId = currentUser.Id,
+            CommentedByRole = ResolvePrimaryRole(currentUser),
+            CommentedByName = currentUser.NombreCompleto ?? currentUser.UserName,
+            Comment = request.Comment.Trim()
+        };
+
+        _context.IdeaComments.Add(comment);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new IdeaCommentDto(
+            comment.Id,
+            comment.CommentedAt,
+            comment.CommentedByRole,
+            comment.CommentedByName,
+            comment.Comment);
     }
 
     [HttpDelete("{id:int}")]
@@ -237,6 +308,36 @@ public class IdeasController : ControllerBase
         _context.AppUsers.Add(user);
         await _context.SaveChangesAsync(cancellationToken);
         return user;
+    }
+
+    private async Task<AppUser?> GetCurrentUserWithRolesAsync(CancellationToken cancellationToken)
+    {
+        var userName = User.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            return null;
+        }
+
+        return await _context.AppUsers
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+    }
+
+    private static string ResolvePrimaryRole(AppUser user)
+    {
+        var roleNames = user.UserRoles.Select(ur => ur.Role.Name).ToList();
+        if (roleNames.Any(r => r.Equals(AppConstants.Roles.Admin, StringComparison.OrdinalIgnoreCase)))
+        {
+            return AppConstants.Roles.Admin;
+        }
+
+        if (roleNames.Any(r => r.Equals(AppConstants.Roles.Gestor, StringComparison.OrdinalIgnoreCase)))
+        {
+            return AppConstants.Roles.Gestor;
+        }
+
+        return AppConstants.Roles.Ideador;
     }
 
     private async Task EnsureRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)

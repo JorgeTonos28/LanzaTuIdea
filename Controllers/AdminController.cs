@@ -57,6 +57,8 @@ public class AdminController : ControllerBase
             .Include(i => i.CreatedByUser)
             .Include(i => i.History)
             .ThenInclude(h => h.ChangedByUser)
+            .Include(i => i.Comments)
+            .ThenInclude(c => c.CommentedByUser)
             .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
 
         if (idea is null)
@@ -76,6 +78,16 @@ public class AdminController : ControllerBase
                 h.Notes))
             .ToList();
 
+        var comments = idea.Comments
+            .OrderByDescending(c => c.CommentedAt)
+            .Select(c => new IdeaCommentDto(
+                c.Id,
+                c.CommentedAt,
+                c.CommentedByRole,
+                c.CommentedByName,
+                c.Comment))
+            .ToList();
+
         return new IdeaDetailDto(
             idea.Id,
             idea.CreatedAt,
@@ -88,7 +100,8 @@ public class AdminController : ControllerBase
             idea.AdminComment,
             idea.CodigoEmpleado,
             nombreCompleto,
-            history);
+            history,
+            comments);
     }
 
     [HttpPut("ideas/{id:int}/review")]
