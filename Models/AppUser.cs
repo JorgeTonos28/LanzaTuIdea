@@ -12,5 +12,4 @@ public class AppUser
 
     public List<UserRole> UserRoles { get; set; } = new();
     public List<Idea> Ideas { get; set; } = new();
-    public List<Idea> AssignedIdeas { get; set; } = new();
 }

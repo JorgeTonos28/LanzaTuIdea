@@ -161,9 +161,6 @@ namespace LanzaTuIdea.Api.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("AssignedToUserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Clasificacion")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -199,8 +196,6 @@ namespace LanzaTuIdea.Api.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AssignedToUserId");
 
                     b.HasIndex("CreatedByUserId");
 
@@ -345,18 +340,11 @@ namespace LanzaTuIdea.Api.Migrations
 
             modelBuilder.Entity("LanzaTuIdea.Api.Models.Idea", b =>
                 {
-                    b.HasOne("LanzaTuIdea.Api.Models.AppUser", "AssignedToUser")
-                        .WithMany("AssignedIdeas")
-                        .HasForeignKey("AssignedToUserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("LanzaTuIdea.Api.Models.AppUser", "CreatedByUser")
                         .WithMany("Ideas")
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AssignedToUser");
 
                     b.Navigation("CreatedByUser");
                 });
@@ -420,8 +408,6 @@ namespace LanzaTuIdea.Api.Migrations
 
             modelBuilder.Entity("LanzaTuIdea.Api.Models.AppUser", b =>
                 {
-                    b.Navigation("AssignedIdeas");
-
                     b.Navigation("Ideas");
 
                     b.Navigation("UserRoles");

@@ -55,7 +55,6 @@ public class AdminController : ControllerBase
     {
         var idea = await _context.Ideas
             .Include(i => i.CreatedByUser)
-            .Include(i => i.AssignedToUser)
             .Include(i => i.History)
             .ThenInclude(h => h.ChangedByUser)
             .Include(i => i.Comments)
@@ -99,8 +98,6 @@ public class AdminController : ControllerBase
             idea.CreatedByUser?.Instancia,
             idea.Via,
             idea.AdminComment,
-            idea.AssignedToUserId,
-            idea.AssignedToUser?.NombreCompleto ?? idea.AssignedToUser?.UserName,
             idea.CodigoEmpleado,
             nombreCompleto,
             history,
@@ -378,81 +375,6 @@ public class AdminController : ControllerBase
         )).ToList();
 
         return result;
-    }
-
-    [HttpGet("gestores")]
-    public async Task<ActionResult<IReadOnlyList<GestorSummaryDto>>> Gestores(CancellationToken cancellationToken)
-    {
-        var gestores = await _context.AppUsers
-            .Where(u => u.UserRoles.Any(ur => ur.Role.Name == AppConstants.Roles.Gestor))
-            .OrderBy(u => u.NombreCompleto ?? u.UserName)
-            .Select(u => new GestorSummaryDto(
-                u.Id,
-                u.NombreCompleto ?? u.UserName,
-                u.Instancia,
-                _context.Ideas.Count(i => i.AssignedToUserId == u.Id)))
-            .ToListAsync(cancellationToken);
-
-        return gestores;
-    }
-
-    [HttpPut("ideas/{id:int}/assign")]
-    public async Task<IActionResult> AssignIdea(int id, [FromBody] IdeaAssignmentRequest request, CancellationToken cancellationToken)
-    {
-        if (request is null || request.GestorUserId <= 0)
-        {
-            return BadRequest(new { message = "El gestor es requerido." });
-        }
-
-        var idea = await _context.Ideas
-            .Include(i => i.CreatedByUser)
-            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
-        if (idea is null)
-        {
-            return NotFound();
-        }
-
-        var gestor = await _context.AppUsers
-            .Include(u => u.UserRoles)
-            .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.Id == request.GestorUserId, cancellationToken);
-        if (gestor is null)
-        {
-            return BadRequest(new { message = "El gestor seleccionado no existe." });
-        }
-
-        var isGestor = gestor.UserRoles.Any(ur => ur.Role.Name.Equals(AppConstants.Roles.Gestor, StringComparison.OrdinalIgnoreCase));
-        if (!isGestor)
-        {
-            return BadRequest(new { message = "El usuario seleccionado no tiene rol Gestor." });
-        }
-
-        var instanciaGestor = gestor.Instancia?.Trim();
-        var instanciaIdea = idea.CreatedByUser?.Instancia?.Trim();
-        if (string.IsNullOrWhiteSpace(instanciaGestor)
-            || string.IsNullOrWhiteSpace(instanciaIdea)
-            || !string.Equals(instanciaGestor, instanciaIdea, StringComparison.OrdinalIgnoreCase))
-        {
-            return BadRequest(new { message = "La instancia del gestor no coincide con la instancia del creador de la idea." });
-        }
-
-        var adminUser = await GetCurrentUserAsync(cancellationToken);
-        if (adminUser is null)
-        {
-            return Unauthorized();
-        }
-
-        idea.AssignedToUserId = gestor.Id;
-        idea.History.Add(new IdeaHistory
-        {
-            ChangedAt = DateTime.UtcNow,
-            ChangedByUserId = adminUser.Id,
-            ChangeType = "Asignación",
-            Notes = $"Asignada a {gestor.NombreCompleto ?? gestor.UserName}"
-        });
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return Ok();
     }
 
     [HttpPost("users")]

@@ -38,8 +38,6 @@ public record IdeaDetailDto(
     string? Instancia,
     string? Via,
     string? AdminComment,
-    int? AssignedToUserId,
-    string? AssignedToName,
     string CodigoEmpleado,
     string? NombreCompleto,
     IReadOnlyList<IdeaHistoryDto> History,
