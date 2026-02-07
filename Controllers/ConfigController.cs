@@ -149,12 +149,12 @@ public class ConfigController : ControllerBase
         {
             var allowedLogoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                ".png", ".jpg", ".jpeg", ".svg"
+                ".png", ".jpg", ".jpeg"
             };
 
             if (!TryGetExtension(logo, allowedLogoExtensions, out var logoExtension))
             {
-                return BadRequest(new { message = "Formato de logo no permitido. Usa PNG, JPG o SVG." });
+                return BadRequest(new { message = "Formato de logo no permitido. Usa PNG o JPG." });
             }
 
             branding.LogoPath = await SaveAssetAsync(logo, "logo", logoExtension, cancellationToken);
@@ -164,12 +164,12 @@ public class ConfigController : ControllerBase
         {
             var allowedFaviconExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
-                ".png", ".ico", ".svg"
+                ".png", ".ico"
             };
 
             if (!TryGetExtension(favicon, allowedFaviconExtensions, out var faviconExtension))
             {
-                return BadRequest(new { message = "Formato de favicon no permitido. Usa PNG, ICO o SVG." });
+                return BadRequest(new { message = "Formato de favicon no permitido. Usa PNG o ICO." });
             }
 
             branding.FaviconPath = await SaveAssetAsync(favicon, "favicon", faviconExtension, cancellationToken);
