@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<IdeaHistory> IdeaHistories => Set<IdeaHistory>();
     public DbSet<Classification> Classifications => Set<Classification>();
     public DbSet<Instance> Instances => Set<Instance>();
+    public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

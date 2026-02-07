@@ -5,66 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lanza tu idea 0.1 | Sistema de Innovación</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
-
-        /* Colores Botones */
-        .btn-registar { background-color: #16a34a; color: white; } /* Verde */
-        .btn-registar:hover { background-color: #15803d; }
-        .btn-cancelar { background-color: #dc2626; color: white; } /* Rojo */
-        .btn-cancelar:hover { background-color: #b91c1c; }
-        .btn-limpiar { background-color: #e2e8f0; color: #475569; } /* Gris suave */
-        .btn-limpiar:hover { background-color: #cbd5e1; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+<body class="flex flex-col min-h-screen">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center gap-4">
-                    <span class="text-2xl font-black italic text-slate-800 tracking-tighter">Lanza <span class="text-blue-600">tu idea 0.1</span></span>
-                    <span class="hidden md:block text-xs font-semibold text-slate-400 border-l-2 border-slate-200 pl-4 uppercase tracking-wide">Dep. Investigación Aplicada a la Innovación</span>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <span id="userInfo" class="text-sm font-medium text-slate-500"></span>
-                    <button onclick="logout()" id="btnLogout" class="hidden text-xs font-bold text-red-500 hover:text-red-700 uppercase">Cerrar Sesión</button>
+    <!-- Header / Navbar -->
+    <header class="navbar sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto w-full flex justify-between items-center px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-4">
+                <img id="appLogo" src="" alt="Logo" class="logo hidden">
+                <div class="flex flex-col justify-center">
+                    <span class="text-xl font-bold text-white tracking-tight leading-none">Lanza tu idea <span class="text-xs align-top opacity-70">0.1</span></span>
+                    <span class="text-xs text-blue-100 uppercase tracking-wide opacity-80 hidden md:block">Dep. Investigación Aplicada a la Innovación</span>
                 </div>
             </div>
-        </div>
-    </nav>
 
+            <div class="flex items-center gap-4 text-white">
+                <span id="userInfo" class="text-sm font-medium opacity-90"></span>
+                <button onclick="logout()" id="btnLogout" class="hidden text-xs font-bold text-white border border-white/40 px-3 py-1 rounded hover:bg-white/10 uppercase transition-colors">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login View -->
     <div id="viewLogin" class="flex-grow flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-            <div class="bg-blue-600 p-8 text-center">
-                <h1 class="text-3xl font-bold text-white mb-2">Bienvenido</h1>
-                <p class="text-blue-100">Ingresa tus credenciales para continuar</p>
+        <div class="card max-w-md w-full p-0 overflow-hidden border-none shadow-2xl">
+            <div class="bg-blue-900 p-8 text-center text-white">
+                <h1 class="text-3xl font-bold mb-2 text-white">Bienvenido</h1>
+                <p class="text-blue-100 opacity-80">Ingresa tus credenciales para continuar</p>
             </div>
             <form id="loginForm" class="p-8 space-y-4" autocomplete="off">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Usuario</label>
-                    <input type="text" id="loginUser" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu usuario" required autocomplete="off">
+                    <input type="text" id="loginUser" placeholder="Tu usuario" required autocomplete="off">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Contraseña</label>
-                    <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu contraseña" required autocomplete="off">
+                    <input type="password" id="loginPass" placeholder="Tu contraseña" required autocomplete="off">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">Entrar</button>
-                <p class="text-xs text-slate-400 text-center">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
+                <button type="submit" class="btn btn-primary w-full text-lg">Entrar</button>
+                <p class="text-xs text-slate-400 text-center mt-4">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
             </form>
         </div>
     </div>
 
-    <main id="viewIdeador" class="hidden max-w-5xl mx-auto w-full p-6 space-y-6 fade-in">
+    <!-- Ideador View -->
+    <main id="viewIdeador" class="hidden max-w-5xl mx-auto w-full p-6 space-y-6 fade-in flex-grow">
 
         <div id="ideadorHome" class="space-y-8">
             <div class="text-center py-10">
@@ -74,21 +70,21 @@
                 </p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-                <button onclick="navIdeador('formulario')" class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 hover:shadow-2xl hover:-translate-y-1 transition-all text-center group">
+                <div onclick="navIdeador('formulario')" class="card cursor-pointer hover:shadow-2xl transition-all text-center group">
                     <div class="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">🚀</div>
-                    <h3 class="text-2xl font-bold text-blue-600 mb-2">Lanza tu idea</h3>
+                    <h3 class="text-2xl font-bold text-blue-800 mb-2">Lanza tu idea</h3>
                     <p class="text-slate-500">Accede al formulario para registrar una nueva propuesta.</p>
-                </button>
-                <button onclick="navIdeador('lista')" class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 hover:shadow-2xl hover:-translate-y-1 transition-all text-center group">
+                </div>
+                <div onclick="navIdeador('lista')" class="card cursor-pointer hover:shadow-2xl transition-all text-center group">
                     <div class="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">📂</div>
                     <h3 class="text-2xl font-bold text-slate-700 mb-2">Ideas Lanzadas</h3>
                     <p class="text-slate-500">Consulta el histórico y estatus de tus ideas registradas.</p>
-                </button>
+                </div>
             </div>
         </div>
 
-        <div id="ideadorForm" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
+        <div id="ideadorForm" class="hidden card p-0 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 class="text-xl font-bold text-slate-700">📝 Formulario de Registro</h3>
                 <button onclick="navIdeador('home')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al inicio</button>
             </div>
@@ -98,21 +94,21 @@
                         <div>
                             <label class="block text-xs font-bold text-blue-800 uppercase mb-1">No. Empleado <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <input type="text" id="idEmpleado" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" readonly required autocomplete="off">
+                                <input type="text" id="idEmpleado" readonly required autocomplete="off">
                             </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <input type="text" id="nombreEmpleado" readonly required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo Electrónico</label>
-                            <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <input type="email" id="correoEmpleado" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="emailHint">Formato de correo inválido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Dirección / Depto</label>
-                            <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <input type="text" id="direccionEmpleado" readonly required autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -120,17 +116,17 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción de la Idea <span class="text-red-500">*</span></label>
-                        <textarea id="descIdea" rows="2" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Título corto o resumen de la idea..." required></textarea>
+                        <textarea id="descIdea" rows="2" placeholder="Título corto o resumen de la idea..." required></textarea>
                         <button type="button" onclick="limpiarCampo('descIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Detalle <span class="text-red-500">*</span></label>
-                        <textarea id="detalleIdea" rows="5" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Explica detalladamente en qué consiste..." required></textarea>
+                        <textarea id="detalleIdea" rows="5" placeholder="Explica detalladamente en qué consiste..." required></textarea>
                         <button type="button" onclick="limpiarCampo('detalleIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="ideaInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
+                        <select id="ideaInstancia" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
@@ -138,13 +134,13 @@
                 </div>
 
                 <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-slate-100">
-                    <button type="submit" class="btn-registar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">
+                    <button type="submit" class="btn btn-primary flex-1">
                         Registrar Idea
                     </button>
-                    <button type="button" onclick="limpiarFormulario()" class="btn-limpiar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">
+                    <button type="button" onclick="limpiarFormulario()" class="btn btn-secondary flex-1">
                         Limpiar Campos
                     </button>
-                    <button type="button" onclick="cancelarProceso()" class="btn-cancelar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">
+                    <button type="button" onclick="cancelarProceso()" class="btn btn-secondary flex-1">
                         Cancelar
                     </button>
                 </div>
@@ -155,12 +151,12 @@
             <div class="flex justify-between items-end">
                 <h3 class="text-2xl font-bold text-slate-800">📂 Mis Ideas Lanzadas</h3>
                 <div class="space-x-2">
-                    <button onclick="navIdeador('formulario')" class="text-blue-600 font-bold text-sm bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100">Nueva Idea</button>
-                    <button onclick="navIdeador('home')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Inicio</button>
+                    <button onclick="navIdeador('formulario')" class="btn btn-action text-sm px-4 py-2 rounded-lg">Nueva Idea</button>
+                    <button onclick="navIdeador('home')" class="btn btn-secondary text-sm px-4 py-2 rounded-lg">Volver Inicio</button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="card p-0 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-bold">
                         <tr>
@@ -178,25 +174,25 @@
         </div>
     </main>
 
-    <main id="viewGestor" class="hidden max-w-4xl mx-auto w-full p-6 space-y-6 fade-in">
-        <div class="bg-white rounded-3xl shadow-lg border border-slate-200 p-8 space-y-6 text-center">
+    <main id="viewGestor" class="hidden max-w-4xl mx-auto w-full p-6 space-y-6 fade-in flex-grow">
+        <div class="card p-8 space-y-6 text-center">
             <div class="text-6xl">🧭</div>
             <h2 class="text-2xl font-bold text-slate-700">Panel de Gestores en construcción</h2>
             <p class="text-slate-500">Estamos trabajando en un panel exclusivo para gestores. Mientras tanto, puedes registrar ideas como ideador.</p>
-            <button onclick="abrirFormularioGestor()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700">Registrar una idea</button>
+            <button onclick="abrirFormularioGestor()" class="btn btn-primary">Registrar una idea</button>
         </div>
     </main>
 
-    <main id="viewAdmin" class="hidden max-w-7xl mx-auto w-full p-6 space-y-6 fade-in">
+    <main id="viewAdmin" class="hidden max-w-7xl mx-auto w-full p-6 space-y-6 fade-in flex-grow">
 
         <div id="adminDashboard">
             <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-800">📊 Dashboard General</h2>
                 <div class="flex gap-2">
-                    <button onclick="navAdmin('registrar')" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Registrar Idea (Manual)</button>
-                    <button onclick="navAdmin('inbox')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">📥 Ideas Registradas</button>
-                    <button onclick="navAdmin('revisadas')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">✅ Ideas Revisadas</button>
-                    <button onclick="navAdmin('config')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">⚙️ Configuración</button>
+                    <button onclick="navAdmin('registrar')" class="btn btn-primary text-sm px-4 py-2">Registrar Idea (Manual)</button>
+                    <button onclick="navAdmin('inbox')" class="btn btn-secondary text-sm px-4 py-2">📥 Ideas Registradas</button>
+                    <button onclick="navAdmin('revisadas')" class="btn btn-secondary text-sm px-4 py-2">✅ Ideas Revisadas</button>
+                    <button onclick="navAdmin('config')" class="btn btn-secondary text-sm px-4 py-2">⚙️ Configuración</button>
                 </div>
             </div>
 
@@ -220,32 +216,32 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="card p-6">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Estatus de Ideas</h3>
                     <canvas id="chartStatus"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="card p-6">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Clasificación de Ideas</h3>
                     <canvas id="chartClasificacion"></canvas>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="card p-6">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Vía</h3>
                     <canvas id="chartVia"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="card p-6">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Instancia</h3>
                     <canvas id="chartInstancia"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="card p-6">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Departamento</h3>
                     <canvas id="chartDepartamento"></canvas>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow mt-8 p-6 space-y-6">
+            <div class="card mt-8 p-6 space-y-6">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-slate-700">📈 Evolución Temporal de Ideas</h3>
@@ -258,7 +254,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Periodo</label>
-                        <select id="timelinePeriodo" class="w-full p-2 border rounded-lg text-sm">
+                        <select id="timelinePeriodo">
                             <option value="1M">1 Mes</option>
                             <option value="3M">3 Meses</option>
                             <option value="6M">6 Meses</option>
@@ -268,30 +264,30 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Status</label>
-                        <select id="timelineStatus" class="w-full p-2 border rounded-lg text-sm">
+                        <select id="timelineStatus">
                             <option value="">Todos</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Vía</label>
-                        <select id="timelineVia" class="w-full p-2 border rounded-lg text-sm">
+                        <select id="timelineVia">
                             <option value="">Todas</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Instancia</label>
-                        <select id="timelineInstancia" class="w-full p-2 border rounded-lg text-sm">
+                        <select id="timelineInstancia">
                             <option value="">Todas</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Departamento</label>
-                        <select id="timelineDepartamento" class="w-full p-2 border rounded-lg text-sm">
+                        <select id="timelineDepartamento">
                             <option value="">Todos</option>
                         </select>
                     </div>
                     <div>
-                        <button id="timelineFilterButton" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">
+                        <button id="timelineFilterButton" class="btn btn-primary w-full text-sm">
                             Filtrar
                         </button>
                     </div>
@@ -305,10 +301,10 @@
         <div id="adminInbox" class="hidden space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-2xl font-bold text-slate-800">📥 Ideas Registradas</h3>
-                <button onclick="navAdmin('dashboard')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Dashboard</button>
+                <button onclick="navAdmin('dashboard')" class="btn btn-secondary text-sm">Volver Dashboard</button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="card p-0 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-bold">
                         <tr>
@@ -327,10 +323,10 @@
         <div id="adminRevisadas" class="hidden space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-2xl font-bold text-slate-800">✅ Ideas Revisadas</h3>
-                <button onclick="navAdmin('dashboard')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Dashboard</button>
+                <button onclick="navAdmin('dashboard')" class="btn btn-secondary text-sm">Volver Dashboard</button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="card p-0 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-bold">
                         <tr>
@@ -347,8 +343,8 @@
             </div>
         </div>
 
-        <div id="adminForm" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
+        <div id="adminForm" class="hidden card p-0 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 class="text-xl font-bold text-slate-700">🛡️ Registro Manual Administrativo</h3>
                 <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
             </div>
@@ -357,21 +353,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-bold text-sky-700 uppercase mb-1">No. Empleado</label>
-                            <input type="text" id="adminIdEmp" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" placeholder="Ej: 1010" required autocomplete="off">
+                            <input type="text" id="adminIdEmp" placeholder="Ej: 1010" required autocomplete="off">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <input type="text" id="adminNomEmp" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminNomEmpHint">Nombre requerido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo</label>
-                            <input type="email" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <input type="email" id="adminMailEmp" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminMailEmpHint">Formato de correo inválido</span>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Departamento</label>
-                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <input type="text" id="adminDirEmp" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminDirEmpHint">Departamento requerido</span>
                         </div>
                     </div>
@@ -380,22 +376,22 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción</label>
-                        <textarea id="adminDesc" rows="2" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" required></textarea>
+                        <textarea id="adminDesc" rows="2" required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Detalle</label>
-                        <textarea id="adminDetalle" rows="4" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" required></textarea>
+                        <textarea id="adminDetalle" rows="4" required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Clasificación</label>
-                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm" required>
+                        <select id="adminClasif" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
                         <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="adminInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
+                        <select id="adminInstancia" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
@@ -403,7 +399,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Vía de Registro</label>
-                        <select id="adminVia" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <select id="adminVia">
                             <option value="Sistema">Sistema</option>
                             <option value="Correo">Correo</option>
                             <option value="Otro">Otro</option>
@@ -411,21 +407,44 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-sky-600 text-white py-3 rounded-lg font-bold hover:bg-sky-700">Registrar Idea Manual</button>
+                <button type="submit" class="btn btn-primary w-full">Registrar Idea Manual</button>
             </form>
         </div>
 
         <div id="adminConfig" class="hidden space-y-6">
-            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-                <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
+            <div class="card p-0 overflow-hidden">
+                <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
                     <h3 class="text-xl font-bold text-slate-700">⚙️ Configuración</h3>
                     <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
                 </div>
                 <div class="p-8 space-y-8">
+                     <!-- NEW APARIENCIA SECTION -->
+                    <section class="space-y-4 border-b pb-8 border-gray-100">
+                        <h4 class="text-lg font-bold text-slate-700">🎨 Apariencia General</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Logo de la Aplicación</label>
+                                <p class="text-xs text-slate-500 mb-3">Formato recomendado: PNG transparente. Dimensiones: 999 x 370 px.</p>
+                                <div class="flex gap-4 items-center">
+                                    <input type="file" id="fileLogo" accept="image/*" class="text-sm w-auto">
+                                    <button onclick="uploadLogo()" class="btn btn-primary text-sm whitespace-nowrap">Subir Logo</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Favicon</label>
+                                <p class="text-xs text-slate-500 mb-3">Icono para la pestaña del navegador.</p>
+                                <div class="flex gap-4 items-center">
+                                    <input type="file" id="fileFavicon" accept="image/*" class="text-sm w-auto">
+                                    <button onclick="uploadFavicon()" class="btn btn-primary text-sm whitespace-nowrap">Subir Favicon</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <section class="space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">👥 Usuarios y Roles</h4>
-                            <button onclick="abrirModalCrearUsuario()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">➕ Agregar usuario</button>
+                            <button onclick="abrirModalCrearUsuario()" class="btn btn-primary text-sm px-4 py-2">➕ Agregar usuario</button>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full text-left text-sm">
@@ -451,8 +470,8 @@
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">🏷️ Clasificaciones</h4>
                             <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                                <input type="text" id="newClassificationName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva clasificación" />
-                                <button onclick="addClassification()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700">Agregar</button>
+                                <input type="text" id="newClassificationName" class="w-full sm:w-64" placeholder="Nueva clasificación" />
+                                <button onclick="addClassification()" class="btn btn-primary text-sm px-4 py-2">Agregar</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -475,8 +494,8 @@
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">🏢 Instancias</h4>
                             <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                                <input type="text" id="newInstanceName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva instancia" />
-                                <button onclick="addInstance()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700">Agregar</button>
+                                <input type="text" id="newInstanceName" class="w-full sm:w-64" placeholder="Nueva instancia" />
+                                <button onclick="addInstance()" class="btn btn-primary text-sm px-4 py-2">Agregar</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -499,25 +518,25 @@
         </div>
 
         <div id="modalCrearUsuario" class="hidden fixed inset-0 bg-black/40 items-center justify-center z-50">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
-                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+            <div class="modal-content w-full max-w-md mx-4">
+                <div class="modal-header flex justify-between items-center">
                     <h4 class="text-lg font-bold text-slate-700">➕ Nuevo usuario</h4>
                     <button onclick="cerrarModalCrearUsuario()" class="text-slate-400 hover:text-slate-600">✕</button>
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre de usuario</label>
-                        <input type="text" id="nuevoUserName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="usuario" />
+                        <input type="text" id="nuevoUserName" placeholder="usuario" />
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Instancia</label>
-                        <select id="nuevoUserInstancia" class="w-full p-3 border rounded-xl bg-white">
+                        <select id="nuevoUserInstancia">
                             <option value="">Seleccione una instancia</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Rol</label>
-                        <select id="nuevoUserRole" class="w-full p-3 border rounded-xl bg-white">
+                        <select id="nuevoUserRole">
                             <option value="">Ideador (sin rol)</option>
                             <option value="Admin">Admin</option>
                             <option value="Gestor">Gestor</option>
@@ -525,15 +544,15 @@
                     </div>
                 </div>
                 <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
-                    <button onclick="cerrarModalCrearUsuario()" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700">Cancelar</button>
-                    <button onclick="crearUsuarioAdmin()" class="px-4 py-2 rounded-lg text-sm font-bold bg-blue-600 text-white hover:bg-blue-700">Guardar</button>
+                    <button onclick="cerrarModalCrearUsuario()" class="btn btn-secondary px-4 py-2 text-sm">Cancelar</button>
+                    <button onclick="crearUsuarioAdmin()" class="btn btn-primary px-4 py-2 text-sm">Guardar</button>
                 </div>
             </div>
         </div>
     </main>
 
     <div id="modalDetalle" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-slide-up">
+        <div class="modal-content w-full max-w-2xl animate-slide-up">
             <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
                 <h3 class="font-bold">Detalle de la Idea <span id="modalId" class="text-blue-300 ml-2"></span></h3>
                 <button onclick="cerrarModal()" class="text-white hover:text-red-400 font-bold text-xl">✕</button>
@@ -560,15 +579,15 @@
                 <div id="adminControls" class="hidden border-t pt-4 mt-4 space-y-4">
                     <h4 class="font-bold text-sky-700 text-sm uppercase">Gestión Administrativa</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <select id="mAdminClasif" class="p-2 border rounded bg-white text-sm">
+                        <select id="mAdminClasif">
                             <option value="">Sin clasificar</option>
                         </select>
-                        <select id="mAdminStatus" class="p-2 border rounded bg-white text-sm">
+                        <select id="mAdminStatus">
                             <option value="Registrada">Registrada (Pendiente)</option>
                             <option value="Revisada">Revisada (Completado)</option>
                             <option value="En Ejecución">En Ejecución</option>
                         </select>
-                        <select id="mAdminVia" class="p-2 border rounded bg-white text-sm">
+                        <select id="mAdminVia">
                             <option value="">Sin vía</option>
                             <option value="Sistema">Sistema</option>
                             <option value="Correo">Correo</option>
@@ -578,10 +597,10 @@
 
                     <div>
                         <label class="block text-xs font-bold text-sky-700 uppercase mb-1">Comentario Administrativo</label>
-                        <textarea id="mAdminComentario" rows="3" class="w-full p-2 border rounded bg-white text-sm" placeholder="Agrega observaciones internas..."></textarea>
+                        <textarea id="mAdminComentario" rows="3" placeholder="Agrega observaciones internas..."></textarea>
                     </div>
 
-                    <button onclick="guardarRevisionAdmin()" class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700">Guardar Revisión</button>
+                    <button onclick="guardarRevisionAdmin()" class="btn btn-primary w-full">Guardar Revisión</button>
                 </div>
             </div>
         </div>
@@ -637,23 +656,15 @@
         }
 
         function getAppBaseHref() {
-            // 1. Si existe <base>, lo priorizamos (estándar SPA)
             const baseTag = document.querySelector('base');
             if (baseTag && baseTag.href) return baseTag.href;
-
-            // 2. Detección automática basada en la ubicación actual
             let path = window.location.pathname;
-
-            // Si la URL termina explícitamente en un archivo (ej: /App/index.html), lo removemos
             if (path.toLowerCase().endsWith('.html')) {
                 path = path.substring(0, path.lastIndexOf('/'));
             }
-
-            // Aseguramos que el path base siempre termine en '/' para concatenar correctamente
             if (!path.endsWith('/')) {
                 path += '/';
             }
-
             return window.location.origin + path;
         }
 
@@ -764,6 +775,7 @@
 
         async function initApp() {
             await apiFetch('/api/csrf/token', { method: 'GET' });
+            loadSystemSettings(); // Load settings initially
             const response = await apiFetch('/api/auth/me', { method: 'GET' });
             if (response.ok) {
                 const user = await response.json();
@@ -1162,7 +1174,6 @@
             const idea = await response.json();
             currentIdeaIdEditing = id;
 
-            // Mapeo de campos básicos (Coinciden con MVP)
             document.getElementById('modalId').innerText = idea.id;
             document.getElementById('mFecha').innerText = new Date(idea.createdAt).toISOString().split('T')[0];
             document.getElementById('mUsuario').innerText = idea.nombreCompleto || idea.codigoEmpleado || '';
@@ -1171,19 +1182,12 @@
             document.getElementById('mDesc').innerText = idea.descripcion;
             document.getElementById('mDetalle').innerText = idea.detalle;
 
-            // NOTA: El MVP NO muestra Estatus/Clasificación/Comentario en modo lectura (texto plano).
-            // Solo se muestran en los controles de input si es Admin. 
-            // Se han eliminado las líneas que asignaban 'mStatus', 'mClasif', 'mComment'.
-
             const adminPanel = document.getElementById('adminControls');
 
-            // Lógica de visualización del panel Admin
-            // Se agrega validación de rol 'Admin' local si está disponible en currentUser
             const esAdminReal = currentUser && currentUser.roles && currentUser.roles.includes('Admin');
 
             if(modoAdmin && esAdminReal) {
                 adminPanel.classList.remove('hidden');
-                // Pre-llenar los inputs del admin
                 document.getElementById('mAdminClasif').value = idea.clasificacion || "";
                 document.getElementById('mAdminStatus').value = idea.status;
                 const adminViaSelect = document.getElementById('mAdminVia');
@@ -1203,7 +1207,6 @@
                 adminPanel.classList.add('hidden');
             }
 
-            // Mostrar el modal (Clases para Flexbox)
             document.getElementById('modalDetalle').classList.remove('hidden');
             document.getElementById('modalDetalle').classList.add('flex');
         }
@@ -1295,8 +1298,8 @@
                         <td class="p-4 text-slate-600">${idea.descripcion}</td>
                         <td class="p-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                                <button onclick="mostrarDetalle(${idea.id}, true)" class="bg-blue-600 text-white px-3 py-1 rounded shadow text-xs hover:bg-blue-700">Revisar</button>
-                                <button onclick="eliminarIdea(${idea.id})" class="bg-rose-100 text-rose-700 px-3 py-1 rounded shadow text-xs hover:bg-rose-200">🗑️ Eliminar</button>
+                                <button onclick="mostrarDetalle(${idea.id}, true)" class="btn btn-primary text-xs px-2 py-1">Revisar</button>
+                                <button onclick="eliminarIdea(${idea.id})" class="btn btn-secondary text-xs px-2 py-1 text-rose-600 border-rose-200 bg-rose-50 hover:bg-rose-100">🗑️ Eliminar</button>
                             </div>
                         </td>
                     </tr>`;
@@ -1322,7 +1325,7 @@
                         <td class="p-4 text-center">
                             <div class="flex items-center justify-center gap-2">
                                 <button onclick="mostrarDetalle(${idea.id}, true)" class="text-slate-400 hover:text-blue-600">📝 Editar</button>
-                                <button onclick="eliminarIdea(${idea.id})" class="bg-rose-100 text-rose-700 px-3 py-1 rounded shadow text-xs hover:bg-rose-200">🗑️ Eliminar</button>
+                                <button onclick="eliminarIdea(${idea.id})" class="btn btn-secondary text-xs px-2 py-1 text-rose-600 border-rose-200 bg-rose-50 hover:bg-rose-100">🗑️ Eliminar</button>
                             </div>
                         </td>
                     </tr>`;
@@ -1919,6 +1922,80 @@
                 return result.isConfirmed;
             }
             return confirm(`${title}\n${text}`);
+        }
+
+        async function uploadLogo() {
+            const fileInput = document.getElementById('fileLogo');
+            const file = fileInput.files[0];
+            if (!file) return showError('Error', 'Selecciona un archivo.');
+
+            const img = new Image();
+            img.onload = async function() {
+                if (this.width !== 999 || this.height !== 370) {
+                     if(!confirm(`Las dimensiones del logo (${this.width}x${this.height}) no coinciden con las recomendadas (999x370). ¿Deseas continuar de todos modos?`)) {
+                        return;
+                     }
+                }
+                await sendFile('/api/config/upload-logo', file, 'Logo actualizado');
+                loadSystemSettings();
+            };
+            img.onerror = function() {
+                showError('Error', 'Archivo de imagen no válido.');
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        async function uploadFavicon() {
+            const fileInput = document.getElementById('fileFavicon');
+            const file = fileInput.files[0];
+            if (!file) return showError('Error', 'Selecciona un archivo.');
+            await sendFile('/api/config/upload-favicon', file, 'Favicon actualizado');
+            loadSystemSettings();
+        }
+
+        async function sendFile(endpoint, file, successMsg) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const xsrfToken = getCookie('XSRF-TOKEN');
+            const headers = {};
+             if (xsrfToken) {
+                headers['X-XSRF-TOKEN'] = decodeURIComponent(xsrfToken);
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: headers,
+                body: formData
+            });
+
+            if(response.ok) {
+                const data = await response.json();
+                showSuccess('Éxito', successMsg);
+            } else {
+                showError('Error', 'No se pudo subir el archivo.');
+            }
+        }
+
+        async function loadSystemSettings() {
+             const response = await apiFetch('/api/config/settings', { method: 'GET' });
+             if(response.ok) {
+                 const settings = await response.json();
+                 if(settings.LogoUrl) {
+                     const logo = document.getElementById('appLogo');
+                     logo.src = settings.LogoUrl;
+                     logo.classList.remove('hidden');
+                 }
+                 if(settings.FaviconUrl) {
+                     let link = document.querySelector("link[rel~='icon']");
+                     if (!link) {
+                         link = document.createElement('link');
+                         link.rel = 'icon';
+                         document.getElementsByTagName('head')[0].appendChild(link);
+                     }
+                     link.href = settings.FaviconUrl;
+                 }
+             }
         }
     </script>
 </body>

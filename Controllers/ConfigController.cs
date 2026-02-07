@@ -13,10 +13,94 @@ namespace LanzaTuIdea.Api.Controllers;
 public class ConfigController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IWebHostEnvironment _environment;
 
-    public ConfigController(AppDbContext context)
+    public ConfigController(AppDbContext context, IWebHostEnvironment environment)
     {
         _context = context;
+        _environment = environment;
+    }
+
+    [HttpGet("settings")]
+    [AllowAnonymous]
+    public async Task<ActionResult<Dictionary<string, string>>> GetSettings(CancellationToken cancellationToken)
+    {
+        var settings = await _context.SystemSettings
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return settings.ToDictionary(s => s.Key, s => s.Value);
+    }
+
+    [HttpPost("upload-logo")]
+    [Authorize(Roles = AppConstants.Roles.Admin)]
+    public async Task<IActionResult> UploadLogo(IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { message = "No file uploaded." });
+
+        if (!file.ContentType.StartsWith("image/"))
+            return BadRequest(new { message = "Invalid file type." });
+
+        var uploadsPath = Path.Combine(_environment.WebRootPath, "uploads");
+        if (!Directory.Exists(uploadsPath))
+            Directory.CreateDirectory(uploadsPath);
+
+        var fileName = $"logo_{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}";
+        var filePath = Path.Combine(uploadsPath, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream, cancellationToken);
+        }
+
+        var fileUrl = $"/uploads/{fileName}";
+        await UpdateSettingAsync("LogoUrl", fileUrl, cancellationToken);
+
+        return Ok(new { url = fileUrl });
+    }
+
+    [HttpPost("upload-favicon")]
+    [Authorize(Roles = AppConstants.Roles.Admin)]
+    public async Task<IActionResult> UploadFavicon(IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { message = "No file uploaded." });
+
+        if (!file.ContentType.StartsWith("image/"))
+            return BadRequest(new { message = "Invalid file type." });
+
+        var uploadsPath = Path.Combine(_environment.WebRootPath, "uploads");
+        if (!Directory.Exists(uploadsPath))
+            Directory.CreateDirectory(uploadsPath);
+
+        var fileName = $"favicon_{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}";
+        var filePath = Path.Combine(uploadsPath, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream, cancellationToken);
+        }
+
+        var fileUrl = $"/uploads/{fileName}";
+        await UpdateSettingAsync("FaviconUrl", fileUrl, cancellationToken);
+
+        return Ok(new { url = fileUrl });
+    }
+
+    private async Task UpdateSettingAsync(string key, string value, CancellationToken cancellationToken)
+    {
+        var setting = await _context.SystemSettings.FirstOrDefaultAsync(s => s.Key == key, cancellationToken);
+        if (setting == null)
+        {
+            setting = new SystemSetting { Key = key, Value = value };
+            _context.SystemSettings.Add(setting);
+        }
+        else
+        {
+            setting.Value = value;
+        }
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     [HttpGet("classifications")]
