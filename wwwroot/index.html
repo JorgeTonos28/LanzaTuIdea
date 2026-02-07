@@ -143,6 +143,20 @@
             font-weight: 600;
         }
 
+        .required-mark {
+            color: #dc2626;
+            margin-left: 2px;
+        }
+
+        .required-hint {
+            background-color: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+
         .btn-registar { background-color: var(--infotep-blue); color: var(--white); }
         .btn-registar:hover { background-color: #004080; }
         .btn-cancelar { background-color: transparent; color: var(--text-muted); border: 1px solid #BDC3C7; }
@@ -183,6 +197,7 @@
             border-radius: 12px;
             border: none;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(0);
         }
 
         .app-modal-header {
@@ -212,6 +227,75 @@
 
         .app-table tbody tr:hover {
             background-color: #f7f9fc;
+        }
+
+        .modal-hero {
+            background: linear-gradient(120deg, rgba(0, 51, 102, 0.08), rgba(247, 147, 30, 0.08));
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #dbe4f0;
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .idea-meta {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .idea-meta-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            border-radius: 10px;
+        }
+
+        .idea-meta-item span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .swal2-popup.swal-card {
+            border-radius: 16px !important;
+            padding: 2rem !important;
+            box-shadow: 0 30px 60px -20px rgba(0, 51, 102, 0.35) !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .swal2-title.swal-title {
+            color: var(--infotep-blue) !important;
+            font-weight: 700 !important;
+        }
+
+        .swal2-html-container.swal-text {
+            color: var(--text-muted) !important;
+            font-size: 0.95rem !important;
+        }
+
+        .swal2-confirm.swal-confirm {
+            background-color: var(--infotep-blue) !important;
+            border-radius: 8px !important;
+            padding: 10px 24px !important;
+        }
+
+        .swal2-cancel.swal-cancel {
+            background-color: transparent !important;
+            color: var(--text-muted) !important;
+            border: 1px solid #cbd5f5 !important;
+            border-radius: 8px !important;
+            padding: 10px 20px !important;
         }
 
         .status-registered {
@@ -256,6 +340,11 @@
     <div id="viewLogin" class="flex-grow flex items-center justify-center p-4">
         <div class="max-w-md w-full app-card overflow-hidden border border-slate-100">
             <div class="bg-gradient-to-r from-[#003366] to-[#004080] p-8 text-center">
+                <div class="flex justify-center mb-4">
+                    <div class="app-logo-wrap">
+                        <img class="app-logo" src="/assets/branding/logo-placeholder.svg" alt="Logo Lanza tu idea">
+                    </div>
+                </div>
                 <h1 class="text-3xl font-bold text-white mb-2">Bienvenido</h1>
                 <p class="text-blue-100">Ingresa tus credenciales para continuar</p>
             </div>
@@ -303,25 +392,26 @@
                 <button onclick="navIdeador('home')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al inicio</button>
             </div>
             <form id="formIdea" class="p-8 space-y-6" autocomplete="off">
+                <p class="required-hint">Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
                 <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs uppercase mb-1">No. Empleado <span class="text-red-500">*</span></label>
+                            <label class="block text-xs uppercase mb-1">No. Empleado <span class="required-mark">*</span></label>
                             <div class="relative">
                                 <input type="text" id="idEmpleado" class="w-full p-3 outline-none" readonly required autocomplete="off">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Nombre Completo</label>
+                            <label class="block text-xs uppercase mb-1">Nombre Completo <span class="required-mark">*</span></label>
                             <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Correo Electrónico</label>
+                            <label class="block text-xs uppercase mb-1">Correo Electrónico <span class="required-mark">*</span></label>
                             <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="emailHint">Formato de correo inválido</span>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Dirección / Depto</label>
+                            <label class="block text-xs uppercase mb-1">Dirección / Depto <span class="required-mark">*</span></label>
                             <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                         </div>
                     </div>
@@ -329,17 +419,17 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase mb-1">Descripción de la Idea <span class="text-red-500">*</span></label>
+                        <label class="block text-xs uppercase mb-1">Descripción de la Idea <span class="required-mark">*</span></label>
                         <textarea id="descIdea" rows="2" class="w-full p-3 outline-none" placeholder="Título corto o resumen de la idea..." required></textarea>
                         <button type="button" onclick="limpiarCampo('descIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Detalle <span class="text-red-500">*</span></label>
+                        <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
                         <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Explica detalladamente en qué consiste..." required></textarea>
                         <button type="button" onclick="limpiarCampo('detalleIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Instancia</label>
+                        <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
                         <select id="ideaInstancia" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
@@ -449,13 +539,13 @@
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Instancia</h3>
                     <canvas id="chartInstancia"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="app-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Departamento</h3>
                     <canvas id="chartDepartamento"></canvas>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow mt-8 p-6 space-y-6">
+            <div class="app-card rounded-2xl mt-8 p-6 space-y-6">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-slate-700">📈 Evolución Temporal de Ideas</h3>
@@ -563,24 +653,25 @@
                 <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al dashboard</button>
             </div>
             <form id="formAdminManual" class="p-8 space-y-6" autocomplete="off">
+                <p class="required-hint">Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
                 <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs uppercase mb-1">No. Empleado</label>
+                            <label class="block text-xs uppercase mb-1">No. Empleado <span class="required-mark">*</span></label>
                             <input type="text" id="adminIdEmp" class="w-full p-3 outline-none" placeholder="Ej: 1010" required autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Nombre Completo</label>
+                            <label class="block text-xs uppercase mb-1">Nombre Completo <span class="required-mark">*</span></label>
                             <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminNomEmpHint">Nombre requerido</span>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Correo</label>
+                            <label class="block text-xs uppercase mb-1">Correo <span class="required-mark">*</span></label>
                             <input type="email" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminMailEmpHint">Formato de correo inválido</span>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Departamento</label>
+                            <label class="block text-xs uppercase mb-1">Departamento <span class="required-mark">*</span></label>
                             <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminDirEmpHint">Departamento requerido</span>
                         </div>
@@ -589,22 +680,22 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase mb-1">Descripción</label>
+                        <label class="block text-xs uppercase mb-1">Descripción <span class="required-mark">*</span></label>
                         <textarea id="adminDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Detalle</label>
+                        <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
                         <textarea id="adminDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Clasificación</label>
+                        <label class="block text-xs uppercase mb-1">Clasificación <span class="required-mark">*</span></label>
                         <select id="adminClasif" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
                         <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Instancia</label>
+                        <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
                         <select id="adminInstancia" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
@@ -779,16 +870,25 @@
             </div>
             
             <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Fecha</span><span id="mFecha" class="font-semibold"></span></div>
-                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Usuario</span><span id="mUsuario" class="font-semibold"></span></div>
-                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Instancia</span><span id="mInstancia" class="font-semibold"></span></div>
-                    <div><span class="block text-xs font-bold text-slate-400 uppercase">Vía</span><span id="mVia" class="font-semibold"></span></div>
+                <div class="modal-hero space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="badge-status status-default" id="mStatusBadge">
+                            <span>●</span>
+                            <span id="mStatusText">Registrada</span>
+                        </div>
+                        <span class="text-xs uppercase tracking-wide text-slate-500">ID <span id="mModalIdeaId" class="font-bold text-[#003366]"></span></span>
+                    </div>
+                    <div>
+                        <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Descripción</span>
+                        <p id="mDesc" class="text-slate-800 font-semibold"></p>
+                    </div>
                 </div>
-                
-                <div class="bg-slate-50 p-4 rounded-xl border">
-                    <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Descripción</span>
-                    <p id="mDesc" class="text-slate-800 font-medium"></p>
+
+                <div class="idea-meta text-sm">
+                    <div class="idea-meta-item"><span>Fecha</span><strong id="mFecha"></strong></div>
+                    <div class="idea-meta-item"><span>Usuario</span><strong id="mUsuario"></strong></div>
+                    <div class="idea-meta-item"><span>Instancia</span><strong id="mInstancia"></strong></div>
+                    <div class="idea-meta-item"><span>Vía</span><strong id="mVia"></strong></div>
                 </div>
                 
                 <div>
@@ -1517,12 +1617,14 @@
 
             // Mapeo de campos básicos (Coinciden con MVP)
             document.getElementById('modalId').innerText = idea.id;
+            document.getElementById('mModalIdeaId').innerText = idea.id;
             document.getElementById('mFecha').innerText = new Date(idea.createdAt).toISOString().split('T')[0];
             document.getElementById('mUsuario').innerText = idea.nombreCompleto || idea.codigoEmpleado || '';
             document.getElementById('mInstancia').innerText = idea.instancia || 'Sin instancia';
             document.getElementById('mVia').innerText = idea.via || 'Sin vía';
             document.getElementById('mDesc').innerText = idea.descripcion;
             document.getElementById('mDetalle').innerText = idea.detalle;
+            updateStatusBadge(idea.status);
 
             // NOTA: El MVP NO muestra Estatus/Clasificación/Comentario en modo lectura (texto plano).
             // Solo se muestran en los controles de input si es Admin. 
@@ -1686,6 +1788,15 @@
             if(status === 'Registrada') return 'status-registered';
             if(status === 'Revisada') return 'status-reviewed';
             return 'status-default';
+        }
+
+        function updateStatusBadge(status) {
+            const badge = document.getElementById('mStatusBadge');
+            const text = document.getElementById('mStatusText');
+            if (!badge || !text) return;
+            badge.classList.remove('status-registered', 'status-reviewed', 'status-default');
+            badge.classList.add(getColorStatus(status));
+            text.innerText = status || 'Sin estatus';
         }
 
         async function actualizarDashboard() {
@@ -2242,9 +2353,22 @@
             validateAdminManualFields();
         }
 
+        function getSwalTheme() {
+            return {
+                buttonsStyling: false,
+                customClass: {
+                    popup: 'swal-card',
+                    title: 'swal-title',
+                    htmlContainer: 'swal-text',
+                    confirmButton: 'swal-confirm',
+                    cancelButton: 'swal-cancel'
+                }
+            };
+        }
+
         function showSuccess(title, text) {
             if (typeof Swal !== 'undefined') {
-                Swal.fire({ title, text, icon: 'success', confirmButtonColor: '#F7931E' });
+                Swal.fire({ title, text, icon: 'success', ...getSwalTheme() });
             } else {
                 alert(`${title} ${text}`);
             }
@@ -2252,7 +2376,7 @@
 
         function showError(title, text) {
             if (typeof Swal !== 'undefined') {
-                Swal.fire({ title, text, icon: 'error' });
+                Swal.fire({ title, text, icon: 'error', ...getSwalTheme() });
             } else {
                 alert(`${title} ${text}`);
             }
@@ -2265,9 +2389,9 @@
                     text,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#dc2626',
                     confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
+                    cancelButtonText: 'Cancelar',
+                    ...getSwalTheme()
                 });
                 return result.isConfirmed;
             }
