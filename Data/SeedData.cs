@@ -7,7 +7,12 @@ namespace LanzaTuIdea.Api.Data;
 
 public static class SeedData
 {
-    private static readonly string[] DefaultRoles = [AppConstants.Roles.Admin, AppConstants.Roles.Ideador];
+    private static readonly string[] DefaultRoles =
+    [
+        AppConstants.Roles.Admin,
+        AppConstants.Roles.Ideador,
+        AppConstants.Roles.Gestor
+    ];
     private const string DefaultLogoPath = "/assets/branding/logo-placeholder.svg";
     private const string DefaultFaviconPath = "/assets/branding/favicon-placeholder.svg";
 

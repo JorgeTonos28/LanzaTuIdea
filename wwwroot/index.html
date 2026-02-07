@@ -600,12 +600,132 @@
         </div>
     </main>
 
-    <main id="viewGestor" class="hidden max-w-4xl mx-auto w-full p-6 space-y-6 fade-in">
-        <div class="app-card rounded-3xl border border-slate-200 p-8 space-y-6 text-center">
-            <div class="text-6xl">🧭</div>
-            <h2 class="text-2xl font-bold">Panel de Gestores en construcción</h2>
-            <p class="text-slate-500">Estamos trabajando en un panel exclusivo para gestores. Mientras tanto, puedes registrar ideas como ideador.</p>
-            <button onclick="abrirFormularioGestor()" class="btn-primary px-6 py-3 rounded-xl font-bold">Registrar una idea</button>
+    <main id="viewGestor" class="hidden max-w-6xl mx-auto w-full p-6 space-y-6 fade-in">
+        <div class="admin-nav rounded-2xl px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sticky top-20 z-40">
+            <div class="flex items-center gap-3">
+                <span class="text-lg font-bold text-[#003366]">Panel del Gestor</span>
+                <span class="text-xs text-slate-400 uppercase tracking-wide">Seguimiento de ideas</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button data-gestor-view="dashboard" onclick="navGestor('dashboard')" class="admin-nav-btn secondary">📊 Dashboard</button>
+                <button data-gestor-view="asignaciones" onclick="navGestor('asignaciones')" class="admin-nav-btn secondary">🗂️ Mis Asignaciones</button>
+                <button data-gestor-view="registrar" onclick="navGestor('registrar')" class="admin-nav-btn secondary">📝 Registrar Idea</button>
+            </div>
+        </div>
+
+        <div id="gestorDashboard" class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">📌 Resumen del Gestor</h2>
+                <div class="text-sm text-slate-500">Carga de trabajo actual</div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#003366]">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Ideas asignadas</p>
+                    <p id="gestorKpiAsignadas" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#4A90E2]">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Ideas registradas por mí</p>
+                    <p id="gestorKpiRegistradas" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#F7931E]">
+                    <p class="text-xs text-slate-500 font-bold uppercase">Ideas en proceso</p>
+                    <p id="gestorKpiEnProceso" class="text-3xl font-black text-slate-800">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="gestorAsignaciones" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-2xl font-bold">🗂️ Ideas Asignadas</h3>
+                <button onclick="navGestor('registrar')" class="btn-outline text-sm px-4 py-2 rounded-lg">Registrar nueva idea</button>
+            </div>
+            <div class="app-card rounded-2xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-left app-table">
+                    <thead class="text-xs uppercase font-bold">
+                        <tr>
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Fecha</th>
+                            <th class="p-4">Proponente</th>
+                            <th class="p-4">Descripción</th>
+                            <th class="p-4">Estatus</th>
+                            <th class="p-4 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaGestorAsignadas" class="text-sm divide-y divide-slate-100">
+                        <tr><td colspan="6" class="p-8 text-center text-slate-400">Cargando asignaciones...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="gestorRegistro" class="hidden app-card rounded-3xl border border-slate-200 overflow-hidden max-w-4xl mx-auto w-full">
+            <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold">🧭 Registro Manual (Gestor)</h3>
+                <span class="text-sm text-slate-400">Registro para colaboradores</span>
+            </div>
+            <form id="formGestorManual" class="p-8 space-y-6" autocomplete="off">
+                <p class="required-hint">Busca al colaborador por código o correo. La instancia se tomará de tu perfil.</p>
+                <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs uppercase mb-1">No. Empleado</label>
+                            <input type="text" id="gestorIdEmp" class="w-full p-3 outline-none" placeholder="Ej: 1010" autocomplete="off">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase mb-1">Correo</label>
+                            <input type="email" id="gestorMailEmpSearch" class="w-full p-3 outline-none" placeholder="correo@empresa.com" autocomplete="off">
+                        </div>
+                        <div class="md:col-span-2 flex flex-col md:flex-row md:items-center gap-3">
+                            <button type="button" onclick="buscarEmpleadoGestor()" class="btn-action px-4 py-2 rounded-lg text-sm">🔎 Buscar colaborador</button>
+                            <span id="gestorEmpleadoHint" class="text-xs text-slate-400">Ingresa un código o correo para autocompletar.</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-200">
+                        <div>
+                            <label class="block text-xs uppercase mb-1">Nombre Completo</label>
+                            <input type="text" id="gestorNomEmp" class="w-full p-3 outline-none" placeholder="Nombre completo">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase mb-1">Correo</label>
+                            <input type="text" id="gestorMailEmp" class="w-full p-3 outline-none" placeholder="correo@empresa.com">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase mb-1">Departamento</label>
+                            <input type="text" id="gestorDirEmp" class="w-full p-3 outline-none" placeholder="Departamento">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase mb-1">Descripción <span class="required-mark">*</span></label>
+                        <textarea id="gestorDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
+                        <textarea id="gestorDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase mb-1">Clasificación</label>
+                        <select id="gestorClasif" class="w-full p-3 bg-white text-sm">
+                            <option value="">Seleccione una clasificación</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase mb-1">Vía de Registro</label>
+                        <select id="gestorVia" class="w-full p-3 bg-white text-sm">
+                            <option value="Gestor">Gestor</option>
+                            <option value="Sistema">Sistema</option>
+                            <option value="Correo">Correo</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <p class="text-xs text-slate-400 mt-1">La instancia quedará vinculada a tu perfil de gestor.</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea</button>
+            </form>
         </div>
     </main>
 
@@ -909,6 +1029,28 @@
 
                     <section class="space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <h4 class="text-lg font-bold text-slate-700">🧭 Banco de Gestores</h4>
+                            <button onclick="loadGestoresAdmin()" class="btn-outline px-4 py-2 rounded-lg text-sm">Actualizar</button>
+                        </div>
+                        <p class="text-sm text-slate-500">Consulta la carga de trabajo actual y la instancia de cada gestor.</p>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-left text-sm app-table">
+                                <thead>
+                                    <tr>
+                                        <th class="p-3">Gestor</th>
+                                        <th class="p-3">Instancia</th>
+                                        <th class="p-3 text-right">Ideas asignadas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaGestoresAdmin">
+                                    <tr><td colspan="3" class="p-6 text-center text-slate-400">Cargando gestores...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">🏷️ Clasificaciones</h4>
                             <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                                 <input type="text" id="newClassificationName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva clasificación" />
@@ -1019,6 +1161,7 @@
                     <div class="idea-meta-item"><span>Usuario</span><strong id="mUsuario"></strong></div>
                     <div class="idea-meta-item"><span>Instancia</span><strong id="mInstancia"></strong></div>
                     <div class="idea-meta-item"><span>Vía</span><strong id="mVia"></strong></div>
+                    <div class="idea-meta-item"><span>Gestor asignado</span><strong id="mAssigned"></strong></div>
                 </div>
                 
                 <div>
@@ -1047,6 +1190,17 @@
                 
                 <div id="adminControls" class="hidden border-t pt-4 mt-4 space-y-4">
                     <h4 class="font-bold text-[#003366] text-sm uppercase">Gestión Administrativa</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label class="block text-xs uppercase mb-1">Asignar gestor</label>
+                            <select id="mAdminGestor" class="p-2 border rounded bg-white text-sm">
+                                <option value="">Seleccione un gestor</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="asignarGestorAdmin()" class="btn-action px-4 py-2 rounded-lg text-sm">Asignar</button>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <select id="mAdminClasif" class="p-2 border rounded bg-white text-sm">
                             <option value="">Sin clasificar</option>
@@ -1080,13 +1234,19 @@
         let currentUser = null;
         let currentIdeaIdEditing = null;
         let adminCache = { pending: [], reviewed: [] };
+        let gestorCache = [];
         let charts = {};
+        let gestorEmployeeFound = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('systemDescription').innerText = systemDescriptionText;
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
             document.getElementById('formIdea').addEventListener('submit', handleIdeaSubmit);
             document.getElementById('formAdminManual').addEventListener('submit', handleManualSubmit);
+            const gestorForm = document.getElementById('formGestorManual');
+            if (gestorForm) {
+                gestorForm.addEventListener('submit', handleGestorManualSubmit);
+            }
             document.getElementById('adminIdEmp').addEventListener('input', (e) => buscarEmpleadoAdmin(e.target.value));
             const correoEmpleadoInput = document.getElementById('correoEmpleado');
             if (correoEmpleadoInput) {
@@ -1313,6 +1473,7 @@
         function updateClassificationSelects(items) {
             const adminSelect = document.getElementById('adminClasif');
             const modalSelect = document.getElementById('mAdminClasif');
+            const gestorSelect = document.getElementById('gestorClasif');
             if (adminSelect) {
                 adminSelect.innerHTML = '<option value="">Seleccione una clasificación</option>';
                 items.forEach(item => {
@@ -1329,6 +1490,15 @@
                     option.value = item.nombre;
                     option.textContent = item.nombre;
                     modalSelect.appendChild(option);
+                });
+            }
+            if (gestorSelect) {
+                gestorSelect.innerHTML = '<option value="">Seleccione una clasificación</option>';
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.nombre;
+                    option.textContent = item.nombre;
+                    gestorSelect.appendChild(option);
                 });
             }
         }
@@ -1424,6 +1594,7 @@
                 document.getElementById('viewGestor').classList.remove('hidden');
                 document.getElementById('viewIdeador').classList.add('hidden');
                 document.getElementById('viewAdmin').classList.add('hidden');
+                navGestor('dashboard');
             } else {
                 document.getElementById('viewIdeador').classList.remove('hidden');
                 document.getElementById('viewAdmin').classList.add('hidden');
@@ -1500,18 +1671,56 @@
             if(view === 'config') {
                 document.getElementById('adminConfig').classList.remove('hidden');
                 loadAdminUsers();
+                loadGestoresAdmin();
                 loadClassifications();
                 loadInstances();
             }
             if(view === 'registrar') document.getElementById('adminForm').classList.remove('hidden');
         }
 
+        function navGestor(view) {
+            ['gestorDashboard', 'gestorAsignaciones', 'gestorRegistro'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.querySelectorAll('[data-gestor-view]').forEach(button => {
+                button.classList.remove('active');
+            });
+            const activeButton = document.querySelector(`[data-gestor-view="${view}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+            if (view === 'dashboard') {
+                document.getElementById('gestorDashboard').classList.remove('hidden');
+                loadGestorDashboard();
+            }
+            if (view === 'asignaciones') {
+                document.getElementById('gestorAsignaciones').classList.remove('hidden');
+                loadGestorAsignaciones();
+            }
+            if (view === 'registrar') {
+                document.getElementById('gestorRegistro').classList.remove('hidden');
+                limpiarFormularioGestor();
+                loadCatalogs();
+            }
+        }
+
         function abrirFormularioGestor() {
-            navIdeador('formulario');
+            navGestor('registrar');
         }
 
         function setFieldEditable(id, isEditable) {
             const input = document.getElementById(id);
+            input.readOnly = !isEditable;
+            if (isEditable) {
+                input.classList.remove('bg-slate-200', 'border-slate-300', 'text-slate-600');
+                input.classList.add('bg-white', 'border-slate-300', 'text-slate-700');
+            } else {
+                input.classList.add('bg-slate-200', 'border-slate-300', 'text-slate-600');
+                input.classList.remove('bg-white', 'text-slate-700');
+            }
+        }
+
+        function setGestorFieldEditable(id, isEditable) {
+            const input = document.getElementById(id);
+            if (!input) return;
             input.readOnly = !isEditable;
             if (isEditable) {
                 input.classList.remove('bg-slate-200', 'border-slate-300', 'text-slate-600');
@@ -1771,8 +1980,12 @@
             });
         }
 
-        async function mostrarDetalle(id, modoAdmin = false) {
-            const endpoint = modoAdmin ? `/api/admin/ideas/${id}` : `/api/ideas/${id}`;
+        async function mostrarDetalle(id, modoAdmin = false, modoGestor = false) {
+            const endpoint = modoAdmin
+                ? `/api/admin/ideas/${id}`
+                : modoGestor
+                    ? `/api/gestor/ideas/${id}`
+                    : `/api/ideas/${id}`;
             const response = await apiFetch(endpoint, { method: 'GET' });
             if (!response.ok) {
                 showError('Error', 'No fue posible cargar el detalle.');
@@ -1788,6 +2001,7 @@
             document.getElementById('mUsuario').innerText = idea.nombreCompleto || idea.codigoEmpleado || '';
             document.getElementById('mInstancia').innerText = idea.instancia || 'Sin instancia';
             document.getElementById('mVia').innerText = idea.via || 'Sin vía';
+            document.getElementById('mAssigned').innerText = idea.assignedToName || 'Sin asignación';
             document.getElementById('mDesc').innerText = idea.descripcion;
             document.getElementById('mDetalle').innerText = idea.detalle;
             updateStatusBadge(idea.status);
@@ -1825,6 +2039,7 @@
                     }
                     adminViaSelect.value = viaValue;
                 }
+                await ensureGestorOptions(idea.assignedToUserId);
                 document.getElementById('mAdminComentario').value = idea.adminComment || "";
             } else {
                 adminPanel.classList.add('hidden');
@@ -2049,6 +2264,245 @@
                         </td>
                     </tr>`;
             });
+        }
+
+        async function loadGestoresAdmin() {
+            const response = await apiFetch('/api/admin/gestores', { method: 'GET' });
+            if (!response.ok) {
+                return;
+            }
+            const gestores = await response.json();
+            gestorCache = gestores;
+            renderGestoresAdmin(gestores);
+            updateGestorSelectOptions();
+        }
+
+        function renderGestoresAdmin(gestores) {
+            const tbody = document.getElementById('tablaGestoresAdmin');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!gestores || gestores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-400">No hay gestores registrados.</td></tr>';
+                return;
+            }
+            gestores.forEach(gestor => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-semibold text-slate-700">${gestor.nombre}</td>
+                        <td class="p-4 text-slate-500">${gestor.instancia || 'Sin instancia'}</td>
+                        <td class="p-4 text-right font-bold text-slate-600">${gestor.ideasAsignadas}</td>
+                    </tr>`;
+            });
+        }
+
+        async function ensureGestorOptions(selectedId) {
+            if (!gestorCache || gestorCache.length === 0) {
+                await loadGestoresAdmin();
+            }
+            updateGestorSelectOptions(selectedId);
+        }
+
+        function updateGestorSelectOptions(selectedId) {
+            const select = document.getElementById('mAdminGestor');
+            if (!select) return;
+            select.innerHTML = '<option value="">Seleccione un gestor</option>';
+            (gestorCache || []).forEach(gestor => {
+                const option = document.createElement('option');
+                option.value = gestor.id;
+                option.textContent = `${gestor.nombre} · ${gestor.instancia || 'Sin instancia'} (${gestor.ideasAsignadas})`;
+                select.appendChild(option);
+            });
+            if (selectedId) {
+                select.value = String(selectedId);
+            }
+        }
+
+        async function asignarGestorAdmin() {
+            if (!currentIdeaIdEditing) {
+                return;
+            }
+            const gestorId = document.getElementById('mAdminGestor')?.value;
+            if (!gestorId) {
+                showError('Gestor requerido', 'Selecciona un gestor para asignar la idea.');
+                return;
+            }
+            const response = await apiFetch(`/api/admin/ideas/${currentIdeaIdEditing}/assign`, {
+                method: 'PUT',
+                body: JSON.stringify({ gestorUserId: Number(gestorId) })
+            });
+            if (!response.ok) {
+                showError('Error', 'No fue posible asignar la idea al gestor.');
+                return;
+            }
+            showSuccess('Asignado', 'La idea fue asignada correctamente.');
+            document.getElementById('mAssigned').innerText = selectGestorLabel(gestorId);
+            await loadGestoresAdmin();
+        }
+
+        function selectGestorLabel(gestorId) {
+            const gestor = (gestorCache || []).find(item => String(item.id) === String(gestorId));
+            return gestor ? gestor.nombre : 'Sin asignación';
+        }
+
+        async function loadGestorDashboard() {
+            const response = await apiFetch('/api/gestor/dashboard', { method: 'GET' });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            const asignadas = document.getElementById('gestorKpiAsignadas');
+            const registradas = document.getElementById('gestorKpiRegistradas');
+            const enProceso = document.getElementById('gestorKpiEnProceso');
+            if (asignadas) asignadas.innerText = data.totalAsignadas;
+            if (registradas) registradas.innerText = data.totalRegistradas;
+            if (enProceso) enProceso.innerText = data.ideasEnProceso;
+        }
+
+        async function loadGestorAsignaciones() {
+            const response = await apiFetch('/api/gestor/ideas/assigned', { method: 'GET' });
+            if (!response.ok) {
+                return;
+            }
+            const ideas = await response.json();
+            renderGestorAsignaciones(ideas);
+        }
+
+        function renderGestorAsignaciones(ideas) {
+            const tbody = document.getElementById('tablaGestorAsignadas');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!ideas || ideas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No tienes ideas asignadas por ahora.</td></tr>';
+                return;
+            }
+            ideas.forEach(idea => {
+                const fecha = new Date(idea.createdAt).toISOString().split('T')[0];
+                const nombre = idea.nombreCompleto || idea.codigoEmpleado;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-600">${idea.id}</td>
+                        <td class="p-4 text-slate-500">${fecha}</td>
+                        <td class="p-4 text-slate-700">${nombre}</td>
+                        <td class="p-4 text-slate-600">${idea.descripcion}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${getColorStatus(idea.status)}">${idea.status}</span></td>
+                        <td class="p-4 text-center">
+                            <button onclick="mostrarDetalle(${idea.id}, false, true)" class="text-[#003366] hover:text-[#F7931E]">👁️ Ver</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function limpiarFormularioGestor() {
+            const ids = ['gestorIdEmp', 'gestorMailEmpSearch', 'gestorNomEmp', 'gestorMailEmp', 'gestorDirEmp', 'gestorDesc', 'gestorDetalle'];
+            ids.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+            const gestorClasif = document.getElementById('gestorClasif');
+            if (gestorClasif) gestorClasif.value = '';
+            const gestorVia = document.getElementById('gestorVia');
+            if (gestorVia) gestorVia.value = 'Gestor';
+            gestorEmployeeFound = false;
+            setGestorFieldEditable('gestorNomEmp', true);
+            setGestorFieldEditable('gestorMailEmp', true);
+            setGestorFieldEditable('gestorDirEmp', true);
+        }
+
+        function limpiarEmpleadoGestor() {
+            const ids = ['gestorIdEmp', 'gestorMailEmpSearch', 'gestorNomEmp', 'gestorMailEmp', 'gestorDirEmp'];
+            ids.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+            gestorEmployeeFound = false;
+            setGestorFieldEditable('gestorNomEmp', true);
+            setGestorFieldEditable('gestorMailEmp', true);
+            setGestorFieldEditable('gestorDirEmp', true);
+        }
+
+        async function buscarEmpleadoGestor() {
+            const codigo = document.getElementById('gestorIdEmp')?.value.trim();
+            const email = document.getElementById('gestorMailEmpSearch')?.value.trim();
+            if (!codigo && !email) {
+                showError('Dato requerido', 'Ingresa un código o correo para buscar al colaborador.');
+                return;
+            }
+
+            const params = new URLSearchParams();
+            if (codigo) params.append('codigo', codigo);
+            if (email) params.append('email', email);
+
+            const response = await apiFetch(`/api/gestor/employees/search?${params.toString()}`, { method: 'GET' });
+            if (!response.ok) {
+                showError('No encontrado', 'No se encontró el colaborador solicitado.');
+                limpiarEmpleadoGestor();
+                gestorEmployeeFound = false;
+                setGestorFieldEditable('gestorNomEmp', true);
+                setGestorFieldEditable('gestorMailEmp', true);
+                setGestorFieldEditable('gestorDirEmp', true);
+                return;
+            }
+            const data = await response.json();
+            document.getElementById('gestorIdEmp').value = data.codigoEmpleado || codigo || '';
+            document.getElementById('gestorNomEmp').value = data.nombreCompleto || '';
+            document.getElementById('gestorMailEmp').value = data.email || '';
+            document.getElementById('gestorDirEmp').value = data.departamento || '';
+            if (!document.getElementById('gestorMailEmpSearch').value) {
+                document.getElementById('gestorMailEmpSearch').value = data.email || '';
+            }
+            gestorEmployeeFound = true;
+            setGestorFieldEditable('gestorNomEmp', false);
+            setGestorFieldEditable('gestorMailEmp', false);
+            setGestorFieldEditable('gestorDirEmp', false);
+        }
+
+        async function handleGestorManualSubmit(event) {
+            event.preventDefault();
+            const descripcion = document.getElementById('gestorDesc').value.trim();
+            const detalle = document.getElementById('gestorDetalle').value.trim();
+            const codigoEmpleado = document.getElementById('gestorIdEmp').value.trim();
+            const email = document.getElementById('gestorMailEmpSearch').value.trim() || document.getElementById('gestorMailEmp').value.trim();
+            const nombreCompleto = document.getElementById('gestorNomEmp').value.trim();
+            const departamento = document.getElementById('gestorDirEmp').value.trim();
+
+            if (!descripcion || !detalle) {
+                showError('Campos requeridos', 'Descripción y detalle son obligatorios.');
+                return;
+            }
+            if (!codigoEmpleado && !email) {
+                showError('Dato requerido', 'Indica un código de empleado o correo.');
+                return;
+            }
+            if (!gestorEmployeeFound && (!nombreCompleto || !email || !departamento)) {
+                showError('Datos incompletos', 'Completa nombre, correo y departamento para registrar al colaborador.');
+                return;
+            }
+
+            const payload = {
+                codigoEmpleado,
+                email,
+                nombreCompleto,
+                departamento,
+                descripcion,
+                detalle,
+                clasificacion: document.getElementById('gestorClasif').value,
+                via: document.getElementById('gestorVia').value
+            };
+
+            const response = await apiFetch('/api/gestor/ideas/manual', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                showError('Error', 'No fue posible registrar la idea.');
+                return;
+            }
+
+            showSuccess('Registrado', 'La idea se registró y quedó asignada a tu perfil.');
+            limpiarFormularioGestor();
+            loadGestorDashboard();
+            loadGestorAsignaciones();
         }
 
         function getColorStatus(status) {
