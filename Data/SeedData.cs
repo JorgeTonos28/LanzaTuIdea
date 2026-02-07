@@ -8,6 +8,8 @@ namespace LanzaTuIdea.Api.Data;
 public static class SeedData
 {
     private static readonly string[] DefaultRoles = [AppConstants.Roles.Admin, AppConstants.Roles.Ideador];
+    private const string DefaultLogoPath = "/assets/branding/logo-placeholder.svg";
+    private const string DefaultFaviconPath = "/assets/branding/favicon-placeholder.svg";
 
     public static async Task InitializeAsync(AppDbContext context, IConfiguration configuration, IHostEnvironment environment)
     {
@@ -67,6 +69,16 @@ public static class SeedData
                 new Instance { Nombre = "Sede Central", Activo = true },
                 new Instance { Nombre = "Regional Norte", Activo = true }
             );
+        }
+
+        if (!await context.BrandingSettings.AnyAsync())
+        {
+            context.BrandingSettings.Add(new AppBranding
+            {
+                LogoPath = DefaultLogoPath,
+                FaviconPath = DefaultFaviconPath,
+                UpdatedAt = DateTime.UtcNow
+            });
         }
 
         await context.SaveChangesAsync();
