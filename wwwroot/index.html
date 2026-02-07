@@ -247,16 +247,40 @@
         select {
             appearance: none;
             background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%),
-                linear-gradient(135deg, #94a3b8 50%, transparent 50%);
-            background-position: calc(100% - 18px) 20px, calc(100% - 12px) 20px;
-            background-size: 6px 6px, 6px 6px;
+                linear-gradient(135deg, #94a3b8 50%, transparent 50%),
+                linear-gradient(to right, #f8fafc, #f1f5f9);
+            background-position: calc(100% - 18px) 20px, calc(100% - 12px) 20px, 0 0;
+            background-size: 6px 6px, 6px 6px, 100% 100%;
             background-repeat: no-repeat;
             padding-right: 34px;
+            border-radius: 10px;
+            border-color: #d7e0ea;
+            color: var(--text-dark);
+            font-weight: 600;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        select:hover {
+            border-color: var(--infotep-blue);
+            background-image: linear-gradient(45deg, transparent 50%, #003366 50%),
+                linear-gradient(135deg, #003366 50%, transparent 50%),
+                linear-gradient(to right, #ffffff, #f1f5f9);
+        }
+
+        select:focus {
+            border-color: var(--infotep-orange);
+            box-shadow: 0 0 0 3px rgba(247, 147, 30, 0.2);
         }
 
         select option:checked {
             background-color: var(--infotep-blue);
             color: var(--white);
+        }
+
+        select option:hover,
+        select option:focus {
+            background-color: #e0f2fe;
+            color: var(--text-dark);
         }
 
         input:focus,
