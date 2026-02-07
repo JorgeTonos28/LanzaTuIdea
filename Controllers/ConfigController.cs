@@ -4,6 +4,7 @@ using LanzaTuIdea.Api.Models.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace LanzaTuIdea.Api.Controllers;
 
@@ -13,10 +14,14 @@ namespace LanzaTuIdea.Api.Controllers;
 public class ConfigController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IWebHostEnvironment _environment;
+    private const string DefaultLogoPath = "/assets/branding/logo-placeholder.svg";
+    private const string DefaultFaviconPath = "/assets/branding/favicon-placeholder.svg";
 
-    public ConfigController(AppDbContext context)
+    public ConfigController(AppDbContext context, IWebHostEnvironment environment)
     {
         _context = context;
+        _environment = environment;
     }
 
     [HttpGet("classifications")]
@@ -117,6 +122,73 @@ public class ConfigController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("branding")]
+    [AllowAnonymous]
+    public async Task<ActionResult<BrandingSettingsDto>> GetBranding(CancellationToken cancellationToken)
+    {
+        var branding = await _context.BrandingSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+        var logoUrl = branding?.LogoPath ?? DefaultLogoPath;
+        var faviconUrl = branding?.FaviconPath ?? DefaultFaviconPath;
+        return new BrandingSettingsDto(logoUrl, faviconUrl);
+    }
+
+    [HttpPost("branding")]
+    [Authorize(Roles = AppConstants.Roles.Admin)]
+    [RequestSizeLimit(5_000_000)]
+    public async Task<ActionResult<BrandingSettingsDto>> UpdateBranding([FromForm] IFormFile? logo, [FromForm] IFormFile? favicon, CancellationToken cancellationToken)
+    {
+        if (logo is null && favicon is null)
+        {
+            return BadRequest(new { message = "Debe seleccionar al menos un archivo." });
+        }
+
+        var branding = await _context.BrandingSettings.FirstOrDefaultAsync(cancellationToken)
+            ?? new AppBranding { UpdatedAt = DateTime.UtcNow };
+
+        if (logo is not null)
+        {
+            var allowedLogoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ".png", ".jpg", ".jpeg", ".svg"
+            };
+
+            if (!TryGetExtension(logo, allowedLogoExtensions, out var logoExtension))
+            {
+                return BadRequest(new { message = "Formato de logo no permitido. Usa PNG, JPG o SVG." });
+            }
+
+            branding.LogoPath = await SaveAssetAsync(logo, "logo", logoExtension, cancellationToken);
+        }
+
+        if (favicon is not null)
+        {
+            var allowedFaviconExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ".png", ".ico", ".svg"
+            };
+
+            if (!TryGetExtension(favicon, allowedFaviconExtensions, out var faviconExtension))
+            {
+                return BadRequest(new { message = "Formato de favicon no permitido. Usa PNG, ICO o SVG." });
+            }
+
+            branding.FaviconPath = await SaveAssetAsync(favicon, "favicon", faviconExtension, cancellationToken);
+        }
+
+        branding.UpdatedAt = DateTime.UtcNow;
+
+        if (branding.Id == 0)
+        {
+            _context.BrandingSettings.Add(branding);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new BrandingSettingsDto(
+            branding.LogoPath ?? DefaultLogoPath,
+            branding.FaviconPath ?? DefaultFaviconPath);
+    }
+
     private static string? TrimTo(string? value, int maxLength)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -126,5 +198,29 @@ public class ConfigController : ControllerBase
 
         var trimmed = value.Trim();
         return trimmed.Length <= maxLength ? trimmed : trimmed.Substring(0, maxLength);
+    }
+
+    private async Task<string> SaveAssetAsync(IFormFile file, string baseName, string extension, CancellationToken cancellationToken)
+    {
+        var webRoot = string.IsNullOrWhiteSpace(_environment.WebRootPath)
+            ? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+            : _environment.WebRootPath;
+
+        var targetDirectory = Path.Combine(webRoot, "assets", "branding");
+        Directory.CreateDirectory(targetDirectory);
+
+        var fileName = $"{baseName}{extension.ToLowerInvariant()}";
+        var filePath = Path.Combine(targetDirectory, fileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream, cancellationToken);
+
+        return $"/assets/branding/{fileName}";
+    }
+
+    private static bool TryGetExtension(IFormFile file, HashSet<string> allowedExtensions, out string extension)
+    {
+        extension = Path.GetExtension(file.FileName);
+        return !string.IsNullOrWhiteSpace(extension) && allowedExtensions.Contains(extension);
     }
 }

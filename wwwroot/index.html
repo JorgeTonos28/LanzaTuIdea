@@ -5,60 +5,270 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lanza tu idea 0.1 | Sistema de Innovación</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link id="appFavicon" rel="icon" href="/assets/branding/favicon-placeholder.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --infotep-blue: #003366;
+            --infotep-orange: #F7931E;
+            --infotep-green: #34BF49;
+            --bg-light: #F4F6F9;
+            --text-dark: #2C3E50;
+            --text-muted: #7F8C8D;
+            --white: #ffffff;
+            --radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 51, 102, 0.08);
+        }
+
+        body {
+            font-family: 'Roboto', 'Open Sans', 'Segoe UI', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--infotep-blue);
+        }
+
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
 
-        /* Colores Botones */
-        .btn-registar { background-color: #16a34a; color: white; } /* Verde */
-        .btn-registar:hover { background-color: #15803d; }
-        .btn-cancelar { background-color: #dc2626; color: white; } /* Rojo */
-        .btn-cancelar:hover { background-color: #b91c1c; }
-        .btn-limpiar { background-color: #e2e8f0; color: #475569; } /* Gris suave */
-        .btn-limpiar:hover { background-color: #cbd5e1; }
+        .app-header {
+            background: linear-gradient(90deg, #003366, #002a52);
+            color: var(--white);
+            height: 70px;
+            box-shadow: 0 4px 6px -1px rgba(0, 51, 102, 0.1);
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-logo-wrap {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 6px 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+        }
+
+        .app-logo {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .app-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--white);
+        }
+
+        .app-subtitle {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #d9e2f1;
+        }
+
+        .app-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #e1e4e8;
+        }
+
+        .app-card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 51, 102, 0.1);
+        }
+
+        .app-card-accent {
+            border-top: 4px solid var(--infotep-blue);
+        }
+
+        .btn-primary {
+            background-color: var(--infotep-blue);
+            color: var(--white);
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #004080;
+        }
+
+        .btn-action {
+            background-color: var(--infotep-orange);
+            color: var(--white);
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            background-color: #D67D14;
+            box-shadow: 0 4px 12px rgba(247, 147, 30, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid #BDC3C7;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--infotep-orange);
+            color: var(--infotep-orange);
+        }
+
+        .btn-soft {
+            background-color: #fff4e6;
+            color: #9a4f00;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-registar { background-color: var(--infotep-blue); color: var(--white); }
+        .btn-registar:hover { background-color: #004080; }
+        .btn-cancelar { background-color: transparent; color: var(--text-muted); border: 1px solid #BDC3C7; }
+        .btn-cancelar:hover { color: var(--infotep-orange); border-color: var(--infotep-orange); }
+        .btn-limpiar { background-color: #E8EEF5; color: var(--text-dark); }
+        .btn-limpiar:hover { background-color: #DCE5EF; }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea,
+        select {
+            background-color: #FDFDFD;
+            border: 1px solid #CED4DA;
+            border-radius: 6px;
+            min-height: 45px;
+            font-size: 0.95rem;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--infotep-orange);
+            box-shadow: 0 0 0 3px rgba(247, 147, 30, 0.15);
+        }
+
+        label {
+            color: var(--infotep-blue);
+            font-weight: 600;
+        }
+
+        .app-modal-overlay {
+            background-color: rgba(0, 51, 102, 0.6);
+        }
+
+        .app-modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .app-modal-header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .app-modal-close {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            transition: color 0.2s ease;
+        }
+
+        .app-modal-close:hover {
+            color: #dc2626;
+        }
+
+        .app-section-title {
+            font-weight: 700;
+            color: var(--infotep-blue);
+        }
+
+        .app-table thead tr {
+            background-color: #EAF0F7;
+            color: var(--text-muted);
+        }
+
+        .app-table tbody tr:hover {
+            background-color: #f7f9fc;
+        }
+
+        .status-registered {
+            background-color: #FFF4E6;
+            color: #9A4F00;
+        }
+
+        .status-reviewed {
+            background-color: #E8F7ED;
+            color: #1D6B2F;
+        }
+
+        .status-default {
+            background-color: #E9EEF5;
+            color: var(--text-dark);
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+<body class="min-h-screen flex flex-col">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center gap-4">
-                    <span class="text-2xl font-black italic text-slate-800 tracking-tighter">Lanza <span class="text-blue-600">tu idea 0.1</span></span>
-                    <span class="hidden md:block text-xs font-semibold text-slate-400 border-l-2 border-slate-200 pl-4 uppercase tracking-wide">Dep. Investigación Aplicada a la Innovación</span>
+    <nav class="app-header sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div class="flex justify-between items-center h-full">
+                <div class="app-brand">
+                    <div class="app-logo-wrap">
+                        <img id="appLogo" class="app-logo" src="/assets/branding/logo-placeholder.svg" alt="Logo Lanza tu idea">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="app-title">Lanza tu idea</span>
+                        <span class="app-subtitle">Dep. Investigación Aplicada a la Innovación</span>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <span id="userInfo" class="text-sm font-medium text-slate-500"></span>
-                    <button onclick="logout()" id="btnLogout" class="hidden text-xs font-bold text-red-500 hover:text-red-700 uppercase">Cerrar Sesión</button>
+                <div class="flex items-center gap-4 text-white">
+                    <span id="userInfo" class="text-sm font-medium text-white/80"></span>
+                    <button onclick="logout()" id="btnLogout" class="hidden text-xs font-bold text-orange-200 hover:text-orange-300 uppercase">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
     </nav>
 
     <div id="viewLogin" class="flex-grow flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-            <div class="bg-blue-600 p-8 text-center">
+        <div class="max-w-md w-full app-card overflow-hidden border border-slate-100">
+            <div class="bg-gradient-to-r from-[#003366] to-[#004080] p-8 text-center">
                 <h1 class="text-3xl font-bold text-white mb-2">Bienvenido</h1>
                 <p class="text-blue-100">Ingresa tus credenciales para continuar</p>
             </div>
             <form id="loginForm" class="p-8 space-y-4" autocomplete="off">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Usuario</label>
-                    <input type="text" id="loginUser" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu usuario" required autocomplete="off">
+                    <label class="block text-xs uppercase mb-1">Usuario</label>
+                    <input type="text" id="loginUser" class="w-full p-3 outline-none" placeholder="Tu usuario" required autocomplete="off">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Contraseña</label>
-                    <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu contraseña" required autocomplete="off">
+                    <label class="block text-xs uppercase mb-1">Contraseña</label>
+                    <input type="password" id="loginPass" class="w-full p-3 outline-none" placeholder="Tu contraseña" required autocomplete="off">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">Entrar</button>
+                <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold transition">Entrar</button>
                 <p class="text-xs text-slate-400 text-center">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
             </form>
         </div>
@@ -68,18 +278,18 @@
 
         <div id="ideadorHome" class="space-y-8">
             <div class="text-center py-10">
-                <h2 class="text-4xl font-bold text-slate-800 mb-4">¿Tienes una idea innovadora?</h2>
+                <h2 class="text-4xl font-bold mb-4">¿Tienes una idea innovadora?</h2>
                 <p class="text-lg text-slate-600 max-w-2xl mx-auto" id="systemDescription">
                     Este es el sistema oficial para registrar, revisar y clasificar las ideas de innovación para su posterior ejecución. Tu creatividad impulsa nuestro crecimiento.
                 </p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-                <button onclick="navIdeador('formulario')" class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 hover:shadow-2xl hover:-translate-y-1 transition-all text-center group">
+                <button onclick="navIdeador('formulario')" class="app-card app-card-hover p-8 rounded-3xl border border-slate-200 transition-all text-center group">
                     <div class="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">🚀</div>
-                    <h3 class="text-2xl font-bold text-blue-600 mb-2">Lanza tu idea</h3>
+                    <h3 class="text-2xl font-bold text-[#003366] mb-2">Lanza tu idea</h3>
                     <p class="text-slate-500">Accede al formulario para registrar una nueva propuesta.</p>
                 </button>
-                <button onclick="navIdeador('lista')" class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200 hover:shadow-2xl hover:-translate-y-1 transition-all text-center group">
+                <button onclick="navIdeador('lista')" class="app-card app-card-hover p-8 rounded-3xl border border-slate-200 transition-all text-center group">
                     <div class="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">📂</div>
                     <h3 class="text-2xl font-bold text-slate-700 mb-2">Ideas Lanzadas</h3>
                     <p class="text-slate-500">Consulta el histórico y estatus de tus ideas registradas.</p>
@@ -87,50 +297,50 @@
             </div>
         </div>
 
-        <div id="ideadorForm" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-slate-700">📝 Formulario de Registro</h3>
-                <button onclick="navIdeador('home')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al inicio</button>
+        <div id="ideadorForm" class="hidden app-card border border-slate-200 overflow-hidden">
+            <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold">📝 Formulario de Registro</h3>
+                <button onclick="navIdeador('home')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al inicio</button>
             </div>
             <form id="formIdea" class="p-8 space-y-6" autocomplete="off">
-                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-4">
+                <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-blue-800 uppercase mb-1">No. Empleado <span class="text-red-500">*</span></label>
+                            <label class="block text-xs uppercase mb-1">No. Empleado <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <input type="text" id="idEmpleado" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" readonly required autocomplete="off">
+                                <input type="text" id="idEmpleado" class="w-full p-3 outline-none" readonly required autocomplete="off">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Nombre Completo</label>
+                            <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo Electrónico</label>
-                            <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Correo Electrónico</label>
+                            <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="emailHint">Formato de correo inválido</span>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Dirección / Depto</label>
-                            <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Dirección / Depto</label>
+                            <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción de la Idea <span class="text-red-500">*</span></label>
-                        <textarea id="descIdea" rows="2" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Título corto o resumen de la idea..." required></textarea>
+                        <label class="block text-xs uppercase mb-1">Descripción de la Idea <span class="text-red-500">*</span></label>
+                        <textarea id="descIdea" rows="2" class="w-full p-3 outline-none" placeholder="Título corto o resumen de la idea..." required></textarea>
                         <button type="button" onclick="limpiarCampo('descIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Detalle <span class="text-red-500">*</span></label>
-                        <textarea id="detalleIdea" rows="5" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Explica detalladamente en qué consiste..." required></textarea>
+                        <label class="block text-xs uppercase mb-1">Detalle <span class="text-red-500">*</span></label>
+                        <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Explica detalladamente en qué consiste..." required></textarea>
                         <button type="button" onclick="limpiarCampo('detalleIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="ideaInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
+                        <label class="block text-xs uppercase mb-1">Instancia</label>
+                        <select id="ideaInstancia" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
@@ -153,16 +363,16 @@
 
         <div id="ideadorLista" class="hidden space-y-4">
             <div class="flex justify-between items-end">
-                <h3 class="text-2xl font-bold text-slate-800">📂 Mis Ideas Lanzadas</h3>
+                <h3 class="text-2xl font-bold">📂 Mis Ideas Lanzadas</h3>
                 <div class="space-x-2">
-                    <button onclick="navIdeador('formulario')" class="text-blue-600 font-bold text-sm bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100">Nueva Idea</button>
-                    <button onclick="navIdeador('home')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Inicio</button>
+                    <button onclick="navIdeador('formulario')" class="btn-action text-sm px-4 py-2 rounded-lg">Nueva Idea</button>
+                    <button onclick="navIdeador('home')" class="btn-outline text-sm px-4 py-2 rounded-lg">Volver Inicio</button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-bold">
+            <div class="app-card rounded-2xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-left app-table">
+                    <thead class="text-xs uppercase font-bold">
                         <tr>
                             <th class="p-4">ID</th>
                             <th class="p-4">Fecha</th>
@@ -179,11 +389,11 @@
     </main>
 
     <main id="viewGestor" class="hidden max-w-4xl mx-auto w-full p-6 space-y-6 fade-in">
-        <div class="bg-white rounded-3xl shadow-lg border border-slate-200 p-8 space-y-6 text-center">
+        <div class="app-card rounded-3xl border border-slate-200 p-8 space-y-6 text-center">
             <div class="text-6xl">🧭</div>
-            <h2 class="text-2xl font-bold text-slate-700">Panel de Gestores en construcción</h2>
+            <h2 class="text-2xl font-bold">Panel de Gestores en construcción</h2>
             <p class="text-slate-500">Estamos trabajando en un panel exclusivo para gestores. Mientras tanto, puedes registrar ideas como ideador.</p>
-            <button onclick="abrirFormularioGestor()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700">Registrar una idea</button>
+            <button onclick="abrirFormularioGestor()" class="btn-primary px-6 py-3 rounded-xl font-bold">Registrar una idea</button>
         </div>
     </main>
 
@@ -191,51 +401,51 @@
 
         <div id="adminDashboard">
             <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-slate-800">📊 Dashboard General</h2>
+                <h2 class="text-2xl font-bold">📊 Dashboard General</h2>
                 <div class="flex gap-2">
-                    <button onclick="navAdmin('registrar')" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Registrar Idea (Manual)</button>
-                    <button onclick="navAdmin('inbox')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">📥 Ideas Registradas</button>
-                    <button onclick="navAdmin('revisadas')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">✅ Ideas Revisadas</button>
-                    <button onclick="navAdmin('config')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">⚙️ Configuración</button>
+                    <button onclick="navAdmin('registrar')" class="btn-primary px-4 py-2 rounded-lg text-sm">Registrar Idea (Manual)</button>
+                    <button onclick="navAdmin('inbox')" class="btn-outline px-4 py-2 rounded-lg text-sm">📥 Ideas Registradas</button>
+                    <button onclick="navAdmin('revisadas')" class="btn-outline px-4 py-2 rounded-lg text-sm">✅ Ideas Revisadas</button>
+                    <button onclick="navAdmin('config')" class="btn-outline px-4 py-2 rounded-lg text-sm">⚙️ Configuración</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-blue-500">
+                <div class="app-card p-4 rounded-2xl border-l-4 border-[#003366]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Total Registradas</p>
                     <p id="kpiTotalIdeas" class="text-3xl font-black text-slate-800">0</p>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-yellow-500">
+                <div class="app-card p-4 rounded-2xl border-l-4 border-[#F7931E]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Pendientes Revisión</p>
                     <p id="kpiPendientes" class="text-3xl font-black text-slate-800">0</p>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-green-500">
+                <div class="app-card p-4 rounded-2xl border-l-4 border-[#34BF49]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Aprobadas/Revisadas</p>
                     <p id="kpiAprobadas" class="text-3xl font-black text-slate-800">0</p>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-sky-500">
+                <div class="app-card p-4 rounded-2xl border-l-4 border-[#4A90E2]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Usuarios Activos</p>
                     <p id="kpiUsuarios" class="text-3xl font-black text-slate-800">0</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="app-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Estatus de Ideas</h3>
                     <canvas id="chartStatus"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="app-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Clasificación de Ideas</h3>
                     <canvas id="chartClasificacion"></canvas>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="app-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Vía</h3>
                     <canvas id="chartVia"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow">
+                <div class="app-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Instancia</h3>
                     <canvas id="chartInstancia"></canvas>
                 </div>
@@ -291,7 +501,7 @@
                         </select>
                     </div>
                     <div>
-                        <button id="timelineFilterButton" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">
+                        <button id="timelineFilterButton" class="w-full btn-primary px-4 py-2 rounded-lg text-sm">
                             Filtrar
                         </button>
                     </div>
@@ -304,13 +514,13 @@
 
         <div id="adminInbox" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-bold text-slate-800">📥 Ideas Registradas</h3>
-                <button onclick="navAdmin('dashboard')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Dashboard</button>
+                <h3 class="text-2xl font-bold">📥 Ideas Registradas</h3>
+                <button onclick="navAdmin('dashboard')" class="btn-outline text-sm px-4 py-2 rounded-lg">Volver Dashboard</button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-bold">
+            <div class="app-card rounded-2xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-left app-table">
+                    <thead class="text-xs uppercase font-bold">
                         <tr>
                             <th class="p-4">Fecha</th>
                             <th class="p-4">Empleado</th>
@@ -326,13 +536,13 @@
 
         <div id="adminRevisadas" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-bold text-slate-800">✅ Ideas Revisadas</h3>
-                <button onclick="navAdmin('dashboard')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Dashboard</button>
+                <h3 class="text-2xl font-bold">✅ Ideas Revisadas</h3>
+                <button onclick="navAdmin('dashboard')" class="btn-outline text-sm px-4 py-2 rounded-lg">Volver Dashboard</button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-100 text-slate-500 text-xs uppercase font-bold">
+            <div class="app-card rounded-2xl border border-slate-200 overflow-hidden">
+                <table class="w-full text-left app-table">
+                    <thead class="text-xs uppercase font-bold">
                         <tr>
                             <th class="p-4">Fecha</th>
                             <th class="p-4">Empleado</th>
@@ -347,31 +557,31 @@
             </div>
         </div>
 
-        <div id="adminForm" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-            <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-slate-700">🛡️ Registro Manual Administrativo</h3>
-                <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
+        <div id="adminForm" class="hidden app-card rounded-3xl border border-slate-200 overflow-hidden">
+            <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold">🛡️ Registro Manual Administrativo</h3>
+                <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al dashboard</button>
             </div>
             <form id="formAdminManual" class="p-8 space-y-6" autocomplete="off">
-                <div class="bg-sky-50 p-6 rounded-2xl border border-sky-100 space-y-4">
+                <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-bold text-sky-700 uppercase mb-1">No. Empleado</label>
-                            <input type="text" id="adminIdEmp" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" placeholder="Ej: 1010" required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">No. Empleado</label>
+                            <input type="text" id="adminIdEmp" class="w-full p-3 outline-none" placeholder="Ej: 1010" required autocomplete="off">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre Completo</label>
-                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Nombre Completo</label>
+                            <input type="text" id="adminNomEmp" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminNomEmpHint">Nombre requerido</span>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Correo</label>
-                            <input type="email" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Correo</label>
+                            <input type="email" id="adminMailEmp" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminMailEmpHint">Formato de correo inválido</span>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Departamento</label>
-                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 rounded-xl text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Departamento</label>
+                            <input type="text" id="adminDirEmp" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             <span class="text-xs text-red-500 hidden" id="adminDirEmpHint">Departamento requerido</span>
                         </div>
                     </div>
@@ -379,31 +589,31 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Descripción</label>
-                        <textarea id="adminDesc" rows="2" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" required></textarea>
+                        <label class="block text-xs uppercase mb-1">Descripción</label>
+                        <textarea id="adminDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Detalle</label>
-                        <textarea id="adminDetalle" rows="4" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-sky-500" required></textarea>
+                        <label class="block text-xs uppercase mb-1">Detalle</label>
+                        <textarea id="adminDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Clasificación</label>
-                        <select id="adminClasif" class="w-full p-3 border rounded-xl bg-white text-sm" required>
+                        <label class="block text-xs uppercase mb-1">Clasificación</label>
+                        <select id="adminClasif" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
                         <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Instancia</label>
-                        <select id="adminInstancia" class="w-full p-3 border rounded-xl bg-white text-sm" required>
+                        <label class="block text-xs uppercase mb-1">Instancia</label>
+                        <select id="adminInstancia" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una instancia</option>
                         </select>
                         <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
                         <span class="text-xs text-red-500 hidden" id="adminInstanciaHint">Instancia requerida</span>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Vía de Registro</label>
-                        <select id="adminVia" class="w-full p-3 border rounded-xl bg-white text-sm">
+                        <label class="block text-xs uppercase mb-1">Vía de Registro</label>
+                        <select id="adminVia" class="w-full p-3 bg-white text-sm">
                             <option value="Sistema">Sistema</option>
                             <option value="Correo">Correo</option>
                             <option value="Otro">Otro</option>
@@ -411,26 +621,55 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-sky-600 text-white py-3 rounded-lg font-bold hover:bg-sky-700">Registrar Idea Manual</button>
+                <button type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea Manual</button>
             </form>
         </div>
 
         <div id="adminConfig" class="hidden space-y-6">
-            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-                <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-slate-700">⚙️ Configuración</h3>
-                    <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-blue-600">← Volver al dashboard</button>
+            <div class="app-card rounded-3xl border border-slate-200 overflow-hidden">
+                <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="text-xl font-bold">⚙️ Configuración</h3>
+                    <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al dashboard</button>
                 </div>
                 <div class="p-8 space-y-8">
                     <section class="space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <h4 class="text-lg font-bold text-slate-700">🎨 Identidad visual</h4>
+                            <button onclick="saveBrandingAssets()" class="btn-primary px-4 py-2 rounded-lg text-sm">Guardar cambios</button>
+                        </div>
+                        <p class="text-sm text-slate-500">Actualiza el logo (999×370) y el favicon institucional. Los cambios se aplican de inmediato en el header y en el navegador.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="app-card p-4 rounded-2xl border border-slate-200 space-y-4">
+                                <div>
+                                    <label class="block text-xs uppercase mb-1">Logo principal</label>
+                                    <input type="file" id="brandingLogo" accept="image/png,image/jpeg,image/svg+xml" class="w-full p-2 border rounded-lg bg-white" />
+                                    <p class="text-xs text-slate-400 mt-1">Formatos: PNG, JPG o SVG.</p>
+                                </div>
+                                <div class="bg-[#F4F6F9] border border-dashed border-slate-200 rounded-xl p-4 flex items-center justify-center min-h-[140px]">
+                                    <img id="brandingLogoPreview" src="/assets/branding/logo-placeholder.svg" alt="Vista previa del logo" class="max-h-[120px] w-auto object-contain">
+                                </div>
+                            </div>
+                            <div class="app-card p-4 rounded-2xl border border-slate-200 space-y-4">
+                                <div>
+                                    <label class="block text-xs uppercase mb-1">Favicon</label>
+                                    <input type="file" id="brandingFavicon" accept="image/png,image/svg+xml,image/x-icon" class="w-full p-2 border rounded-lg bg-white" />
+                                    <p class="text-xs text-slate-400 mt-1">Formatos: PNG, SVG o ICO.</p>
+                                </div>
+                                <div class="bg-[#F4F6F9] border border-dashed border-slate-200 rounded-xl p-6 flex items-center justify-center min-h-[140px]">
+                                    <img id="brandingFaviconPreview" src="/assets/branding/favicon-placeholder.svg" alt="Vista previa del favicon" class="h-16 w-16 object-contain">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">👥 Usuarios y Roles</h4>
-                            <button onclick="abrirModalCrearUsuario()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">➕ Agregar usuario</button>
+                            <button onclick="abrirModalCrearUsuario()" class="btn-action px-4 py-2 rounded-lg text-sm">➕ Agregar usuario</button>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full text-left text-sm">
+                            <table class="min-w-full text-left text-sm app-table">
                                 <thead>
-                                    <tr class="text-slate-500">
+                                    <tr>
                                         <th class="p-3">Usuario</th>
                                         <th class="p-3">Código</th>
                                         <th class="p-3">Nombre</th>
@@ -452,13 +691,13 @@
                             <h4 class="text-lg font-bold text-slate-700">🏷️ Clasificaciones</h4>
                             <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                                 <input type="text" id="newClassificationName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva clasificación" />
-                                <button onclick="addClassification()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700">Agregar</button>
+                                <button onclick="addClassification()" class="btn-action px-4 py-2 rounded-lg text-sm">Agregar</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full text-left text-sm">
+                            <table class="min-w-full text-left text-sm app-table">
                                 <thead>
-                                    <tr class="text-slate-500">
+                                    <tr>
                                         <th class="p-3">ID</th>
                                         <th class="p-3">Nombre</th>
                                         <th class="p-3 text-right">Acciones</th>
@@ -476,13 +715,13 @@
                             <h4 class="text-lg font-bold text-slate-700">🏢 Instancias</h4>
                             <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                                 <input type="text" id="newInstanceName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva instancia" />
-                                <button onclick="addInstance()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700">Agregar</button>
+                                <button onclick="addInstance()" class="btn-action px-4 py-2 rounded-lg text-sm">Agregar</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full text-left text-sm">
+                            <table class="min-w-full text-left text-sm app-table">
                                 <thead>
-                                    <tr class="text-slate-500">
+                                    <tr>
                                         <th class="p-3">ID</th>
                                         <th class="p-3">Nombre</th>
                                         <th class="p-3 text-right">Acciones</th>
@@ -498,26 +737,26 @@
             </div>
         </div>
 
-        <div id="modalCrearUsuario" class="hidden fixed inset-0 bg-black/40 items-center justify-center z-50">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
-                <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+        <div id="modalCrearUsuario" class="hidden fixed inset-0 app-modal-overlay items-center justify-center z-50">
+            <div class="bg-white app-modal-content w-full max-w-md mx-4">
+                <div class="p-6 app-modal-header flex justify-between items-center">
                     <h4 class="text-lg font-bold text-slate-700">➕ Nuevo usuario</h4>
-                    <button onclick="cerrarModalCrearUsuario()" class="text-slate-400 hover:text-slate-600">✕</button>
+                    <button onclick="cerrarModalCrearUsuario()" class="app-modal-close">✕</button>
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre de usuario</label>
-                        <input type="text" id="nuevoUserName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="usuario" />
+                        <label class="block text-xs uppercase mb-1">Nombre de usuario</label>
+                        <input type="text" id="nuevoUserName" class="w-full p-3 outline-none" placeholder="usuario" />
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Instancia</label>
-                        <select id="nuevoUserInstancia" class="w-full p-3 border rounded-xl bg-white">
+                        <label class="block text-xs uppercase mb-1">Instancia</label>
+                        <select id="nuevoUserInstancia" class="w-full p-3 bg-white">
                             <option value="">Seleccione una instancia</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Rol</label>
-                        <select id="nuevoUserRole" class="w-full p-3 border rounded-xl bg-white">
+                        <label class="block text-xs uppercase mb-1">Rol</label>
+                        <select id="nuevoUserRole" class="w-full p-3 bg-white">
                             <option value="">Ideador (sin rol)</option>
                             <option value="Admin">Admin</option>
                             <option value="Gestor">Gestor</option>
@@ -525,18 +764,18 @@
                     </div>
                 </div>
                 <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
-                    <button onclick="cerrarModalCrearUsuario()" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700">Cancelar</button>
-                    <button onclick="crearUsuarioAdmin()" class="px-4 py-2 rounded-lg text-sm font-bold bg-blue-600 text-white hover:bg-blue-700">Guardar</button>
+                    <button onclick="cerrarModalCrearUsuario()" class="btn-outline px-4 py-2 rounded-lg text-sm">Cancelar</button>
+                    <button onclick="crearUsuarioAdmin()" class="btn-primary px-4 py-2 rounded-lg text-sm">Guardar</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <div id="modalDetalle" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-slide-up">
-            <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
-                <h3 class="font-bold">Detalle de la Idea <span id="modalId" class="text-blue-300 ml-2"></span></h3>
-                <button onclick="cerrarModal()" class="text-white hover:text-red-400 font-bold text-xl">✕</button>
+    <div id="modalDetalle" class="fixed inset-0 app-modal-overlay hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white app-modal-content w-full max-w-2xl overflow-hidden animate-slide-up">
+            <div class="app-modal-header p-4 flex justify-between items-center">
+                <h3 class="font-bold text-[#003366]">Detalle de la Idea <span id="modalId" class="text-[#F7931E] ml-2"></span></h3>
+                <button onclick="cerrarModal()" class="app-modal-close">✕</button>
             </div>
             
             <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
@@ -558,7 +797,7 @@
                 </div>
                 
                 <div id="adminControls" class="hidden border-t pt-4 mt-4 space-y-4">
-                    <h4 class="font-bold text-sky-700 text-sm uppercase">Gestión Administrativa</h4>
+                    <h4 class="font-bold text-[#003366] text-sm uppercase">Gestión Administrativa</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <select id="mAdminClasif" class="p-2 border rounded bg-white text-sm">
                             <option value="">Sin clasificar</option>
@@ -577,11 +816,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 uppercase mb-1">Comentario Administrativo</label>
+                        <label class="block text-xs uppercase mb-1">Comentario Administrativo</label>
                         <textarea id="mAdminComentario" rows="3" class="w-full p-2 border rounded bg-white text-sm" placeholder="Agrega observaciones internas..."></textarea>
                     </div>
 
-                    <button onclick="guardarRevisionAdmin()" class="w-full bg-sky-600 text-white py-2 rounded-lg font-bold hover:bg-sky-700">Guardar Revisión</button>
+                    <button onclick="guardarRevisionAdmin()" class="w-full btn-primary py-2 rounded-lg font-bold">Guardar Revisión</button>
                 </div>
             </div>
         </div>
@@ -626,6 +865,8 @@
             if (timelineButton) {
                 timelineButton.addEventListener('click', () => cargarTimeline());
             }
+            bindBrandingPreview('brandingLogo', 'brandingLogoPreview');
+            bindBrandingPreview('brandingFavicon', 'brandingFaviconPreview');
             initApp();
         });
 
@@ -681,6 +922,117 @@
                 headers: finalHeaders
             };
             return fetch(finalUrl, finalOptions);
+        }
+
+        async function apiFetchForm(url, formData, method = 'POST') {
+            const endpoint = url.startsWith('/') ? url.substring(1) : url;
+            const baseUrl = getAppBaseHref();
+            const finalUrl = `${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}${endpoint}`;
+            const headers = {};
+
+            if (!['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase())) {
+                const xsrfToken = getCookie('XSRF-TOKEN');
+                if (xsrfToken) {
+                    headers['X-XSRF-TOKEN'] = decodeURIComponent(xsrfToken);
+                }
+            }
+
+            return fetch(finalUrl, {
+                method,
+                body: formData,
+                credentials: 'include',
+                headers
+            });
+        }
+
+        function resolveAssetUrl(path) {
+            if (!path) return '';
+            if (path.startsWith('http')) return path;
+            const base = getAppBaseHref().replace(/\/$/, '');
+            return `${base}${path}`;
+        }
+
+        async function loadBranding() {
+            const response = await apiFetch('/api/config/branding', { method: 'GET' });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            applyBranding(data);
+        }
+
+        function applyBranding(data) {
+            if (!data) return;
+            const logoUrl = resolveAssetUrl(data.logoUrl);
+            const faviconUrl = resolveAssetUrl(data.faviconUrl);
+
+            const logoImg = document.getElementById('appLogo');
+            if (logoImg && logoUrl) {
+                logoImg.src = logoUrl;
+            }
+
+            const faviconLink = document.getElementById('appFavicon');
+            if (faviconLink && faviconUrl) {
+                faviconLink.href = faviconUrl;
+            }
+
+            const logoPreview = document.getElementById('brandingLogoPreview');
+            if (logoPreview && logoUrl) {
+                logoPreview.src = logoUrl;
+            }
+
+            const faviconPreview = document.getElementById('brandingFaviconPreview');
+            if (faviconPreview && faviconUrl) {
+                faviconPreview.src = faviconUrl;
+            }
+        }
+
+        function bindBrandingPreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            if (!input || !preview) return;
+
+            input.addEventListener('change', () => {
+                const file = input.files?.[0];
+                if (!file) return;
+                const objectUrl = URL.createObjectURL(file);
+                preview.src = objectUrl;
+                preview.onload = () => URL.revokeObjectURL(objectUrl);
+            });
+        }
+
+        async function saveBrandingAssets() {
+            const logoInput = document.getElementById('brandingLogo');
+            const faviconInput = document.getElementById('brandingFavicon');
+            const logoFile = logoInput?.files?.[0];
+            const faviconFile = faviconInput?.files?.[0];
+
+            if (!logoFile && !faviconFile) {
+                showError('Error', 'Selecciona al menos un archivo para actualizar.');
+                return;
+            }
+
+            const formData = new FormData();
+            if (logoFile) {
+                formData.append('logo', logoFile);
+            }
+            if (faviconFile) {
+                formData.append('favicon', faviconFile);
+            }
+
+            const response = await apiFetchForm('/api/config/branding', formData, 'POST');
+            if (!response.ok) {
+                showError('Error', 'No fue posible guardar la identidad visual.');
+                return;
+            }
+
+            const data = await response.json();
+            applyBranding(data);
+
+            if (logoInput) logoInput.value = '';
+            if (faviconInput) faviconInput.value = '';
+
+            showSuccess('Actualizado', 'La identidad visual se guardó correctamente.');
         }
 
         async function loadCatalogs() {
@@ -763,6 +1115,7 @@
         }
 
         async function initApp() {
+            await loadBranding();
             await apiFetch('/api/csrf/token', { method: 'GET' });
             const response = await apiFetch('/api/auth/me', { method: 'GET' });
             if (response.ok) {
@@ -1144,7 +1497,7 @@
                         <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${getColorStatus(idea.status)}">${idea.status}</span></td>
                         <td class="p-4 text-center">
                             <div class="flex items-center justify-center gap-3">
-                                <button onclick="mostrarDetalle(${idea.id})" class="text-blue-600 hover:text-blue-800">👁️ Ver</button>
+                                <button onclick="mostrarDetalle(${idea.id})" class="text-[#003366] hover:text-[#F7931E]">👁️ Ver</button>
                                 ${deleteButton}
                             </div>
                         </td>
@@ -1295,7 +1648,7 @@
                         <td class="p-4 text-slate-600">${idea.descripcion}</td>
                         <td class="p-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                                <button onclick="mostrarDetalle(${idea.id}, true)" class="bg-blue-600 text-white px-3 py-1 rounded shadow text-xs hover:bg-blue-700">Revisar</button>
+                                <button onclick="mostrarDetalle(${idea.id}, true)" class="btn-primary px-3 py-1 rounded text-xs">Revisar</button>
                                 <button onclick="eliminarIdea(${idea.id})" class="bg-rose-100 text-rose-700 px-3 py-1 rounded shadow text-xs hover:bg-rose-200">🗑️ Eliminar</button>
                             </div>
                         </td>
@@ -1318,10 +1671,10 @@
                         <td class="p-4 text-slate-500">${fecha}</td>
                         <td class="p-4 font-bold text-slate-700">${nombre}</td>
                         <td class="p-4 text-slate-600">${idea.descripcion}</td>
-                        <td class="p-4 text-xs font-bold text-sky-600">${idea.clasificacion || '-'}</td>
+                        <td class="p-4 text-xs font-bold text-[#34BF49]">${idea.clasificacion || '-'}</td>
                         <td class="p-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                                <button onclick="mostrarDetalle(${idea.id}, true)" class="text-slate-400 hover:text-blue-600">📝 Editar</button>
+                                <button onclick="mostrarDetalle(${idea.id}, true)" class="text-slate-400 hover:text-[#F7931E]">📝 Editar</button>
                                 <button onclick="eliminarIdea(${idea.id})" class="bg-rose-100 text-rose-700 px-3 py-1 rounded shadow text-xs hover:bg-rose-200">🗑️ Eliminar</button>
                             </div>
                         </td>
@@ -1330,9 +1683,9 @@
         }
 
         function getColorStatus(status) {
-            if(status === 'Registrada') return 'bg-yellow-100 text-yellow-800';
-            if(status === 'Revisada') return 'bg-green-100 text-green-800';
-            return 'bg-slate-100 text-slate-800';
+            if(status === 'Registrada') return 'status-registered';
+            if(status === 'Revisada') return 'status-reviewed';
+            return 'status-default';
         }
 
         async function actualizarDashboard() {
@@ -1891,7 +2244,7 @@
 
         function showSuccess(title, text) {
             if (typeof Swal !== 'undefined') {
-                Swal.fire({ title, text, icon: 'success', confirmButtonColor: '#16a34a' });
+                Swal.fire({ title, text, icon: 'success', confirmButtonColor: '#F7931E' });
             } else {
                 alert(`${title} ${text}`);
             }
