@@ -21,9 +21,20 @@ builder.Services.AddExceptionHandler<LanzaTuIdea.Api.Middleware.GlobalExceptionH
 builder.Services.AddProblemDetails();
 
 // Base de Datos
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+var useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
+if (useInMemory)
+{
+    // Modo para Codex/Tests: Base de datos volátil en RAM
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseInMemoryDatabase("LanzaTuIdeaTestDb"));
+}
+else
+{
+    // Modo Real: SQL Server
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(
+            builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 // Configuración de Opciones del Servicio AD
 builder.Services.Configure<AdServiceOptions>(builder.Configuration.GetSection("AdService"));

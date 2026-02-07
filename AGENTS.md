@@ -79,3 +79,15 @@ else
 fi
 
 echo "🚀 Setup completado. Ya puedes compilar y ejecutar."
+
+### 📸 Instrucciones para Screenshots y Pruebas de UI (IMPORTANTE)
+El entorno Sandbox NO tiene SQL Server. Para levantar la interfaz y tomar screenshots, DEBES usar el modo "In-Memory":
+
+1. **Ejecutar la App:**
+   Usa este comando exacto para activar el modo sin SQL:
+   `dotnet run --UseInMemoryDatabase=true --urls "http://0.0.0.0:5116"`
+
+2. **Comportamiento Esperado:**
+   * La app iniciará usando una base de datos vacía en RAM.
+   * `SeedData` se ejecutará automáticamente (asegúrate de que SeedData no use transacciones SQL crudas).
+   * Ahora podrás navegar a `http://localhost:5116` y tomar screenshots sin errores de conexión.
