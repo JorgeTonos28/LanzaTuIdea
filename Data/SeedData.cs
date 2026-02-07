@@ -14,10 +14,14 @@ public static class SeedData
         Console.WriteLine("--> [SeedData] Iniciando inicialización de datos...");
         
         var autoMigrate = environment.IsDevelopment() || configuration.GetValue<bool>("Database:AutoMigrate");
-        if (autoMigrate)
+        if (autoMigrate && !context.Database.IsInMemory())
         {
             Console.WriteLine("--> [SeedData] Aplicando migraciones pendientes...");
             await context.Database.MigrateAsync();
+        }
+        else if (autoMigrate)
+        {
+            Console.WriteLine("--> [SeedData] Migraciones omitidas (proveedor InMemory).");
         }
 
         await SeedRolesAsync(context);
