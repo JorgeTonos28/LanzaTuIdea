@@ -348,7 +348,7 @@ namespace LanzaTuIdea.Api.Migrations
                     b.HasOne("LanzaTuIdea.Api.Models.AppUser", "AssignedToUser")
                         .WithMany("AssignedIdeas")
                         .HasForeignKey("AssignedToUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("LanzaTuIdea.Api.Models.AppUser", "CreatedByUser")
                         .WithMany("Ideas")

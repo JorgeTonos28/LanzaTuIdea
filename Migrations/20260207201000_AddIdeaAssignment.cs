@@ -26,8 +26,7 @@ namespace LanzaTuIdea.Api.Migrations
                 table: "Ideas",
                 column: "AssignedToUserId",
                 principalTable: "AppUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />

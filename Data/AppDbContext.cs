@@ -89,7 +89,7 @@ public class AppDbContext : DbContext
             entity.HasOne(i => i.AssignedToUser)
                 .WithMany(u => u.AssignedIdeas)
                 .HasForeignKey(i => i.AssignedToUserId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<IdeaHistory>(entity =>
