@@ -3,41 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lanza tu idea 0.1 | Sistema de Innovación</title>
+    <title>Lanza tu idea | Sistema de Innovación</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link id="appFavicon" rel="icon" href="assets/lanza-tu-idea-favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --infotep-blue: #003366;
+            --infotep-orange: #f7931e;
+            --infotep-green: #34bf49;
+            --bg-light: #f4f6f9;
+            --text-dark: #2c3e50;
+            --text-muted: #7f8c8d;
+            --white: #ffffff;
+            --radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 51, 102, 0.08);
+        }
+
+        .app-body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .app-shell {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .nav-shell {
+            padding: 0 20px;
+        }
+
+        .site-header {
+            background: linear-gradient(120deg, #002b55, var(--infotep-blue));
+            color: var(--white);
+            height: 70px;
+            box-shadow: 0 4px 6px -1px rgba(0, 51, 102, 0.12);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo {
+            height: 50px;
+            width: auto;
+            background: #f7f9fc;
+            padding: 6px 10px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .brand-title {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.75);
+            letter-spacing: 0.04em;
+        }
+
+        h1, h2, h3 {
+            color: var(--infotep-blue);
+            font-weight: 700;
+        }
+
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
 
-        /* Colores Botones */
-        .btn-registar { background-color: #16a34a; color: white; } /* Verde */
-        .btn-registar:hover { background-color: #15803d; }
-        .btn-cancelar { background-color: #dc2626; color: white; } /* Rojo */
-        .btn-cancelar:hover { background-color: #b91c1c; }
-        .btn-limpiar { background-color: #e2e8f0; color: #475569; } /* Gris suave */
-        .btn-limpiar:hover { background-color: #cbd5e1; }
+        .btn-primary {
+            background-color: var(--infotep-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #004080;
+        }
+
+        .btn-action {
+            background-color: var(--infotep-orange);
+            color: var(--white);
+        }
+
+        .btn-action:hover {
+            background-color: #d67d14;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #bdc3c7;
+            color: var(--text-muted);
+        }
+
+        .btn-primary,
+        .btn-action,
+        .btn-outline {
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .btn-registar {
+            background-color: var(--infotep-blue);
+            color: var(--white);
+            border-radius: 6px !important;
+        }
+
+        .btn-registar:hover {
+            background-color: #004080;
+        }
+
+        .btn-cancelar {
+            background-color: transparent;
+            border: 1px solid #bdc3c7;
+            color: var(--text-muted);
+            border-radius: 6px !important;
+        }
+
+        .btn-cancelar:hover {
+            background-color: #eef1f4;
+            color: var(--text-dark);
+        }
+
+        .btn-limpiar {
+            background-color: #eef1f4;
+            color: var(--text-muted);
+            border-radius: 6px !important;
+        }
+
+        .btn-limpiar:hover {
+            background-color: #dde3ea;
+        }
+
+        label {
+            color: var(--infotep-blue) !important;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        textarea,
+        select {
+            background-color: #fdfdfd !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 6px !important;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--infotep-orange) !important;
+            box-shadow: 0 0 0 3px rgba(247, 147, 30, 0.12) !important;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 51, 102, 0.6) !important;
+        }
+
+        .modal-panel {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background-color: var(--white);
+            border-bottom: 2px solid var(--bg-light);
+            color: var(--infotep-blue);
+        }
+
+        .modal-close {
+            color: var(--text-muted);
+        }
+
+        .modal-close:hover {
+            color: #dc2626;
+        }
+
+        .card-surface {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .idea-card {
+            border-top: 4px solid var(--infotep-blue);
+        }
+
+        .idea-card[data-category="procesos"] {
+            border-top-color: var(--infotep-green);
+        }
+
+        .idea-card[data-category="cultura"] {
+            border-top-color: var(--infotep-orange);
+        }
+
+        .bg-blue-600 { background-color: var(--infotep-blue) !important; }
+        .hover\:bg-blue-700:hover { background-color: #004080 !important; }
+        .text-blue-600 { color: var(--infotep-blue) !important; }
+        .text-blue-100 { color: rgba(255, 255, 255, 0.75) !important; }
+        .bg-blue-50 { background-color: rgba(0, 51, 102, 0.06) !important; }
+        .border-blue-100 { border-color: rgba(0, 51, 102, 0.12) !important; }
+        .border-blue-500 { border-color: var(--infotep-blue) !important; }
+        .border-green-500 { border-color: var(--infotep-green) !important; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+<body class="app-body min-h-screen flex flex-col">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center gap-4">
-                    <span class="text-2xl font-black italic text-slate-800 tracking-tighter">Lanza <span class="text-blue-600">tu idea 0.1</span></span>
-                    <span class="hidden md:block text-xs font-semibold text-slate-400 border-l-2 border-slate-200 pl-4 uppercase tracking-wide">Dep. Investigación Aplicada a la Innovación</span>
+    <nav class="site-header sticky top-0 z-50">
+        <div class="app-shell nav-shell">
+            <div class="flex justify-between items-center h-full">
+                <div class="brand">
+                    <img id="appLogo" class="brand-logo" src="assets/lanza-tu-idea-logo.svg" alt="Logo Lanza tu idea">
+                    <div class="flex flex-col">
+                        <span class="brand-title">Lanza tu idea</span>
+                        <span class="brand-subtitle">Sistema de Innovación Institucional</span>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-4">
-                    <span id="userInfo" class="text-sm font-medium text-slate-500"></span>
-                    <button onclick="logout()" id="btnLogout" class="hidden text-xs font-bold text-red-500 hover:text-red-700 uppercase">Cerrar Sesión</button>
+                    <span id="userInfo" class="text-sm font-medium text-blue-100"></span>
+                    <button onclick="logout()" id="btnLogout" class="hidden text-xs font-bold text-red-200 hover:text-red-100 uppercase">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
@@ -58,13 +263,13 @@
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Contraseña</label>
                     <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tu contraseña" required autocomplete="off">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">Entrar</button>
+                <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold transition">Entrar</button>
                 <p class="text-xs text-slate-400 text-center">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
             </form>
         </div>
     </div>
 
-    <main id="viewIdeador" class="hidden max-w-5xl mx-auto w-full p-6 space-y-6 fade-in">
+    <main id="viewIdeador" class="hidden app-shell space-y-6 fade-in">
 
         <div id="ideadorHome" class="space-y-8">
             <div class="text-center py-10">
@@ -155,7 +360,7 @@
             <div class="flex justify-between items-end">
                 <h3 class="text-2xl font-bold text-slate-800">📂 Mis Ideas Lanzadas</h3>
                 <div class="space-x-2">
-                    <button onclick="navIdeador('formulario')" class="text-blue-600 font-bold text-sm bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100">Nueva Idea</button>
+                    <button onclick="navIdeador('formulario')" class="btn-action text-sm px-4 py-2 rounded-lg font-bold">Nueva Idea</button>
                     <button onclick="navIdeador('home')" class="text-slate-500 font-bold text-sm bg-white px-4 py-2 rounded-lg hover:bg-slate-100">Volver Inicio</button>
                 </div>
             </div>
@@ -178,7 +383,7 @@
         </div>
     </main>
 
-    <main id="viewGestor" class="hidden max-w-4xl mx-auto w-full p-6 space-y-6 fade-in">
+    <main id="viewGestor" class="hidden app-shell space-y-6 fade-in">
         <div class="bg-white rounded-3xl shadow-lg border border-slate-200 p-8 space-y-6 text-center">
             <div class="text-6xl">🧭</div>
             <h2 class="text-2xl font-bold text-slate-700">Panel de Gestores en construcción</h2>
@@ -187,13 +392,13 @@
         </div>
     </main>
 
-    <main id="viewAdmin" class="hidden max-w-7xl mx-auto w-full p-6 space-y-6 fade-in">
+    <main id="viewAdmin" class="hidden app-shell space-y-6 fade-in">
 
         <div id="adminDashboard">
             <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-800">📊 Dashboard General</h2>
                 <div class="flex gap-2">
-                    <button onclick="navAdmin('registrar')" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Registrar Idea (Manual)</button>
+                    <button onclick="navAdmin('registrar')" class="btn-action px-4 py-2 rounded-lg font-bold text-sm">Registrar Idea (Manual)</button>
                     <button onclick="navAdmin('inbox')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">📥 Ideas Registradas</button>
                     <button onclick="navAdmin('revisadas')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">✅ Ideas Revisadas</button>
                     <button onclick="navAdmin('config')" class="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-50">⚙️ Configuración</button>
@@ -449,6 +654,34 @@
 
                     <section class="space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <h4 class="text-lg font-bold text-slate-700">🎨 Identidad visual</h4>
+                            <p class="text-sm text-slate-500">Actualiza el logo y el favicon para reflejar la nueva línea gráfica.</p>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                                <label class="block text-xs font-bold uppercase mb-1">Logo principal</label>
+                                <input type="file" id="logoUpload" accept="image/png, image/jpeg, image/svg+xml" class="w-full p-2 border rounded-lg bg-white" />
+                                <p class="text-xs text-slate-500">Dimensiones recomendadas: 999 x 370 px. Fondo claro y sin versión darkmode.</p>
+                                <div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-center">
+                                    <img id="logoPreview" class="max-h-24 w-auto" src="assets/lanza-tu-idea-logo.svg" alt="Vista previa del logo">
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                                <label class="block text-xs font-bold uppercase mb-1">Favicon</label>
+                                <input type="file" id="faviconUpload" accept="image/png, image/jpeg, image/svg+xml" class="w-full p-2 border rounded-lg bg-white" />
+                                <p class="text-xs text-slate-500">Ideal 64 x 64 px o SVG. Se aplica automáticamente al navegador.</p>
+                                <div class="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-center">
+                                    <img id="faviconPreview" class="h-12 w-12" src="assets/lanza-tu-idea-favicon.svg" alt="Vista previa del favicon">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button id="resetBrandAssets" class="btn-outline px-4 py-2 rounded-lg text-sm font-bold">Restablecer identidad</button>
+                        </div>
+                    </section>
+
+                    <section class="space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">🏷️ Clasificaciones</h4>
                             <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                                 <input type="text" id="newClassificationName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva clasificación" />
@@ -532,11 +765,11 @@
         </div>
     </main>
 
-    <div id="modalDetalle" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-slide-up">
-            <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
-                <h3 class="font-bold">Detalle de la Idea <span id="modalId" class="text-blue-300 ml-2"></span></h3>
-                <button onclick="cerrarModal()" class="text-white hover:text-red-400 font-bold text-xl">✕</button>
+    <div id="modalDetalle" class="modal-overlay fixed inset-0 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="modal-panel bg-white w-full max-w-2xl animate-slide-up">
+            <div class="modal-header p-4 flex justify-between items-center">
+                <h3 class="font-bold">Detalle de la Idea <span id="modalId" class="text-blue-600 ml-2"></span></h3>
+                <button onclick="cerrarModal()" class="modal-close font-bold text-xl">✕</button>
             </div>
             
             <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
@@ -589,6 +822,10 @@
 
     <script>
         const systemDescriptionText = "Es un sistema a través del cual se registran, revisan, clasifican y guardan las ideas de innovación para su posterior ejecución.";
+        const brandDefaults = {
+            logo: 'assets/lanza-tu-idea-logo.svg',
+            favicon: 'assets/lanza-tu-idea-favicon.svg'
+        };
         let currentUser = null;
         let currentIdeaIdEditing = null;
         let adminCache = { pending: [], reviewed: [] };
@@ -626,8 +863,82 @@
             if (timelineButton) {
                 timelineButton.addEventListener('click', () => cargarTimeline());
             }
+            applyBrandAssets();
+            setupBrandControls();
             initApp();
         });
+
+        function applyBrandAssets() {
+            const logoSrc = localStorage.getItem('appLogo') || brandDefaults.logo;
+            const faviconSrc = localStorage.getItem('appFavicon') || brandDefaults.favicon;
+
+            const logoImg = document.getElementById('appLogo');
+            if (logoImg) {
+                logoImg.src = logoSrc;
+            }
+
+            const logoPreview = document.getElementById('logoPreview');
+            if (logoPreview) {
+                logoPreview.src = logoSrc;
+            }
+
+            const faviconLink = document.getElementById('appFavicon');
+            if (faviconLink) {
+                faviconLink.href = faviconSrc;
+            }
+
+            const faviconPreview = document.getElementById('faviconPreview');
+            if (faviconPreview) {
+                faviconPreview.src = faviconSrc;
+            }
+        }
+
+        function setupBrandControls() {
+            const logoUpload = document.getElementById('logoUpload');
+            if (logoUpload) {
+                logoUpload.addEventListener('change', () => handleBrandUpload(logoUpload, 'appLogo'));
+            }
+
+            const faviconUpload = document.getElementById('faviconUpload');
+            if (faviconUpload) {
+                faviconUpload.addEventListener('change', () => handleBrandUpload(faviconUpload, 'appFavicon'));
+            }
+
+            const resetButton = document.getElementById('resetBrandAssets');
+            if (resetButton) {
+                resetButton.addEventListener('click', () => resetBrandAssets());
+            }
+        }
+
+        function handleBrandUpload(input, storageKey) {
+            const file = input.files && input.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                const dataUrl = reader.result;
+                if (typeof dataUrl === 'string') {
+                    localStorage.setItem(storageKey, dataUrl);
+                    applyBrandAssets();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetBrandAssets() {
+            localStorage.removeItem('appLogo');
+            localStorage.removeItem('appFavicon');
+            const logoUpload = document.getElementById('logoUpload');
+            const faviconUpload = document.getElementById('faviconUpload');
+            if (logoUpload) {
+                logoUpload.value = '';
+            }
+            if (faviconUpload) {
+                faviconUpload.value = '';
+            }
+            applyBrandAssets();
+        }
 
         function getCookie(name) {
             return document.cookie
