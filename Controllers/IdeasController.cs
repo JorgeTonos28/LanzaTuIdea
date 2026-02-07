@@ -131,7 +131,6 @@ public class IdeasController : ControllerBase
 
         var idea = await _context.Ideas
             .Include(i => i.CreatedByUser)
-            .Include(i => i.AssignedToUser)
             .Include(i => i.History)
             .ThenInclude(h => h.ChangedByUser)
             .Include(i => i.Comments)
@@ -179,8 +178,6 @@ public class IdeasController : ControllerBase
             idea.CreatedByUser?.Instancia,
             idea.Via,
             idea.AdminComment,
-            idea.AssignedToUserId,
-            idea.AssignedToUser?.NombreCompleto ?? idea.AssignedToUser?.UserName,
             idea.CodigoEmpleado,
             idea.CreatedByUser?.NombreCompleto,
             history,

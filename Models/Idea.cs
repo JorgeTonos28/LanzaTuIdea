@@ -13,8 +13,6 @@ public class Idea
     public string? Clasificacion { get; set; }
     public string? Via { get; set; }
     public string? AdminComment { get; set; }
-    public int? AssignedToUserId { get; set; }
-    public AppUser? AssignedToUser { get; set; }
 
     public List<IdeaHistory> History { get; set; } = new();
     public List<IdeaComment> Comments { get; set; } = new();
