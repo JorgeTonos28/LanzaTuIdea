@@ -4,15 +4,17 @@ using LanzaTuIdea.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace LanzaTuIdea.Api.Migrations;
 
 [DbContext(typeof(AppDbContext))]
-public partial class AppDbContextModelSnapshot : ModelSnapshot
+[Migration("20250310100000_AddAppBranding")]
+public partial class AddAppBranding
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
         modelBuilder
             .HasAnnotation("ProductVersion", "8.0.23")
@@ -343,6 +345,23 @@ public partial class AppDbContextModelSnapshot : ModelSnapshot
                 b.Navigation("Role");
 
                 b.Navigation("User");
+            });
+
+        modelBuilder.Entity("LanzaTuIdea.Api.Models.AppUser", b =>
+            {
+                b.Navigation("Ideas");
+
+                b.Navigation("UserRoles");
+            });
+
+        modelBuilder.Entity("LanzaTuIdea.Api.Models.Idea", b =>
+            {
+                b.Navigation("History");
+            });
+
+        modelBuilder.Entity("LanzaTuIdea.Api.Models.Role", b =>
+            {
+                b.Navigation("UserRoles");
             });
     }
 }

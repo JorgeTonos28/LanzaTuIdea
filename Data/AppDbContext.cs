@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<IdeaHistory> IdeaHistories => Set<IdeaHistory>();
     public DbSet<Classification> Classifications => Set<Classification>();
     public DbSet<Instance> Instances => Set<Instance>();
+    public DbSet<AppBranding> AppBrandings => Set<AppBranding>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -109,6 +110,14 @@ public class AppDbContext : DbContext
         {
             entity.HasKey(i => i.Id);
             entity.Property(i => i.Nombre).HasMaxLength(200).IsRequired();
+        });
+
+        modelBuilder.Entity<AppBranding>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+            entity.Property(b => b.LogoPath).HasMaxLength(500);
+            entity.Property(b => b.FaviconPath).HasMaxLength(500);
+            entity.Property(b => b.UpdatedAt).HasDefaultValueSql("GETUTCDATE()");
         });
     }
 
