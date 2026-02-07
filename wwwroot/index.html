@@ -1025,6 +1025,25 @@
                     <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Detalle Completo</span>
                     <p id="mDetalle" class="text-slate-600 text-sm whitespace-pre-wrap"></p>
                 </div>
+
+                <div class="border-t pt-4 mt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-[#003366] text-sm uppercase">💬 Comentarios</h4>
+                        <span id="mCommentCount" class="text-xs text-slate-400">0 comentarios</span>
+                    </div>
+
+                    <div id="mCommentsList" class="space-y-3 max-h-72 overflow-y-auto pr-2">
+                        <div class="text-sm text-slate-400 italic">Aún no hay comentarios.</div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                        <label class="block text-xs uppercase text-slate-500">Agregar comentario</label>
+                        <textarea id="mCommentInput" rows="2" class="w-full p-2 border rounded-lg bg-white text-sm" placeholder="Escribe tu comentario..."></textarea>
+                        <div class="flex justify-end">
+                            <button id="mCommentSubmit" class="btn-primary px-4 py-2 rounded-lg text-sm font-bold">Enviar comentario</button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div id="adminControls" class="hidden border-t pt-4 mt-4 space-y-4">
                     <h4 class="font-bold text-[#003366] text-sm uppercase">Gestión Administrativa</h4>
@@ -1094,6 +1113,10 @@
             const timelineButton = document.getElementById('timelineFilterButton');
             if (timelineButton) {
                 timelineButton.addEventListener('click', () => cargarTimeline());
+            }
+            const commentButton = document.getElementById('mCommentSubmit');
+            if (commentButton) {
+                commentButton.addEventListener('click', enviarComentario);
             }
             bindBrandingPreview('brandingLogo', 'brandingLogoPreview');
             bindBrandingPreview('brandingFavicon', 'brandingFaviconPreview');
@@ -1768,6 +1791,12 @@
             document.getElementById('mDesc').innerText = idea.descripcion;
             document.getElementById('mDetalle').innerText = idea.detalle;
             updateStatusBadge(idea.status);
+            window.currentIdeaComments = idea.comments || [];
+            renderIdeaComments(window.currentIdeaComments);
+            const commentInput = document.getElementById('mCommentInput');
+            if (commentInput) {
+                commentInput.value = '';
+            }
 
             // NOTA: El MVP NO muestra Estatus/Clasificación/Comentario en modo lectura (texto plano).
             // Solo se muestran en los controles de input si es Admin. 
@@ -1810,6 +1839,101 @@
             document.getElementById('modalDetalle').classList.add('hidden');
             document.getElementById('modalDetalle').classList.remove('flex');
             currentIdeaIdEditing = null;
+            window.currentIdeaComments = [];
+        }
+
+        function escapeHtml(value) {
+            return value
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function linkify(text) {
+            const escaped = escapeHtml(text);
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return escaped.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener" class="text-[#F7931E] underline">$1</a>');
+        }
+
+        function formatDateTime(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '';
+            return date.toLocaleString('es-DO', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getRoleStyle(role) {
+            if (!role) return 'bg-slate-100 text-slate-600';
+            const normalized = role.toLowerCase();
+            if (normalized.includes('admin')) return 'bg-indigo-100 text-indigo-700';
+            if (normalized.includes('gestor')) return 'bg-emerald-100 text-emerald-700';
+            return 'bg-amber-100 text-amber-700';
+        }
+
+        function renderIdeaComments(comments) {
+            const list = document.getElementById('mCommentsList');
+            const count = document.getElementById('mCommentCount');
+            if (!list || !count) return;
+
+            const total = comments.length;
+            count.innerText = `${total} comentario${total === 1 ? '' : 's'}`;
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = '<div class="text-sm text-slate-400 italic">Aún no hay comentarios.</div>';
+                return;
+            }
+
+            list.innerHTML = comments.map(comment => {
+                const roleStyle = getRoleStyle(comment.commentedByRole);
+                const author = comment.commentedByName || 'Sin nombre';
+                const date = formatDateTime(comment.commentedAt);
+                return `
+                    <div class="border border-slate-200 rounded-2xl p-3 bg-white shadow-sm space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 rounded-full font-bold ${roleStyle}">${comment.commentedByRole}</span>
+                                <span class="font-semibold text-slate-700">${escapeHtml(author)}</span>
+                            </div>
+                            <span>${escapeHtml(date)}</span>
+                        </div>
+                        <p class="text-sm text-slate-700 leading-relaxed">${linkify(comment.comment || '')}</p>
+                    </div>`;
+            }).join('');
+        }
+
+        async function enviarComentario() {
+            if (!currentIdeaIdEditing) return;
+            const commentInput = document.getElementById('mCommentInput');
+            if (!commentInput) return;
+            const comment = commentInput.value.trim();
+            if (!comment) {
+                showError('Comentario requerido', 'Escribe un comentario antes de enviar.');
+                return;
+            }
+
+            const response = await apiFetch(`/api/ideas/${currentIdeaIdEditing}/comments`, {
+                method: 'POST',
+                body: JSON.stringify({ comment })
+            });
+
+            if (!response.ok) {
+                showError('Error', 'No fue posible guardar el comentario.');
+                return;
+            }
+
+            const saved = await response.json();
+            const current = (window.currentIdeaComments || []);
+            current.unshift(saved);
+            window.currentIdeaComments = current;
+            renderIdeaComments(current);
+            commentInput.value = '';
         }
 
         async function guardarRevisionAdmin() {

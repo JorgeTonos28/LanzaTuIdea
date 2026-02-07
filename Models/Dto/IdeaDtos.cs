@@ -40,7 +40,8 @@ public record IdeaDetailDto(
     string? AdminComment,
     string CodigoEmpleado,
     string? NombreCompleto,
-    IReadOnlyList<IdeaHistoryDto> History
+    IReadOnlyList<IdeaHistoryDto> History,
+    IReadOnlyList<IdeaCommentDto> Comments
 );
 
 public record IdeaHistoryDto(
@@ -50,12 +51,22 @@ public record IdeaHistoryDto(
     string? Notes
 );
 
+public record IdeaCommentDto(
+    int Id,
+    DateTime CommentedAt,
+    string CommentedByRole,
+    string CommentedByName,
+    string Comment
+);
+
 public record IdeaReviewRequest(
     string Status,
     string? Clasificacion,
     string? Via,
     string? AdminComment
 );
+
+public record IdeaCommentRequest(string Comment);
 
 public record IdeaManualRequest(
     string CodigoEmpleado,
