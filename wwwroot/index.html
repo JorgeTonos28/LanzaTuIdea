@@ -45,6 +45,40 @@
             box-shadow: 0 4px 6px -1px rgba(0, 51, 102, 0.1);
         }
 
+        .admin-nav {
+            background-color: var(--white);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 51, 102, 0.06);
+        }
+
+        .admin-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .admin-nav-btn.primary {
+            background-color: var(--infotep-blue);
+            color: var(--white);
+        }
+
+        .admin-nav-btn.secondary {
+            background-color: #f1f5f9;
+            color: var(--infotep-blue);
+            border-color: #dbe4f0;
+        }
+
+        .admin-nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px -12px rgba(0, 51, 102, 0.4);
+        }
+
         .app-brand {
             display: flex;
             align-items: center;
@@ -91,6 +125,15 @@
         .app-card-hover:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 15px rgba(0, 51, 102, 0.1);
+        }
+
+        .admin-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 30px -18px rgba(0, 51, 102, 0.45);
         }
 
         .app-card-accent {
@@ -288,14 +331,25 @@
             background-color: var(--infotep-blue) !important;
             border-radius: 8px !important;
             padding: 10px 24px !important;
+            color: var(--white) !important;
+            box-shadow: 0 10px 20px rgba(0, 51, 102, 0.2) !important;
         }
 
         .swal2-cancel.swal-cancel {
             background-color: transparent !important;
-            color: var(--text-muted) !important;
-            border: 1px solid #cbd5f5 !important;
+            color: #64748b !important;
+            border: 1px solid #c7d2fe !important;
             border-radius: 8px !important;
             padding: 10px 20px !important;
+        }
+
+        .swal2-confirm.swal-confirm:hover {
+            background-color: #004080 !important;
+        }
+
+        .swal2-cancel.swal-cancel:hover {
+            border-color: var(--infotep-orange) !important;
+            color: var(--infotep-orange) !important;
         }
 
         .status-registered {
@@ -342,7 +396,7 @@
             <div class="bg-gradient-to-r from-[#003366] to-[#004080] p-8 text-center">
                 <div class="flex justify-center mb-4">
                     <div class="app-logo-wrap">
-                        <img class="app-logo" src="/assets/branding/logo-placeholder.svg" alt="Logo Lanza tu idea">
+                        <img id="loginLogo" class="app-logo" src="/assets/branding/logo-placeholder.svg" alt="Logo Lanza tu idea">
                     </div>
                 </div>
                 <h1 class="text-3xl font-bold text-white mb-2">Bienvenido</h1>
@@ -488,58 +542,66 @@
     </main>
 
     <main id="viewAdmin" class="hidden max-w-7xl mx-auto w-full p-6 space-y-6 fade-in">
+        <div class="admin-nav rounded-2xl px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sticky top-20 z-40">
+            <div class="flex items-center gap-3">
+                <span class="text-lg font-bold text-[#003366]">Panel administrativo</span>
+                <span class="text-xs text-slate-400 uppercase tracking-wide">Gestión completa</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="navAdmin('dashboard')" class="admin-nav-btn secondary">📊 Dashboard</button>
+                <button onclick="navAdmin('registrar')" class="admin-nav-btn primary">📝 Registrar Idea</button>
+                <button onclick="navAdmin('inbox')" class="admin-nav-btn secondary">📥 Registradas</button>
+                <button onclick="navAdmin('revisadas')" class="admin-nav-btn secondary">✅ Revisadas</button>
+                <button onclick="navAdmin('config')" class="admin-nav-btn secondary">⚙️ Configuración</button>
+            </div>
+        </div>
 
         <div id="adminDashboard">
             <div class="flex flex-col md:flex-row justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold">📊 Dashboard General</h2>
-                <div class="flex gap-2">
-                    <button onclick="navAdmin('registrar')" class="btn-primary px-4 py-2 rounded-lg text-sm">Registrar Idea (Manual)</button>
-                    <button onclick="navAdmin('inbox')" class="btn-outline px-4 py-2 rounded-lg text-sm">📥 Ideas Registradas</button>
-                    <button onclick="navAdmin('revisadas')" class="btn-outline px-4 py-2 rounded-lg text-sm">✅ Ideas Revisadas</button>
-                    <button onclick="navAdmin('config')" class="btn-outline px-4 py-2 rounded-lg text-sm">⚙️ Configuración</button>
-                </div>
+                <div class="text-sm text-slate-500">Resumen en tiempo real</div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="app-card p-4 rounded-2xl border-l-4 border-[#003366]">
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#003366]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Total Registradas</p>
                     <p id="kpiTotalIdeas" class="text-3xl font-black text-slate-800">0</p>
                 </div>
-                <div class="app-card p-4 rounded-2xl border-l-4 border-[#F7931E]">
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#F7931E]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Pendientes Revisión</p>
                     <p id="kpiPendientes" class="text-3xl font-black text-slate-800">0</p>
                 </div>
-                <div class="app-card p-4 rounded-2xl border-l-4 border-[#34BF49]">
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#34BF49]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Aprobadas/Revisadas</p>
                     <p id="kpiAprobadas" class="text-3xl font-black text-slate-800">0</p>
                 </div>
-                <div class="app-card p-4 rounded-2xl border-l-4 border-[#4A90E2]">
+                <div class="app-card admin-card p-4 rounded-2xl border-l-4 border-[#4A90E2]">
                     <p class="text-xs text-slate-500 font-bold uppercase">Usuarios Activos</p>
                     <p id="kpiUsuarios" class="text-3xl font-black text-slate-800">0</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="app-card p-6 rounded-2xl">
+                <div class="app-card admin-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Estatus de Ideas</h3>
                     <canvas id="chartStatus"></canvas>
                 </div>
-                <div class="app-card p-6 rounded-2xl">
+                <div class="app-card admin-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Clasificación de Ideas</h3>
                     <canvas id="chartClasificacion"></canvas>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <div class="app-card p-6 rounded-2xl">
+                <div class="app-card admin-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Vía</h3>
                     <canvas id="chartVia"></canvas>
                 </div>
-                <div class="app-card p-6 rounded-2xl">
+                <div class="app-card admin-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Instancia</h3>
                     <canvas id="chartInstancia"></canvas>
                 </div>
-                <div class="app-card p-6 rounded-2xl">
+                <div class="app-card admin-card p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-slate-600 mb-4 uppercase">Ideas por Departamento</h3>
                     <canvas id="chartDepartamento"></canvas>
                 </div>
@@ -605,7 +667,7 @@
         <div id="adminInbox" class="hidden space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-2xl font-bold">📥 Ideas Registradas</h3>
-                <button onclick="navAdmin('dashboard')" class="btn-outline text-sm px-4 py-2 rounded-lg">Volver Dashboard</button>
+                <span class="text-sm text-slate-400">Pendientes por revisar</span>
             </div>
 
             <div class="app-card rounded-2xl border border-slate-200 overflow-hidden">
@@ -627,7 +689,7 @@
         <div id="adminRevisadas" class="hidden space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-2xl font-bold">✅ Ideas Revisadas</h3>
-                <button onclick="navAdmin('dashboard')" class="btn-outline text-sm px-4 py-2 rounded-lg">Volver Dashboard</button>
+                <span class="text-sm text-slate-400">Histórico de aprobaciones</span>
             </div>
 
             <div class="app-card rounded-2xl border border-slate-200 overflow-hidden">
@@ -650,7 +712,7 @@
         <div id="adminForm" class="hidden app-card rounded-3xl border border-slate-200 overflow-hidden">
             <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
                 <h3 class="text-xl font-bold">🛡️ Registro Manual Administrativo</h3>
-                <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al dashboard</button>
+                <span class="text-sm text-slate-400">Formulario manual</span>
             </div>
             <form id="formAdminManual" class="p-8 space-y-6" autocomplete="off">
                 <p class="required-hint">Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
@@ -720,7 +782,7 @@
             <div class="app-card rounded-3xl border border-slate-200 overflow-hidden">
                 <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
                     <h3 class="text-xl font-bold">⚙️ Configuración</h3>
-                    <button onclick="navAdmin('dashboard')" class="text-sm font-bold text-slate-500 hover:text-[#F7931E]">← Volver al dashboard</button>
+                    <span class="text-sm text-slate-400">Administración general</span>
                 </div>
                 <div class="p-8 space-y-8">
                     <section class="space-y-4">
@@ -1079,6 +1141,11 @@
             const logoPreview = document.getElementById('brandingLogoPreview');
             if (logoPreview && logoUrl) {
                 logoPreview.src = logoUrl;
+            }
+
+            const loginLogo = document.getElementById('loginLogo');
+            if (loginLogo && logoUrl) {
+                loginLogo.src = logoUrl;
             }
 
             const faviconPreview = document.getElementById('brandingFaviconPreview');
