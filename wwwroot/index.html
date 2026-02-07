@@ -74,6 +74,12 @@
             border-color: #dbe4f0;
         }
 
+        .admin-nav-btn.active {
+            background-color: var(--infotep-orange);
+            color: var(--white);
+            border-color: transparent;
+        }
+
         .admin-nav-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 8px 16px -12px rgba(0, 51, 102, 0.4);
@@ -186,6 +192,25 @@
             font-weight: 600;
         }
 
+        .btn-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            color: var(--infotep-blue);
+            background-color: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        .btn-inline:hover {
+            border-color: var(--infotep-orange);
+            color: var(--infotep-orange);
+            transform: translateY(-1px);
+        }
+
         .required-mark {
             color: #dc2626;
             margin-left: 2px;
@@ -217,6 +242,21 @@
             border-radius: 6px;
             min-height: 45px;
             font-size: 0.95rem;
+        }
+
+        select {
+            appearance: none;
+            background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+                linear-gradient(135deg, #94a3b8 50%, transparent 50%);
+            background-position: calc(100% - 18px) 20px, calc(100% - 12px) 20px;
+            background-size: 6px 6px, 6px 6px;
+            background-repeat: no-repeat;
+            padding-right: 34px;
+        }
+
+        select option:checked {
+            background-color: var(--infotep-blue);
+            color: var(--white);
         }
 
         input:focus,
@@ -352,6 +392,10 @@
             color: var(--infotep-orange) !important;
         }
 
+        .swal2-actions {
+            gap: 12px !important;
+        }
+
         .status-registered {
             background-color: #FFF4E6;
             color: #9A4F00;
@@ -475,12 +519,12 @@
                     <div>
                         <label class="block text-xs uppercase mb-1">Descripción de la Idea <span class="required-mark">*</span></label>
                         <textarea id="descIdea" rows="2" class="w-full p-3 outline-none" placeholder="Título corto o resumen de la idea..." required></textarea>
-                        <button type="button" onclick="limpiarCampo('descIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
+                        <button type="button" onclick="limpiarCampo('descIdea')" class="btn-inline mt-2">Borrar campo</button>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
                         <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Explica detalladamente en qué consiste..." required></textarea>
-                        <button type="button" onclick="limpiarCampo('detalleIdea')" class="text-xs text-red-400 hover:text-red-600 mt-1">Borrar campo</button>
+                        <button type="button" onclick="limpiarCampo('detalleIdea')" class="btn-inline mt-2">Borrar campo</button>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
@@ -548,11 +592,11 @@
                 <span class="text-xs text-slate-400 uppercase tracking-wide">Gestión completa</span>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button onclick="navAdmin('dashboard')" class="admin-nav-btn secondary">📊 Dashboard</button>
-                <button onclick="navAdmin('registrar')" class="admin-nav-btn primary">📝 Registrar Idea</button>
-                <button onclick="navAdmin('inbox')" class="admin-nav-btn secondary">📥 Registradas</button>
-                <button onclick="navAdmin('revisadas')" class="admin-nav-btn secondary">✅ Revisadas</button>
-                <button onclick="navAdmin('config')" class="admin-nav-btn secondary">⚙️ Configuración</button>
+                <button data-admin-view="dashboard" onclick="navAdmin('dashboard')" class="admin-nav-btn secondary">📊 Dashboard</button>
+                <button data-admin-view="registrar" onclick="navAdmin('registrar')" class="admin-nav-btn secondary">📝 Registrar Idea</button>
+                <button data-admin-view="inbox" onclick="navAdmin('inbox')" class="admin-nav-btn secondary">📥 Registradas</button>
+                <button data-admin-view="revisadas" onclick="navAdmin('revisadas')" class="admin-nav-btn secondary">✅ Revisadas</button>
+                <button data-admin-view="config" onclick="navAdmin('config')" class="admin-nav-btn secondary">⚙️ Configuración</button>
             </div>
         </div>
 
@@ -709,7 +753,7 @@
             </div>
         </div>
 
-        <div id="adminForm" class="hidden app-card rounded-3xl border border-slate-200 overflow-hidden">
+        <div id="adminForm" class="hidden app-card rounded-3xl border border-slate-200 overflow-hidden max-w-4xl mx-auto w-full">
             <div class="bg-white/80 p-6 border-b border-slate-200 flex justify-between items-center">
                 <h3 class="text-xl font-bold">🛡️ Registro Manual Administrativo</h3>
                 <span class="text-sm text-slate-400">Formulario manual</span>
@@ -891,8 +935,8 @@
         </div>
 
         <div id="modalCrearUsuario" class="hidden fixed inset-0 app-modal-overlay items-center justify-center z-50">
-            <div class="bg-white app-modal-content w-full max-w-md mx-4">
-                <div class="p-6 app-modal-header flex justify-between items-center">
+            <div class="bg-white app-modal-content w-full max-w-md mx-4 overflow-hidden rounded-3xl">
+                <div class="p-6 app-modal-header flex justify-between items-center rounded-t-3xl">
                     <h4 class="text-lg font-bold text-slate-700">➕ Nuevo usuario</h4>
                     <button onclick="cerrarModalCrearUsuario()" class="app-modal-close">✕</button>
                 </div>
@@ -1386,6 +1430,13 @@
 
         function navAdmin(view) {
             ['adminDashboard', 'adminInbox', 'adminRevisadas', 'adminForm', 'adminConfig'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.querySelectorAll('[data-admin-view]').forEach(button => {
+                button.classList.remove('active');
+            });
+            const activeButton = document.querySelector(`[data-admin-view="${view}"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
             if(view === 'dashboard') {
                 document.getElementById('adminDashboard').classList.remove('hidden');
                 actualizarDashboard();
@@ -1540,8 +1591,9 @@
                     text: "Se perderán los datos no guardados.",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#dc2626',
-                    confirmButtonText: 'Sí, cancelar'
+                    confirmButtonText: 'Sí, cancelar',
+                    cancelButtonText: 'Cancelar',
+                    ...getSwalTheme()
                 }).then((result) => {
                     if (result.isConfirmed) navIdeador('home');
                 });
@@ -1972,7 +2024,23 @@
                     }]
                 },
                 options: {
-                    plugins: { legend: { display: false } }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => {
+                                    const index = items[0]?.dataIndex ?? 0;
+                                    return departamentoLabels[index] ?? '';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { display: false },
+                            grid: { display: false }
+                        }
+                    }
                 }
             });
         }
