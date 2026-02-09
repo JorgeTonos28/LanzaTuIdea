@@ -909,6 +909,7 @@
                         <div>
                             <label class="block text-xs uppercase mb-1">No. Empleado <span class="required-mark">*</span></label>
                             <input type="text" id="adminIdEmp" class="w-full p-3 outline-none" placeholder="Ej: 1010" required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminIdEmpHint"></span>
                         </div>
                         <div>
                             <label class="block text-xs uppercase mb-1">Nombre Completo <span class="required-mark">*</span></label>
@@ -962,7 +963,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea Manual</button>
+                <button id="adminManualSubmit" type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea Manual</button>
             </form>
         </div>
 
@@ -1108,8 +1109,14 @@
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
+                        <label class="block text-xs uppercase mb-1">Código de empleado</label>
+                        <input type="text" id="nuevoUserCodigo" class="w-full p-3 outline-none" placeholder="Ej. 102233" />
+                        <p id="nuevoUserCodigoHelp" class="text-xs text-slate-400 mt-1">Ingresa el código para validar en Active Directory.</p>
+                    </div>
+                    <div>
                         <label class="block text-xs uppercase mb-1">Nombre de usuario</label>
                         <input type="text" id="nuevoUserName" class="w-full p-3 outline-none" placeholder="usuario" />
+                        <p id="nuevoUserNameHelp" class="text-xs text-slate-400 mt-1">Se completa luego de validar el código en AD.</p>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Instancia</label>
@@ -1128,7 +1135,7 @@
                 </div>
                 <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
                     <button onclick="cerrarModalCrearUsuario()" class="btn-outline px-4 py-2 rounded-lg text-sm">Cancelar</button>
-                    <button onclick="crearUsuarioAdmin()" class="btn-primary px-4 py-2 rounded-lg text-sm">Guardar</button>
+                    <button id="nuevoUserGuardar" onclick="crearUsuarioAdmin()" class="btn-primary px-4 py-2 rounded-lg text-sm">Guardar</button>
                 </div>
             </div>
         </div>
@@ -1237,6 +1244,9 @@
         let gestorCache = [];
         let charts = {};
         let gestorEmployeeFound = false;
+        let adminManualAdValid = false;
+        let adminManualValidateToken = 0;
+        let adminManualValidateTimer = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('systemDescription').innerText = systemDescriptionText;
@@ -1247,14 +1257,17 @@
             if (gestorForm) {
                 gestorForm.addEventListener('submit', handleGestorManualSubmit);
             }
-            document.getElementById('adminIdEmp').addEventListener('input', (e) => buscarEmpleadoAdmin(e.target.value));
+            document.getElementById('adminIdEmp').addEventListener('input', (e) => validarEmpleadoAdminManual(e.target.value));
             const correoEmpleadoInput = document.getElementById('correoEmpleado');
             if (correoEmpleadoInput) {
                 correoEmpleadoInput.addEventListener('input', validateCorreoEmpleado);
             }
             const adminMailEmpInput = document.getElementById('adminMailEmp');
             if (adminMailEmpInput) {
-                adminMailEmpInput.addEventListener('input', validateAdminManualFields);
+                adminMailEmpInput.addEventListener('input', (e) => {
+                    validarCorreoEmpleadoManual(e.target.value);
+                    validateAdminManualFields();
+                });
             }
             const adminNomEmpInput = document.getElementById('adminNomEmp');
             const adminDirEmpInput = document.getElementById('adminDirEmp');
@@ -1278,6 +1291,7 @@
             if (commentButton) {
                 commentButton.addEventListener('click', enviarComentario);
             }
+            setAdminManualFormEnabled(false);
             bindBrandingPreview('brandingLogo', 'brandingLogoPreview');
             bindBrandingPreview('brandingFavicon', 'brandingFaviconPreview');
             initApp();
@@ -1718,6 +1732,66 @@
             }
         }
 
+        function setControlState(id, isEnabled) {
+            const control = document.getElementById(id);
+            if (!control) return;
+            control.disabled = !isEnabled;
+            if (isEnabled) {
+                control.classList.remove('bg-slate-200', 'text-slate-500', 'cursor-not-allowed', 'opacity-70');
+                control.classList.add('bg-white', 'text-slate-700');
+            } else {
+                control.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed', 'opacity-70');
+                control.classList.remove('bg-white', 'text-slate-700');
+            }
+        }
+
+        function setButtonState(id, isEnabled) {
+            const button = document.getElementById(id);
+            if (!button) return;
+            button.disabled = !isEnabled;
+            if (isEnabled) {
+                button.classList.remove('opacity-60', 'cursor-not-allowed');
+            } else {
+                button.classList.add('opacity-60', 'cursor-not-allowed');
+            }
+        }
+
+        function setAdminManualFormEnabled(isEnabled) {
+            setControlState('adminDesc', isEnabled);
+            setControlState('adminDetalle', isEnabled);
+            setControlState('adminClasif', isEnabled);
+            setControlState('adminInstancia', isEnabled);
+            setControlState('adminVia', isEnabled);
+            setButtonState('adminManualSubmit', isEnabled);
+        }
+
+        function setAdminManualHint(message, isError) {
+            const hint = document.getElementById('adminIdEmpHint');
+            if (!hint) return;
+            if (!message) {
+                hint.classList.add('hidden');
+                hint.innerText = '';
+                return;
+            }
+            hint.innerText = message;
+            hint.classList.remove('hidden');
+            if (isError) {
+                hint.classList.add('text-red-500');
+                hint.classList.remove('text-slate-500');
+            } else {
+                hint.classList.add('text-slate-500');
+                hint.classList.remove('text-red-500');
+            }
+        }
+
+        function resetAdminManualEmployeeFields() {
+            document.getElementById('adminNomEmp').value = '';
+            document.getElementById('adminMailEmp').value = '';
+            document.getElementById('adminDirEmp').value = '';
+            ajustarCamposAdmin(null);
+            validateAdminManualFields();
+        }
+
         function setGestorFieldEditable(id, isEditable) {
             const input = document.getElementById(id);
             if (!input) return;
@@ -1893,6 +1967,10 @@
 
         async function handleManualSubmit(e) {
             e.preventDefault();
+            if (!adminManualAdValid) {
+                showError('Validación requerida', 'Debes validar el colaborador en Active Directory antes de registrar la idea.');
+                return;
+            }
             if (!validateAdminManualFields()) {
                 showError('Error', 'Completa los campos requeridos con un correo válido.');
                 return;
@@ -1922,6 +2000,9 @@
 
             showSuccess('Registrada', 'La idea se guardó con estatus Revisada.');
             document.getElementById('formAdminManual').reset();
+            adminManualAdValid = false;
+            setAdminManualFormEnabled(false);
+            setAdminManualHint('', false);
             navAdmin('dashboard');
         }
 
@@ -2967,7 +3048,8 @@
                 body: JSON.stringify({ roles })
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible actualizar el rol del usuario.');
+                const message = await readErrorMessage(response, 'No fue posible actualizar el rol del usuario.');
+                showError('Error al actualizar rol', message);
                 return;
             }
             loadAdminUsers();
@@ -2979,16 +3061,29 @@
                 body: JSON.stringify({ instancia })
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible actualizar la instancia del usuario.');
+                const message = await readErrorMessage(response, 'No fue posible actualizar la instancia del usuario.');
+                showError('Error al actualizar instancia', message);
                 return;
             }
             loadAdminUsers();
         }
 
-        function abrirModalCrearUsuario() {
+        function resetAdminUserCreation() {
+            document.getElementById('nuevoUserCodigo').value = '';
             document.getElementById('nuevoUserName').value = '';
             document.getElementById('nuevoUserRole').value = '';
             document.getElementById('nuevoUserInstancia').value = '';
+            document.getElementById('nuevoUserCodigoHelp').innerText = 'Ingresa el código para validar en Active Directory.';
+            document.getElementById('nuevoUserNameHelp').innerText = 'Se completa luego de validar el código en AD.';
+            setControlState('nuevoUserCodigo', true);
+            setControlState('nuevoUserName', false);
+            setControlState('nuevoUserRole', true);
+            setControlState('nuevoUserInstancia', true);
+            setButtonState('nuevoUserGuardar', true);
+        }
+
+        function abrirModalCrearUsuario() {
+            resetAdminUserCreation();
             document.getElementById('modalCrearUsuario').classList.remove('hidden');
             document.getElementById('modalCrearUsuario').classList.add('flex');
         }
@@ -2999,21 +3094,39 @@
         }
 
         async function crearUsuarioAdmin() {
-            const userName = document.getElementById('nuevoUserName').value.trim();
+            const codigoEmpleado = document.getElementById('nuevoUserCodigo').value.trim();
             const role = document.getElementById('nuevoUserRole').value;
             const instancia = document.getElementById('nuevoUserInstancia').value;
-            if (!userName) {
-                showError('Error', 'El nombre de usuario es requerido.');
+            if (!codigoEmpleado) {
+                showError('Código requerido', 'Indica el código de empleado para validar en AD.');
                 return;
             }
 
+            const validationResponse = await apiFetch(`/api/admin/users/validate?codigo=${encodeURIComponent(codigoEmpleado)}`, { method: 'GET' });
+            if (!validationResponse.ok) {
+                const message = await readErrorMessage(validationResponse, 'No fue posible validar el código de empleado.');
+                showError('Validación de usuario', message);
+                return;
+            }
+
+            const validationData = await validationResponse.json();
+            const userName = (validationData?.userName || '').trim();
+            if (!userName) {
+                showError('Usuario requerido', 'No se pudo obtener el nombre de usuario desde AD.');
+                return;
+            }
+            document.getElementById('nuevoUserName').value = userName;
+            document.getElementById('nuevoUserCodigoHelp').innerText = 'Código validado correctamente.';
+            document.getElementById('nuevoUserNameHelp').innerText = 'Usuario confirmado en Active Directory.';
+
             const response = await apiFetch('/api/admin/users', {
                 method: 'POST',
-                body: JSON.stringify({ userName, role, instancia })
+                body: JSON.stringify({ userName, role, instancia, codigoEmpleado })
             });
 
             if (!response.ok) {
-                showError('Error', 'No fue posible crear el usuario.');
+                const message = await readErrorMessage(response, 'No fue posible crear el usuario.');
+                showError('No se pudo crear el usuario', message);
                 return;
             }
 
@@ -3028,7 +3141,8 @@
                 body: JSON.stringify({ isActive })
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible actualizar el estado del usuario.');
+                const message = await readErrorMessage(response, 'No fue posible actualizar el estado del usuario.');
+                showError('Error al actualizar estado', message);
                 return;
             }
             loadAdminUsers();
@@ -3047,9 +3161,10 @@
                 method: 'DELETE'
             });
             if (!response.ok) {
-                const data = await response.json().catch(() => null);
-                const message = data?.message
-                    || 'No fue posible eliminar el usuario. Asegúrate de que exista al menos otro administrador.';
+                const message = await readErrorMessage(
+                    response,
+                    'No fue posible eliminar el usuario. Asegúrate de que exista al menos otro administrador.'
+                );
                 showError('No se puede eliminar', message);
                 return;
             }
@@ -3065,10 +3180,102 @@
             setFieldEditable('adminDirEmp', !hasDepartamento);
         }
 
-        async function buscarEmpleadoAdmin(valor) {
+        function validarEmpleadoAdminManual(valor) {
+            const codigo = valor.trim();
+            adminManualAdValid = false;
+            setAdminManualFormEnabled(false);
+            clearTimeout(adminManualValidateTimer);
+
+            if (!codigo) {
+                setAdminManualHint('', false);
+                resetAdminManualEmployeeFields();
+                return;
+            }
+
+            if (codigo.length < 3) {
+                setAdminManualHint('Ingresa el código completo para validar en Active Directory.', false);
+                resetAdminManualEmployeeFields();
+                return;
+            }
+
+            const token = ++adminManualValidateToken;
+            adminManualValidateTimer = setTimeout(async () => {
+                const empleado = await buscarEmpleadoAdmin(codigo, token);
+                if (!empleado) {
+                    return;
+                }
+
+                const email = document.getElementById('adminMailEmp').value.trim();
+                if (!email) {
+                    setAdminManualHint('Ingresa el correo del colaborador para validar en Active Directory.', false);
+                    return;
+                }
+
+                await validateAdminManualAd(codigo, email, token);
+            }, 400);
+        }
+
+        function validarCorreoEmpleadoManual(valor) {
+            const codigo = document.getElementById('adminIdEmp').value.trim();
+            const email = valor.trim();
+            if (!codigo || codigo.length < 3) {
+                return;
+            }
+            if (!email) {
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                return;
+            }
+            const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!correoValido) {
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                setAdminManualHint('El correo ingresado no tiene un formato válido.', true);
+                return;
+            }
+            const token = ++adminManualValidateToken;
+            validateAdminManualAd(codigo, email, token);
+        }
+
+        async function validateAdminManualAd(codigo, email, token) {
+            const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!correoValido) {
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                setAdminManualHint('El correo ingresado no tiene un formato válido.', true);
+                return;
+            }
+            setAdminManualHint('Validando usuario en Active Directory...', false);
+            const response = await apiFetch(
+                `/api/admin/users/validate?codigo=${encodeURIComponent(codigo)}&email=${encodeURIComponent(email)}`,
+                { method: 'GET' }
+            );
+            if (token !== adminManualValidateToken) {
+                return;
+            }
+
+            if (!response.ok) {
+                const message = await readErrorMessage(response, 'No fue posible validar el colaborador en Active Directory.');
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                setAdminManualHint(message, true);
+                showError('Validación de colaborador', message);
+                return;
+            }
+
+            const data = await response.json();
+            adminManualAdValid = true;
+            setAdminManualFormEnabled(true);
+            setAdminManualHint('Usuario verificado en Active Directory.', false);
+            if (data?.email) {
+                document.getElementById('adminMailEmp').value = data.email;
+            }
+        }
+
+        async function buscarEmpleadoAdmin(valor, token = null) {
             const codigo = valor.trim();
             if (codigo.length < 3) {
-                return;
+                return null;
             }
             const response = await apiFetch(`/api/admin/employees/search?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
             if (response.status === 404) {
@@ -3077,10 +3284,15 @@
                 document.getElementById('adminDirEmp').value = '';
                 ajustarCamposAdmin(null);
                 validateAdminManualFields();
-                return;
+                setAdminManualHint('El código no existe en el catálogo local.', true);
+                return null;
             }
             if (!response.ok) {
-                return;
+                setAdminManualHint('No fue posible obtener los datos del colaborador.', true);
+                return null;
+            }
+            if (token !== null && token !== adminManualValidateToken) {
+                return null;
             }
             const empleado = await response.json();
             document.getElementById('adminNomEmp').value = empleado.nombreCompleto || '';
@@ -3088,6 +3300,7 @@
             document.getElementById('adminDirEmp').value = empleado.departamento || '';
             ajustarCamposAdmin(empleado);
             validateAdminManualFields();
+            return empleado;
         }
 
         function getSwalTheme() {
@@ -3116,6 +3329,15 @@
                 Swal.fire({ title, text, icon: 'error', ...getSwalTheme() });
             } else {
                 alert(`${title} ${text}`);
+            }
+        }
+
+        async function readErrorMessage(response, fallback) {
+            try {
+                const data = await response.json();
+                return data?.message || data?.title || data?.detail || fallback;
+            } catch (error) {
+                return fallback;
             }
         }
 

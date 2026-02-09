@@ -173,6 +173,23 @@ public class AdminController : ControllerBase
             return BadRequest(new { message = "Descripción o detalle exceden el límite permitido." });
         }
 
+        var adUserName = NormalizeUserName(request.Email);
+        if (string.IsNullOrWhiteSpace(adUserName))
+        {
+            return BadRequest(new { message = "El correo no es válido para validar el usuario en AD." });
+        }
+
+        var adData = await _adServiceClient.GetUserDataAsync(adUserName, cancellationToken);
+        if (adData is null)
+        {
+            return BadRequest(new { message = "El colaborador no existe en Active Directory o no está disponible." });
+        }
+
+        if (!string.Equals(adData.CodigoEmpleado?.Trim(), request.CodigoEmpleado?.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { message = "El usuario de Active Directory no corresponde al código de empleado ingresado." });
+        }
+
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
@@ -455,9 +472,66 @@ public class AdminController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("users/validate")]
+    public async Task<IActionResult> ValidateUser([FromQuery] string codigo, [FromQuery] string? email, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(codigo))
+        {
+            return BadRequest(new { message = "El código de empleado es requerido para validar el usuario." });
+        }
+
+        var codigoEmpleado = codigo.Trim();
+        var employee = await _context.Employees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Codigo_Empleado == codigoEmpleado, cancellationToken);
+        if (employee is null)
+        {
+            return NotFound(new { message = "El código de empleado no existe en el catálogo local." });
+        }
+
+        var emailToUse = !string.IsNullOrWhiteSpace(email) ? email.Trim() : employee.E_Mail?.Trim();
+        if (string.IsNullOrWhiteSpace(emailToUse))
+        {
+            return BadRequest(new { message = "El colaborador no tiene correo registrado. Ingresa un correo para validar el usuario en AD." });
+        }
+
+        var userName = NormalizeUserName(emailToUse);
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            return BadRequest(new { message = "No fue posible derivar el usuario desde el correo del colaborador." });
+        }
+
+        var adData = await _adServiceClient.GetUserDataAsync(userName, cancellationToken);
+        if (adData is null)
+        {
+            return BadRequest(new { message = "El usuario no existe en Active Directory o no está disponible." });
+        }
+
+        if (!string.Equals(adData.CodigoEmpleado?.Trim(), codigoEmpleado, StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { message = "El usuario encontrado en AD no corresponde al código de empleado." });
+        }
+
+        return Ok(new { userName, nombreCompleto = adData.NombreCompleto, email = emailToUse });
+    }
+
     [HttpPost("users")]
     public async Task<ActionResult<UserSummaryDto>> CreateUser([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.CodigoEmpleado))
+        {
+            return BadRequest(new { message = "El código de empleado es requerido para validar el usuario en AD." });
+        }
+
+        var codigoEmpleado = request.CodigoEmpleado.Trim();
+        var empleado = await _context.Employees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Codigo_Empleado == codigoEmpleado, cancellationToken);
+        if (empleado is null)
+        {
+            return BadRequest(new { message = "El código de empleado no está registrado en el catálogo local de empleados." });
+        }
+
         if (string.IsNullOrWhiteSpace(request.UserName))
         {
             return BadRequest(new { message = "El nombre de usuario es requerido." });
@@ -473,14 +547,19 @@ public class AdminController : ControllerBase
         var adData = await _adServiceClient.GetUserDataAsync(normalized, cancellationToken);
         if (adData is null)
         {
-            return BadRequest(new { message = "No fue posible obtener los datos del usuario desde AD." });
+            return BadRequest(new { message = "No se encontró el usuario en Active Directory. Verifica el código de empleado y su usuario asociado." });
+        }
+
+        if (!string.Equals(adData.CodigoEmpleado?.Trim(), codigoEmpleado, StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { message = "El usuario de Active Directory no coincide con el código de empleado ingresado." });
         }
 
         var user = new AppUser
         {
             UserName = normalized,
             IsActive = true,
-            Codigo_Empleado = TrimTo(adData.CodigoEmpleado, 20),
+            Codigo_Empleado = TrimTo(codigoEmpleado, 20),
             NombreCompleto = TrimTo(adData.NombreCompleto, 200),
             Instancia = TrimTo(request.Instancia, 200),
             LastLoginAt = null
