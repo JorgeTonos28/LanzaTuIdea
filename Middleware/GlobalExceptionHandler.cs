@@ -16,11 +16,13 @@ public class GlobalExceptionHandler : IExceptionHandler
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Unhandled exception");
+        var errorId = Guid.NewGuid().ToString("N");
+        var traceId = httpContext.TraceIdentifier;
+        _logger.LogError(exception, "Unhandled exception. ErrorId: {ErrorId} TraceId: {TraceId}", errorId, traceId);
 
         var detail = _environment.IsDevelopment()
-            ? exception.Message
-            : null;
+            ? exception.ToString()
+            : $"Referencia de error: {errorId}";
 
         var problemDetails = new ProblemDetails
         {
@@ -28,6 +30,9 @@ public class GlobalExceptionHandler : IExceptionHandler
             Title = "Ocurrió un error interno.",
             Detail = detail
         };
+
+        problemDetails.Extensions["errorId"] = errorId;
+        problemDetails.Extensions["traceId"] = traceId;
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

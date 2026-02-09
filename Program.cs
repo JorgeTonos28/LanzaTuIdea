@@ -1,9 +1,22 @@
 using LanzaTuIdea.Api.Data;
+using LanzaTuIdea.Api.Logging;
+using LanzaTuIdea.Api.Middleware;
 using LanzaTuIdea.Api.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddFileLogging(builder.Configuration);
+
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = false;
+});
 
 // Configuración de Controladores y Seguridad
 builder.Services.AddControllersWithViews(options =>
@@ -105,6 +118,7 @@ else
 }
 
 app.UseExceptionHandler();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Inicialización de Datos (Seed)
 using (var scope = app.Services.CreateScope())

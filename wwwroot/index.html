@@ -1108,8 +1108,14 @@
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
+                        <label class="block text-xs uppercase mb-1">Código de empleado</label>
+                        <input type="text" id="nuevoUserCodigo" class="w-full p-3 outline-none" placeholder="Ej. 102233" />
+                        <p id="nuevoUserCodigoHelp" class="text-xs text-slate-400 mt-1">Ingresa el código para validar en Active Directory.</p>
+                    </div>
+                    <div>
                         <label class="block text-xs uppercase mb-1">Nombre de usuario</label>
                         <input type="text" id="nuevoUserName" class="w-full p-3 outline-none" placeholder="usuario" />
+                        <p id="nuevoUserNameHelp" class="text-xs text-slate-400 mt-1">Se completa luego de validar el código en AD.</p>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Instancia</label>
@@ -1128,7 +1134,7 @@
                 </div>
                 <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
                     <button onclick="cerrarModalCrearUsuario()" class="btn-outline px-4 py-2 rounded-lg text-sm">Cancelar</button>
-                    <button onclick="crearUsuarioAdmin()" class="btn-primary px-4 py-2 rounded-lg text-sm">Guardar</button>
+                    <button id="nuevoUserGuardar" onclick="crearUsuarioAdmin()" class="btn-primary px-4 py-2 rounded-lg text-sm">Guardar</button>
                 </div>
             </div>
         </div>
@@ -1248,6 +1254,7 @@
                 gestorForm.addEventListener('submit', handleGestorManualSubmit);
             }
             document.getElementById('adminIdEmp').addEventListener('input', (e) => buscarEmpleadoAdmin(e.target.value));
+            document.getElementById('nuevoUserCodigo').addEventListener('input', (e) => validarCodigoEmpleadoUsuario(e.target.value));
             const correoEmpleadoInput = document.getElementById('correoEmpleado');
             if (correoEmpleadoInput) {
                 correoEmpleadoInput.addEventListener('input', validateCorreoEmpleado);
@@ -1715,6 +1722,30 @@
             } else {
                 input.classList.add('bg-slate-200', 'border-slate-300', 'text-slate-600');
                 input.classList.remove('bg-white', 'text-slate-700');
+            }
+        }
+
+        function setControlState(id, isEnabled) {
+            const control = document.getElementById(id);
+            if (!control) return;
+            control.disabled = !isEnabled;
+            if (isEnabled) {
+                control.classList.remove('bg-slate-200', 'text-slate-500', 'cursor-not-allowed', 'opacity-70');
+                control.classList.add('bg-white', 'text-slate-700');
+            } else {
+                control.classList.add('bg-slate-200', 'text-slate-500', 'cursor-not-allowed', 'opacity-70');
+                control.classList.remove('bg-white', 'text-slate-700');
+            }
+        }
+
+        function setButtonState(id, isEnabled) {
+            const button = document.getElementById(id);
+            if (!button) return;
+            button.disabled = !isEnabled;
+            if (isEnabled) {
+                button.classList.remove('opacity-60', 'cursor-not-allowed');
+            } else {
+                button.classList.add('opacity-60', 'cursor-not-allowed');
             }
         }
 
@@ -2967,7 +2998,8 @@
                 body: JSON.stringify({ roles })
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible actualizar el rol del usuario.');
+                const message = await readErrorMessage(response, 'No fue posible actualizar el rol del usuario.');
+                showError('Error al actualizar rol', message);
                 return;
             }
             loadAdminUsers();
@@ -2979,16 +3011,72 @@
                 body: JSON.stringify({ instancia })
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible actualizar la instancia del usuario.');
+                const message = await readErrorMessage(response, 'No fue posible actualizar la instancia del usuario.');
+                showError('Error al actualizar instancia', message);
                 return;
             }
             loadAdminUsers();
         }
 
-        function abrirModalCrearUsuario() {
+        let adminUserValidationToken = 0;
+
+        function resetAdminUserCreation() {
+            document.getElementById('nuevoUserCodigo').value = '';
             document.getElementById('nuevoUserName').value = '';
             document.getElementById('nuevoUserRole').value = '';
             document.getElementById('nuevoUserInstancia').value = '';
+            document.getElementById('nuevoUserName').dataset.adValid = 'false';
+            document.getElementById('nuevoUserCodigoHelp').innerText = 'Ingresa el código para validar en Active Directory.';
+            document.getElementById('nuevoUserNameHelp').innerText = 'Se completa luego de validar el código en AD.';
+            setControlState('nuevoUserCodigo', true);
+            setControlState('nuevoUserName', false);
+            setControlState('nuevoUserRole', false);
+            setControlState('nuevoUserInstancia', false);
+            setButtonState('nuevoUserGuardar', false);
+        }
+
+        async function validarCodigoEmpleadoUsuario(valor) {
+            const codigo = valor.trim();
+            const token = ++adminUserValidationToken;
+
+            if (codigo.length < 3) {
+                resetAdminUserCreation();
+                return;
+            }
+
+            document.getElementById('nuevoUserCodigoHelp').innerText = 'Validando código en catálogo y AD...';
+            const response = await apiFetch(`/api/admin/users/validate?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
+
+            if (token !== adminUserValidationToken) {
+                return;
+            }
+
+            if (!response.ok) {
+                const message = await readErrorMessage(response, 'No fue posible validar el código de empleado.');
+                document.getElementById('nuevoUserName').value = '';
+                document.getElementById('nuevoUserName').dataset.adValid = 'false';
+                setControlState('nuevoUserName', false);
+                setControlState('nuevoUserRole', false);
+                setControlState('nuevoUserInstancia', false);
+                setButtonState('nuevoUserGuardar', false);
+                document.getElementById('nuevoUserCodigoHelp').innerText = message;
+                showError('Validación de usuario', message);
+                return;
+            }
+
+            const data = await response.json();
+            document.getElementById('nuevoUserName').value = data.userName || '';
+            document.getElementById('nuevoUserName').dataset.adValid = 'true';
+            document.getElementById('nuevoUserCodigoHelp').innerText = 'Código validado correctamente.';
+            document.getElementById('nuevoUserNameHelp').innerText = 'Usuario confirmado en Active Directory.';
+            setControlState('nuevoUserName', false);
+            setControlState('nuevoUserRole', true);
+            setControlState('nuevoUserInstancia', true);
+            setButtonState('nuevoUserGuardar', true);
+        }
+
+        function abrirModalCrearUsuario() {
+            resetAdminUserCreation();
             document.getElementById('modalCrearUsuario').classList.remove('hidden');
             document.getElementById('modalCrearUsuario').classList.add('flex');
         }
@@ -2999,21 +3087,32 @@
         }
 
         async function crearUsuarioAdmin() {
+            const codigoEmpleado = document.getElementById('nuevoUserCodigo').value.trim();
             const userName = document.getElementById('nuevoUserName').value.trim();
             const role = document.getElementById('nuevoUserRole').value;
             const instancia = document.getElementById('nuevoUserInstancia').value;
+            const adValid = document.getElementById('nuevoUserName').dataset.adValid === 'true';
+            if (!codigoEmpleado) {
+                showError('Código requerido', 'Indica el código de empleado para validar en AD.');
+                return;
+            }
+            if (!adValid) {
+                showError('Validación pendiente', 'Debes validar el código de empleado en AD antes de continuar.');
+                return;
+            }
             if (!userName) {
-                showError('Error', 'El nombre de usuario es requerido.');
+                showError('Usuario requerido', 'No se pudo obtener el nombre de usuario desde AD.');
                 return;
             }
 
             const response = await apiFetch('/api/admin/users', {
                 method: 'POST',
-                body: JSON.stringify({ userName, role, instancia })
+                body: JSON.stringify({ userName, role, instancia, codigoEmpleado })
             });
 
             if (!response.ok) {
-                showError('Error', 'No fue posible crear el usuario.');
+                const message = await readErrorMessage(response, 'No fue posible crear el usuario.');
+                showError('No se pudo crear el usuario', message);
                 return;
             }
 
@@ -3028,7 +3127,8 @@
                 body: JSON.stringify({ isActive })
             });
             if (!response.ok) {
-                showError('Error', 'No fue posible actualizar el estado del usuario.');
+                const message = await readErrorMessage(response, 'No fue posible actualizar el estado del usuario.');
+                showError('Error al actualizar estado', message);
                 return;
             }
             loadAdminUsers();
@@ -3047,9 +3147,10 @@
                 method: 'DELETE'
             });
             if (!response.ok) {
-                const data = await response.json().catch(() => null);
-                const message = data?.message
-                    || 'No fue posible eliminar el usuario. Asegúrate de que exista al menos otro administrador.';
+                const message = await readErrorMessage(
+                    response,
+                    'No fue posible eliminar el usuario. Asegúrate de que exista al menos otro administrador.'
+                );
                 showError('No se puede eliminar', message);
                 return;
             }
@@ -3116,6 +3217,15 @@
                 Swal.fire({ title, text, icon: 'error', ...getSwalTheme() });
             } else {
                 alert(`${title} ${text}`);
+            }
+        }
+
+        async function readErrorMessage(response, fallback) {
+            try {
+                const data = await response.json();
+                return data?.message || data?.title || data?.detail || fallback;
+            } catch (error) {
+                return fallback;
             }
         }
 

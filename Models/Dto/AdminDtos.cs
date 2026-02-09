@@ -27,7 +27,7 @@ public record UpdateRolesRequest(IReadOnlyList<string> Roles);
 
 public record UpdateActiveRequest(bool IsActive);
 
-public record CreateUserRequest(string UserName, string? Role, string? Instancia);
+public record CreateUserRequest(string UserName, string? Role, string? Instancia, string? CodigoEmpleado);
 
 public record UpdateUserInstanceRequest(string? Instancia);
 
