@@ -3020,8 +3020,10 @@
 
         let adminUserValidationToken = 0;
 
-        function resetAdminUserCreation() {
-            document.getElementById('nuevoUserCodigo').value = '';
+        function resetAdminUserCreation(keepCode = false) {
+            if (!keepCode) {
+                document.getElementById('nuevoUserCodigo').value = '';
+            }
             document.getElementById('nuevoUserName').value = '';
             document.getElementById('nuevoUserRole').value = '';
             document.getElementById('nuevoUserInstancia').value = '';
@@ -3040,7 +3042,7 @@
             const token = ++adminUserValidationToken;
 
             if (codigo.length < 3) {
-                resetAdminUserCreation();
+                resetAdminUserCreation(true);
                 return;
             }
 
