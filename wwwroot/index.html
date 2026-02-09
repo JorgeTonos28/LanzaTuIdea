@@ -909,6 +909,7 @@
                         <div>
                             <label class="block text-xs uppercase mb-1">No. Empleado <span class="required-mark">*</span></label>
                             <input type="text" id="adminIdEmp" class="w-full p-3 outline-none" placeholder="Ej: 1010" required autocomplete="off">
+                            <span class="text-xs text-red-500 hidden" id="adminIdEmpHint"></span>
                         </div>
                         <div>
                             <label class="block text-xs uppercase mb-1">Nombre Completo <span class="required-mark">*</span></label>
@@ -962,7 +963,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea Manual</button>
+                <button id="adminManualSubmit" type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea Manual</button>
             </form>
         </div>
 
@@ -1243,6 +1244,9 @@
         let gestorCache = [];
         let charts = {};
         let gestorEmployeeFound = false;
+        let adminManualAdValid = false;
+        let adminManualValidateToken = 0;
+        let adminManualValidateTimer = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('systemDescription').innerText = systemDescriptionText;
@@ -1253,8 +1257,7 @@
             if (gestorForm) {
                 gestorForm.addEventListener('submit', handleGestorManualSubmit);
             }
-            document.getElementById('adminIdEmp').addEventListener('input', (e) => buscarEmpleadoAdmin(e.target.value));
-            document.getElementById('nuevoUserCodigo').addEventListener('input', (e) => validarCodigoEmpleadoUsuario(e.target.value));
+            document.getElementById('adminIdEmp').addEventListener('input', (e) => validarEmpleadoAdminManual(e.target.value));
             const correoEmpleadoInput = document.getElementById('correoEmpleado');
             if (correoEmpleadoInput) {
                 correoEmpleadoInput.addEventListener('input', validateCorreoEmpleado);
@@ -1285,6 +1288,7 @@
             if (commentButton) {
                 commentButton.addEventListener('click', enviarComentario);
             }
+            setAdminManualFormEnabled(false);
             bindBrandingPreview('brandingLogo', 'brandingLogoPreview');
             bindBrandingPreview('brandingFavicon', 'brandingFaviconPreview');
             initApp();
@@ -1749,6 +1753,42 @@
             }
         }
 
+        function setAdminManualFormEnabled(isEnabled) {
+            setControlState('adminDesc', isEnabled);
+            setControlState('adminDetalle', isEnabled);
+            setControlState('adminClasif', isEnabled);
+            setControlState('adminInstancia', isEnabled);
+            setControlState('adminVia', isEnabled);
+            setButtonState('adminManualSubmit', isEnabled);
+        }
+
+        function setAdminManualHint(message, isError) {
+            const hint = document.getElementById('adminIdEmpHint');
+            if (!hint) return;
+            if (!message) {
+                hint.classList.add('hidden');
+                hint.innerText = '';
+                return;
+            }
+            hint.innerText = message;
+            hint.classList.remove('hidden');
+            if (isError) {
+                hint.classList.add('text-red-500');
+                hint.classList.remove('text-slate-500');
+            } else {
+                hint.classList.add('text-slate-500');
+                hint.classList.remove('text-red-500');
+            }
+        }
+
+        function resetAdminManualEmployeeFields() {
+            document.getElementById('adminNomEmp').value = '';
+            document.getElementById('adminMailEmp').value = '';
+            document.getElementById('adminDirEmp').value = '';
+            ajustarCamposAdmin(null);
+            validateAdminManualFields();
+        }
+
         function setGestorFieldEditable(id, isEditable) {
             const input = document.getElementById(id);
             if (!input) return;
@@ -1924,6 +1964,10 @@
 
         async function handleManualSubmit(e) {
             e.preventDefault();
+            if (!adminManualAdValid) {
+                showError('Validación requerida', 'Debes validar el colaborador en Active Directory antes de registrar la idea.');
+                return;
+            }
             if (!validateAdminManualFields()) {
                 showError('Error', 'Completa los campos requeridos con un correo válido.');
                 return;
@@ -1953,6 +1997,9 @@
 
             showSuccess('Registrada', 'La idea se guardó con estatus Revisada.');
             document.getElementById('formAdminManual').reset();
+            adminManualAdValid = false;
+            setAdminManualFormEnabled(false);
+            setAdminManualHint('', false);
             navAdmin('dashboard');
         }
 
@@ -3018,59 +3065,14 @@
             loadAdminUsers();
         }
 
-        let adminUserValidationToken = 0;
-
-        function resetAdminUserCreation(keepCode = false) {
-            if (!keepCode) {
-                document.getElementById('nuevoUserCodigo').value = '';
-            }
+        function resetAdminUserCreation() {
+            document.getElementById('nuevoUserCodigo').value = '';
             document.getElementById('nuevoUserName').value = '';
             document.getElementById('nuevoUserRole').value = '';
             document.getElementById('nuevoUserInstancia').value = '';
-            document.getElementById('nuevoUserName').dataset.adValid = 'false';
             document.getElementById('nuevoUserCodigoHelp').innerText = 'Ingresa el código para validar en Active Directory.';
             document.getElementById('nuevoUserNameHelp').innerText = 'Se completa luego de validar el código en AD.';
             setControlState('nuevoUserCodigo', true);
-            setControlState('nuevoUserName', false);
-            setControlState('nuevoUserRole', false);
-            setControlState('nuevoUserInstancia', false);
-            setButtonState('nuevoUserGuardar', false);
-        }
-
-        async function validarCodigoEmpleadoUsuario(valor) {
-            const codigo = valor.trim();
-            const token = ++adminUserValidationToken;
-
-            if (codigo.length < 3) {
-                resetAdminUserCreation(true);
-                return;
-            }
-
-            document.getElementById('nuevoUserCodigoHelp').innerText = 'Validando código en catálogo y AD...';
-            const response = await apiFetch(`/api/admin/users/validate?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
-
-            if (token !== adminUserValidationToken) {
-                return;
-            }
-
-            if (!response.ok) {
-                const message = await readErrorMessage(response, 'No fue posible validar el código de empleado.');
-                document.getElementById('nuevoUserName').value = '';
-                document.getElementById('nuevoUserName').dataset.adValid = 'false';
-                setControlState('nuevoUserName', false);
-                setControlState('nuevoUserRole', false);
-                setControlState('nuevoUserInstancia', false);
-                setButtonState('nuevoUserGuardar', false);
-                document.getElementById('nuevoUserCodigoHelp').innerText = message;
-                showError('Validación de usuario', message);
-                return;
-            }
-
-            const data = await response.json();
-            document.getElementById('nuevoUserName').value = data.userName || '';
-            document.getElementById('nuevoUserName').dataset.adValid = 'true';
-            document.getElementById('nuevoUserCodigoHelp').innerText = 'Código validado correctamente.';
-            document.getElementById('nuevoUserNameHelp').innerText = 'Usuario confirmado en Active Directory.';
             setControlState('nuevoUserName', false);
             setControlState('nuevoUserRole', true);
             setControlState('nuevoUserInstancia', true);
@@ -3090,22 +3092,29 @@
 
         async function crearUsuarioAdmin() {
             const codigoEmpleado = document.getElementById('nuevoUserCodigo').value.trim();
-            const userName = document.getElementById('nuevoUserName').value.trim();
             const role = document.getElementById('nuevoUserRole').value;
             const instancia = document.getElementById('nuevoUserInstancia').value;
-            const adValid = document.getElementById('nuevoUserName').dataset.adValid === 'true';
             if (!codigoEmpleado) {
                 showError('Código requerido', 'Indica el código de empleado para validar en AD.');
                 return;
             }
-            if (!adValid) {
-                showError('Validación pendiente', 'Debes validar el código de empleado en AD antes de continuar.');
+
+            const validationResponse = await apiFetch(`/api/admin/users/validate?codigo=${encodeURIComponent(codigoEmpleado)}`, { method: 'GET' });
+            if (!validationResponse.ok) {
+                const message = await readErrorMessage(validationResponse, 'No fue posible validar el código de empleado.');
+                showError('Validación de usuario', message);
                 return;
             }
+
+            const validationData = await validationResponse.json();
+            const userName = (validationData?.userName || '').trim();
             if (!userName) {
                 showError('Usuario requerido', 'No se pudo obtener el nombre de usuario desde AD.');
                 return;
             }
+            document.getElementById('nuevoUserName').value = userName;
+            document.getElementById('nuevoUserCodigoHelp').innerText = 'Código validado correctamente.';
+            document.getElementById('nuevoUserNameHelp').innerText = 'Usuario confirmado en Active Directory.';
 
             const response = await apiFetch('/api/admin/users', {
                 method: 'POST',
@@ -3166,6 +3175,49 @@
             setFieldEditable('adminNomEmp', !hasNombre);
             setFieldEditable('adminMailEmp', !hasCorreo);
             setFieldEditable('adminDirEmp', !hasDepartamento);
+        }
+
+        function validarEmpleadoAdminManual(valor) {
+            const codigo = valor.trim();
+            adminManualAdValid = false;
+            setAdminManualFormEnabled(false);
+            clearTimeout(adminManualValidateTimer);
+
+            if (!codigo) {
+                setAdminManualHint('', false);
+                resetAdminManualEmployeeFields();
+                return;
+            }
+
+            if (codigo.length < 3) {
+                setAdminManualHint('Ingresa el código completo para validar en Active Directory.', false);
+                resetAdminManualEmployeeFields();
+                return;
+            }
+
+            const token = ++adminManualValidateToken;
+            setAdminManualHint('Validando usuario en Active Directory...', false);
+            adminManualValidateTimer = setTimeout(async () => {
+                const response = await apiFetch(`/api/admin/users/validate?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
+                if (token !== adminManualValidateToken) {
+                    return;
+                }
+
+                if (!response.ok) {
+                    const message = await readErrorMessage(response, 'No fue posible validar el colaborador en Active Directory.');
+                    adminManualAdValid = false;
+                    setAdminManualFormEnabled(false);
+                    setAdminManualHint(message, true);
+                    resetAdminManualEmployeeFields();
+                    showError('Validación de colaborador', message);
+                    return;
+                }
+
+                adminManualAdValid = true;
+                setAdminManualFormEnabled(true);
+                setAdminManualHint('Usuario verificado en Active Directory.', false);
+                await buscarEmpleadoAdmin(codigo);
+            }, 400);
         }
 
         async function buscarEmpleadoAdmin(valor) {
