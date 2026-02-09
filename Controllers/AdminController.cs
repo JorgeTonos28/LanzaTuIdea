@@ -173,6 +173,23 @@ public class AdminController : ControllerBase
             return BadRequest(new { message = "Descripción o detalle exceden el límite permitido." });
         }
 
+        var adUserName = NormalizeUserName(request.Email);
+        if (string.IsNullOrWhiteSpace(adUserName))
+        {
+            return BadRequest(new { message = "El correo no es válido para validar el usuario en AD." });
+        }
+
+        var adData = await _adServiceClient.GetUserDataAsync(adUserName, cancellationToken);
+        if (adData is null)
+        {
+            return BadRequest(new { message = "El colaborador no existe en Active Directory o no está disponible." });
+        }
+
+        if (!string.Equals(adData.CodigoEmpleado?.Trim(), request.CodigoEmpleado?.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { message = "El usuario de Active Directory no corresponde al código de empleado ingresado." });
+        }
+
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
@@ -456,7 +473,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("users/validate")]
-    public async Task<IActionResult> ValidateUser([FromQuery] string codigo, CancellationToken cancellationToken)
+    public async Task<IActionResult> ValidateUser([FromQuery] string codigo, [FromQuery] string? email, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(codigo))
         {
@@ -472,12 +489,13 @@ public class AdminController : ControllerBase
             return NotFound(new { message = "El código de empleado no existe en el catálogo local." });
         }
 
-        if (string.IsNullOrWhiteSpace(employee.E_Mail))
+        var emailToUse = !string.IsNullOrWhiteSpace(email) ? email.Trim() : employee.E_Mail?.Trim();
+        if (string.IsNullOrWhiteSpace(emailToUse))
         {
-            return BadRequest(new { message = "El colaborador no tiene correo registrado para derivar su usuario." });
+            return BadRequest(new { message = "El colaborador no tiene correo registrado. Ingresa un correo para validar el usuario en AD." });
         }
 
-        var userName = NormalizeUserName(employee.E_Mail);
+        var userName = NormalizeUserName(emailToUse);
         if (string.IsNullOrWhiteSpace(userName))
         {
             return BadRequest(new { message = "No fue posible derivar el usuario desde el correo del colaborador." });
@@ -494,7 +512,7 @@ public class AdminController : ControllerBase
             return BadRequest(new { message = "El usuario encontrado en AD no corresponde al código de empleado." });
         }
 
-        return Ok(new { userName, nombreCompleto = adData.NombreCompleto });
+        return Ok(new { userName, nombreCompleto = adData.NombreCompleto, email = emailToUse });
     }
 
     [HttpPost("users")]

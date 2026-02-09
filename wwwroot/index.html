@@ -1264,7 +1264,10 @@
             }
             const adminMailEmpInput = document.getElementById('adminMailEmp');
             if (adminMailEmpInput) {
-                adminMailEmpInput.addEventListener('input', validateAdminManualFields);
+                adminMailEmpInput.addEventListener('input', (e) => {
+                    validarCorreoEmpleadoManual(e.target.value);
+                    validateAdminManualFields();
+                });
             }
             const adminNomEmpInput = document.getElementById('adminNomEmp');
             const adminDirEmpInput = document.getElementById('adminDirEmp');
@@ -3196,34 +3199,83 @@
             }
 
             const token = ++adminManualValidateToken;
-            setAdminManualHint('Validando usuario en Active Directory...', false);
             adminManualValidateTimer = setTimeout(async () => {
-                const response = await apiFetch(`/api/admin/users/validate?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
-                if (token !== adminManualValidateToken) {
+                const empleado = await buscarEmpleadoAdmin(codigo, token);
+                if (!empleado) {
                     return;
                 }
 
-                if (!response.ok) {
-                    const message = await readErrorMessage(response, 'No fue posible validar el colaborador en Active Directory.');
-                    adminManualAdValid = false;
-                    setAdminManualFormEnabled(false);
-                    setAdminManualHint(message, true);
-                    resetAdminManualEmployeeFields();
-                    showError('Validación de colaborador', message);
+                const email = document.getElementById('adminMailEmp').value.trim();
+                if (!email) {
+                    setAdminManualHint('Ingresa el correo del colaborador para validar en Active Directory.', false);
                     return;
                 }
 
-                adminManualAdValid = true;
-                setAdminManualFormEnabled(true);
-                setAdminManualHint('Usuario verificado en Active Directory.', false);
-                await buscarEmpleadoAdmin(codigo);
+                await validateAdminManualAd(codigo, email, token);
             }, 400);
         }
 
-        async function buscarEmpleadoAdmin(valor) {
+        function validarCorreoEmpleadoManual(valor) {
+            const codigo = document.getElementById('adminIdEmp').value.trim();
+            const email = valor.trim();
+            if (!codigo || codigo.length < 3) {
+                return;
+            }
+            if (!email) {
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                return;
+            }
+            const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!correoValido) {
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                setAdminManualHint('El correo ingresado no tiene un formato válido.', true);
+                return;
+            }
+            const token = ++adminManualValidateToken;
+            validateAdminManualAd(codigo, email, token);
+        }
+
+        async function validateAdminManualAd(codigo, email, token) {
+            const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!correoValido) {
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                setAdminManualHint('El correo ingresado no tiene un formato válido.', true);
+                return;
+            }
+            setAdminManualHint('Validando usuario en Active Directory...', false);
+            const response = await apiFetch(
+                `/api/admin/users/validate?codigo=${encodeURIComponent(codigo)}&email=${encodeURIComponent(email)}`,
+                { method: 'GET' }
+            );
+            if (token !== adminManualValidateToken) {
+                return;
+            }
+
+            if (!response.ok) {
+                const message = await readErrorMessage(response, 'No fue posible validar el colaborador en Active Directory.');
+                adminManualAdValid = false;
+                setAdminManualFormEnabled(false);
+                setAdminManualHint(message, true);
+                showError('Validación de colaborador', message);
+                return;
+            }
+
+            const data = await response.json();
+            adminManualAdValid = true;
+            setAdminManualFormEnabled(true);
+            setAdminManualHint('Usuario verificado en Active Directory.', false);
+            if (data?.email) {
+                document.getElementById('adminMailEmp').value = data.email;
+            }
+        }
+
+        async function buscarEmpleadoAdmin(valor, token = null) {
             const codigo = valor.trim();
             if (codigo.length < 3) {
-                return;
+                return null;
             }
             const response = await apiFetch(`/api/admin/employees/search?codigo=${encodeURIComponent(codigo)}`, { method: 'GET' });
             if (response.status === 404) {
@@ -3232,10 +3284,15 @@
                 document.getElementById('adminDirEmp').value = '';
                 ajustarCamposAdmin(null);
                 validateAdminManualFields();
-                return;
+                setAdminManualHint('El código no existe en el catálogo local.', true);
+                return null;
             }
             if (!response.ok) {
-                return;
+                setAdminManualHint('No fue posible obtener los datos del colaborador.', true);
+                return null;
+            }
+            if (token !== null && token !== adminManualValidateToken) {
+                return null;
             }
             const empleado = await response.json();
             document.getElementById('adminNomEmp').value = empleado.nombreCompleto || '';
@@ -3243,6 +3300,7 @@
             document.getElementById('adminDirEmp').value = empleado.departamento || '';
             ajustarCamposAdmin(empleado);
             validateAdminManualFields();
+            return empleado;
         }
 
         function getSwalTheme() {
