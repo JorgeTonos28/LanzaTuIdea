@@ -25,13 +25,20 @@ public class ConfigController : ControllerBase
     }
 
     [HttpGet("classifications")]
-    public async Task<ActionResult<IReadOnlyList<CatalogItemDto>>> GetClassifications(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<ClassificationCatalogItemDto>>> GetClassifications(CancellationToken cancellationToken)
     {
         var items = await _context.Classifications
             .AsNoTracking()
             .Where(c => c.Activo)
-            .OrderBy(c => c.Nombre)
-            .Select(c => new CatalogItemDto(c.Id, c.Nombre))
+            .OrderBy(c => c.Proceso)
+            .ThenBy(c => c.Subproceso)
+            .Select(c => new ClassificationCatalogItemDto(
+                c.Id,
+                c.Nombre,
+                c.Proceso,
+                c.Subproceso,
+                c.Icono,
+                c.Descripcion))
             .ToListAsync(cancellationToken);
 
         return items;
@@ -39,38 +46,16 @@ public class ConfigController : ControllerBase
 
     [HttpPost("classifications")]
     [Authorize(Roles = AppConstants.Roles.Admin)]
-    public async Task<ActionResult<CatalogItemDto>> CreateClassification([FromBody] CreateCatalogItemRequest request, CancellationToken cancellationToken)
+    public ActionResult CreateClassification([FromBody] CreateCatalogItemRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Nombre))
-        {
-            return BadRequest(new { message = "El nombre es requerido." });
-        }
-
-        var nombre = TrimTo(request.Nombre, 200);
-        if (nombre is null)
-        {
-            return BadRequest(new { message = "El nombre es requerido." });
-        }
-
-        var classification = new Classification { Nombre = nombre, Activo = true };
-        _context.Classifications.Add(classification);
-        await _context.SaveChangesAsync(cancellationToken);
-        return new CatalogItemDto(classification.Id, classification.Nombre);
+        return StatusCode(StatusCodes.Status403Forbidden, new { message = "Las clasificaciones están predefinidas y no se pueden crear manualmente." });
     }
 
     [HttpDelete("classifications/{id:int}")]
     [Authorize(Roles = AppConstants.Roles.Admin)]
-    public async Task<IActionResult> DeleteClassification(int id, CancellationToken cancellationToken)
+    public ActionResult DeleteClassification(int id, CancellationToken cancellationToken)
     {
-        var classification = await _context.Classifications.FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
-        if (classification is null)
-        {
-            return NotFound();
-        }
-
-        classification.Activo = false;
-        await _context.SaveChangesAsync(cancellationToken);
-        return Ok();
+        return StatusCode(StatusCodes.Status403Forbidden, new { message = "Las clasificaciones están predefinidas y no se pueden eliminar." });
     }
 
     [HttpGet("instances")]

@@ -2,7 +2,9 @@ namespace LanzaTuIdea.Api.Models.Dto;
 
 public record IdeaCreateRequest(
     string Descripcion,
+    string Problema,
     string Detalle,
+    string Clasificacion,
     string? Instancia,
     string? NombreCompleto,
     string? Email,
@@ -32,6 +34,7 @@ public record IdeaDetailDto(
     int Id,
     DateTime CreatedAt,
     string Descripcion,
+    string Problema,
     string Detalle,
     string Status,
     string? Clasificacion,
@@ -73,6 +76,7 @@ public record IdeaCommentRequest(string Comment);
 public record IdeaManualRequest(
     string CodigoEmpleado,
     string Descripcion,
+    string Problema,
     string Detalle,
     string? Via,
     string? AdminComment,

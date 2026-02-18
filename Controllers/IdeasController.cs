@@ -52,14 +52,18 @@ public class IdeasController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<IdeaSummaryDto>> Create([FromBody] IdeaCreateRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Descripcion) || string.IsNullOrWhiteSpace(request.Detalle))
+        if (string.IsNullOrWhiteSpace(request.Descripcion)
+            || string.IsNullOrWhiteSpace(request.Problema)
+            || string.IsNullOrWhiteSpace(request.Detalle)
+            || string.IsNullOrWhiteSpace(request.Clasificacion)
+            || string.IsNullOrWhiteSpace(request.Email))
         {
-            return BadRequest(new { message = "Descripción y detalle son requeridos." });
+            return BadRequest(new { message = "Descripción, problema, detalle, clasificación y correo son requeridos." });
         }
 
-        if (request.Descripcion.Length > 500 || request.Detalle.Length > 4000)
+        if (request.Descripcion.Length > 500 || request.Problema.Length > 1000 || request.Detalle.Length > 4000)
         {
-            return BadRequest(new { message = "Descripción o detalle exceden el límite permitido." });
+            return BadRequest(new { message = "Descripción, problema o detalle exceden el límite permitido." });
         }
 
         var userName = User.Identity?.Name;
@@ -87,6 +91,14 @@ public class IdeasController : ControllerBase
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        var clasificacion = await _context.Classifications
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Activo && c.Nombre == request.Clasificacion.Trim(), cancellationToken);
+        if (clasificacion is null)
+        {
+            return BadRequest(new { message = "La clasificación seleccionada no es válida." });
+        }
+
         var codigoEmpleado = user.Codigo_Empleado ?? string.Empty;
         var idea = new Models.Idea
         {
@@ -94,7 +106,9 @@ public class IdeasController : ControllerBase
             CreatedByUserId = user.Id,
             CodigoEmpleado = TrimTo(codigoEmpleado, 20) ?? string.Empty,
             Descripcion = TrimTo(request.Descripcion, 500) ?? string.Empty,
+            Problema = TrimTo(request.Problema, 1000) ?? string.Empty,
             Detalle = TrimTo(request.Detalle, 4000) ?? string.Empty,
+            Clasificacion = clasificacion.Nombre,
             Status = AppConstants.Status.Registrada,
             Via = "Sistema"
         };
@@ -173,6 +187,7 @@ public class IdeasController : ControllerBase
             idea.Id,
             idea.CreatedAt,
             idea.Descripcion,
+            idea.Problema,
             idea.Detalle,
             idea.Status,
             idea.Clasificacion,

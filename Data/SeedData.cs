@@ -16,6 +16,23 @@ public static class SeedData
     private const string DefaultLogoPath = "/assets/branding/logo-placeholder.svg";
     private const string DefaultFaviconPath = "/assets/branding/favicon-placeholder.svg";
 
+    private static readonly (string Proceso, string Subproceso, string Icono, string Descripcion)[] DefaultClassifications =
+    [
+        ("Planear", "Planificación y Monitoreo", "📊", "Metas, indicadores, seguimiento, reportes y control de planes."),
+        ("Planear", "Enfoque al Cliente", "👥", "Experiencia del usuario, atención, satisfacción, quejas y mejora del servicio."),
+        ("Planear", "Diseño y Desarrollo", "💡", "Diseño/mejora de programas, contenidos, metodologías y soluciones institucionales."),
+        ("Prestación del Servicio", "Formación Profesional", "🎓", "Ejecución de la formación: planificación de ofertas, docencia, evaluación y certificación."),
+        ("Prestación del Servicio", "Asesoría y Asistencia Técnica", "🤝", "Acompañamiento a empresas: diagnósticos, asistencia técnica, soluciones y seguimiento."),
+        ("Control", "Auditorías Internas (SGC)", "📋", "Auditorías, hallazgos, acciones correctivas/preventivas y mejora del sistema de calidad."),
+        ("Control", "Revisión por la Dirección", "👔", "Revisión gerencial del desempeño: resultados, decisiones, prioridades y recursos."),
+        ("Soporte", "Recursos Humanos", "❤️", "Gestión de personal: reclutamiento, desarrollo, bienestar, desempeño y nómina."),
+        ("Soporte", "Servicios Generales", "🏢", "Servicios de apoyo: mantenimiento, transporte, limpieza, seguridad y facilidades."),
+        ("Soporte", "Abastecimiento", "📦", "Compras, almacén, inventarios, proveedores y logística de suministros."),
+        ("Soporte", "Finanzas", "💰", "Presupuesto, pagos, contabilidad, ingresos, costos y control financiero."),
+        ("Soporte", "Tecnología y Sistemas", "💻", "Soporte TI, sistemas, datos, infraestructura, automatización y seguridad informática."),
+        ("Soporte", "Regulación y Supervisión", "⚖️", "Normativas, supervisión, cumplimiento y apoyo regulatorio a centros y operaciones.")
+    ];
+
     public static async Task InitializeAsync(AppDbContext context, IConfiguration configuration, IHostEnvironment environment)
     {
         Console.WriteLine("--> [SeedData] Iniciando inicialización de datos...");
@@ -60,13 +77,7 @@ public static class SeedData
 
     private static async Task SeedConfigurationAsync(AppDbContext context)
     {
-        if (!await context.Classifications.AnyAsync())
-        {
-            context.Classifications.AddRange(
-                new Classification { Nombre = "Mejora de Proceso", Activo = true },
-                new Classification { Nombre = "Ahorro de Costos", Activo = true }
-            );
-        }
+        await SeedDefaultClassificationsAsync(context);
 
         if (!await context.Instances.AnyAsync())
         {
@@ -84,6 +95,50 @@ public static class SeedData
                 FaviconPath = DefaultFaviconPath,
                 UpdatedAt = DateTime.UtcNow
             });
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedDefaultClassificationsAsync(AppDbContext context)
+    {
+        var existing = await context.Classifications.ToListAsync();
+
+        foreach (var template in DefaultClassifications)
+        {
+            var current = existing.FirstOrDefault(c =>
+                string.Equals(c.Subproceso, template.Subproceso, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(c.Nombre, template.Subproceso, StringComparison.OrdinalIgnoreCase));
+
+            if (current is null)
+            {
+                context.Classifications.Add(new Classification
+                {
+                    Nombre = template.Subproceso,
+                    Proceso = template.Proceso,
+                    Subproceso = template.Subproceso,
+                    Icono = template.Icono,
+                    Descripcion = template.Descripcion,
+                    Activo = true
+                });
+                continue;
+            }
+
+            current.Nombre = template.Subproceso;
+            current.Proceso = template.Proceso;
+            current.Subproceso = template.Subproceso;
+            current.Icono = template.Icono;
+            current.Descripcion = template.Descripcion;
+            current.Activo = true;
+        }
+
+        var validSubprocesos = DefaultClassifications
+            .Select(c => c.Subproceso)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var extra in existing.Where(c => !validSubprocesos.Contains(c.Subproceso ?? c.Nombre)))
+        {
+            extra.Activo = false;
         }
 
         await context.SaveChangesAsync();
