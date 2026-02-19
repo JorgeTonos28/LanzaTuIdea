@@ -443,48 +443,49 @@
         }
 
         .classification-process-title {
-            font-size: 1.3rem;
-            font-weight: 700;
+            font-size: 1.05rem;
+            font-weight: 800;
             color: var(--infotep-blue);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .classification-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
         }
 
         .classification-card {
             position: relative;
             border: 1px solid #d8e2f1;
-            border-top-width: 5px;
-            border-radius: 14px;
+            border-top-width: 4px;
+            border-radius: 12px;
             background: #fff;
-            padding: 16px;
+            padding: 10px 12px;
             text-align: left;
             transition: all 0.2s ease;
-            min-height: 150px;
+            min-height: 88px;
         }
 
-        .classification-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(0, 51, 102, 0.12);
+        .classification-card:hover,
+        .classification-card:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 51, 102, 0.14);
         }
 
         .classification-card.active {
             border-color: #7aa9ff;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
         }
 
         .classification-chip {
             display: inline-flex;
             align-items: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: .04em;
-            padding: 4px 8px;
+            padding: 3px 7px;
             border-radius: 999px;
             background-color: #eef2ff;
             color: #334155;
@@ -493,14 +494,45 @@
         .classification-subtitle {
             font-weight: 700;
             color: #1e293b;
-            margin-top: 10px;
+            margin-top: 6px;
+            font-size: 0.88rem;
+            line-height: 1.2;
         }
 
-        .classification-desc {
-            color: #64748b;
-            font-size: 0.82rem;
-            margin-top: 6px;
-            line-height: 1.4;
+        .classification-tooltip {
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 8px);
+            transform: translateX(-50%);
+            width: min(260px, 92vw);
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 0.75rem;
+            line-height: 1.35;
+            border-radius: 10px;
+            padding: 8px 10px;
+            box-shadow: 0 12px 24px rgba(2, 6, 23, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 30;
+        }
+
+        .classification-card:hover .classification-tooltip,
+        .classification-card:focus-visible .classification-tooltip {
+            opacity: 1;
+        }
+
+        @media (max-width: 1280px) {
+            .classification-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .classification-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
 
@@ -620,18 +652,18 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs uppercase mb-1">Descripción de la Idea <span class="required-mark">*</span></label>
+                            <label class="block text-xs uppercase mb-1">Título o nombre de la idea <span class="required-mark">*</span></label>
                             <textarea id="descIdea" rows="2" class="w-full p-3 outline-none" placeholder="Título corto o resumen de la idea..." required></textarea>
                             <button type="button" onclick="limpiarCampo('descIdea')" class="btn-inline mt-2">Borrar campo</button>
                         </div>
                         <div>
                             <label class="block text-xs uppercase mb-1">¿Qué problema buscas resolver con tu idea? <span class="required-mark">*</span></label>
-                            <textarea id="problemaIdea" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema principal..." required></textarea>
+                            <textarea id="problemaIdea" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema identificado..." required></textarea>
                             <p class="text-xs text-slate-400 mt-1">Ejemplo: retrasos en un proceso, reprocesos frecuentes o baja satisfacción del usuario interno.</p>
                         </div>
                         <div>
                             <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
-                            <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Explica detalladamente en qué consiste..." required></textarea>
+                            <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Describe detalladamente en qué consiste la solución..." required></textarea>
                             <button type="button" onclick="limpiarCampo('detalleIdea')" class="btn-inline mt-2">Borrar campo</button>
                         </div>
                         <div>
@@ -650,9 +682,9 @@
                     </div>
                 </div>
 
-                <div id="ideadorStep2" class="hidden space-y-5">
+                <div id="ideadorStep2" class="hidden space-y-4">
                     <div class="text-center space-y-2">
-                        <h4 class="text-3xl font-bold">Clasifica tu idea</h4>
+                        <h4 class="text-2xl font-bold">Clasifica tu idea</h4>
                         <p class="text-slate-500">Selecciona el proceso interno del INFOTEP al que aporta tu propuesta.</p>
                     </div>
                     <div id="ideadorClassificationBoard" class="space-y-6"></div>
@@ -792,16 +824,16 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase mb-1">Descripción <span class="required-mark">*</span></label>
-                        <textarea id="gestorDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
+                        <label class="block text-xs uppercase mb-1">Título o nombre de la idea <span class="required-mark">*</span></label>
+                        <textarea id="gestorDesc" rows="2" class="w-full p-3 outline-none" placeholder="Título o nombre de la idea..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Problema a resolver <span class="required-mark">*</span></label>
-                        <textarea id="gestorProblema" rows="3" class="w-full p-3 outline-none" required></textarea>
+                        <textarea id="gestorProblema" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema identificado..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
-                        <textarea id="gestorDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
+                        <textarea id="gestorDetalle" rows="4" class="w-full p-3 outline-none" placeholder="Describe detalladamente en qué consiste la solución..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Clasificación <span class="required-mark">*</span></label>
@@ -1029,17 +1061,17 @@
 
                 <div id="adminStep1" class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase mb-1">Descripción <span class="required-mark">*</span></label>
-                        <textarea id="adminDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
+                        <label class="block text-xs uppercase mb-1">Título o nombre de la idea <span class="required-mark">*</span></label>
+                        <textarea id="adminDesc" rows="2" class="w-full p-3 outline-none" placeholder="Título o nombre de la idea..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">¿Qué problema busca resolver esta idea? <span class="required-mark">*</span></label>
-                        <textarea id="adminProblema" rows="3" class="w-full p-3 outline-none" required></textarea>
+                        <textarea id="adminProblema" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema identificado..." required></textarea>
                         <p class="text-xs text-slate-400 mt-1">Describe brevemente el problema operativo o de servicio que motiva esta propuesta.</p>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
-                        <textarea id="adminDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
+                        <textarea id="adminDetalle" rows="4" class="w-full p-3 outline-none" placeholder="Describe detalladamente en qué consiste la solución..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
@@ -1063,7 +1095,7 @@
                     </div>
                 </div>
 
-                <div id="adminStep2" class="hidden space-y-5">
+                <div id="adminStep2" class="hidden space-y-4">
                     <div class="text-center space-y-2">
                         <h4 class="text-2xl font-bold">Clasifica la idea por proceso interno</h4>
                         <p class="text-slate-500">Selecciona el subproceso del INFOTEP al que impacta esta idea.</p>
@@ -1674,7 +1706,7 @@
                     card.innerHTML = `
                         <span class="classification-chip">${proceso}</span>
                         <p class="classification-subtitle">${item.icono || ''} ${item.subproceso || item.nombre}</p>
-                        <p class="classification-desc">${item.descripcion || ''}</p>
+                        <div class="classification-tooltip">${item.descripcion || "Sin descripción."}</div>
                     `;
                     card.addEventListener('click', () => selectClassification(hiddenInputId, item.nombre));
                     grid.appendChild(card);
