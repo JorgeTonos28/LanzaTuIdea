@@ -804,8 +804,8 @@
                         <textarea id="gestorDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Clasificación</label>
-                        <select id="gestorClasif" class="w-full p-3 bg-white text-sm">
+                        <label class="block text-xs uppercase mb-1">Clasificación <span class="required-mark">*</span></label>
+                        <select id="gestorClasif" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
                     </div>
@@ -2801,9 +2801,14 @@
             const email = document.getElementById('gestorMailEmpSearch').value.trim() || document.getElementById('gestorMailEmp').value.trim();
             const nombreCompleto = document.getElementById('gestorNomEmp').value.trim();
             const departamento = document.getElementById('gestorDirEmp').value.trim();
+            const clasificacion = document.getElementById('gestorClasif').value.trim();
 
             if (!descripcion || !problema || !detalle) {
                 showError('Campos requeridos', 'Descripción, problema y detalle son obligatorios.');
+                return;
+            }
+            if (!clasificacion) {
+                showError('Clasificación requerida', 'Selecciona una clasificación para continuar.');
                 return;
             }
             if (!codigoEmpleado && !email) {
@@ -2823,7 +2828,7 @@
                 descripcion,
                 problema,
                 detalle,
-                clasificacion: document.getElementById('gestorClasif').value,
+                clasificacion,
                 via: document.getElementById('gestorVia').value
             };
 
