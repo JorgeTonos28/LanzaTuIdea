@@ -78,6 +78,7 @@ public class AppDbContext : DbContext
         {
             entity.Property(i => i.CodigoEmpleado).HasMaxLength(20).IsRequired();
             entity.Property(i => i.Descripcion).HasMaxLength(500).IsRequired();
+            entity.Property(i => i.Problema).HasMaxLength(1000).IsRequired();
             entity.Property(i => i.Detalle).HasMaxLength(4000).IsRequired();
             entity.Property(i => i.Status).HasMaxLength(50).IsRequired();
             entity.Property(i => i.Clasificacion).HasMaxLength(200);
@@ -122,7 +123,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Classification>(entity =>
         {
             entity.HasKey(c => c.Id);
+            entity.Property(c => c.Proceso).HasMaxLength(150).IsRequired();
+            entity.Property(c => c.Subproceso).HasMaxLength(200).IsRequired();
             entity.Property(c => c.Nombre).HasMaxLength(200).IsRequired();
+            entity.Property(c => c.Icono).HasMaxLength(20);
+            entity.Property(c => c.Descripcion).HasMaxLength(500);
         });
 
         modelBuilder.Entity<Instance>(entity =>

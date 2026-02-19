@@ -8,6 +8,7 @@ public class Idea
     public AppUser CreatedByUser { get; set; } = null!;
     public string CodigoEmpleado { get; set; } = "";
     public string Descripcion { get; set; } = "";
+    public string Problema { get; set; } = "";
     public string Detalle { get; set; } = "";
     public string Status { get; set; } = "Registrada";
     public string? Clasificacion { get; set; }

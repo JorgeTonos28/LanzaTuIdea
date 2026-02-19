@@ -430,6 +430,160 @@
             color: #1D6B2F;
         }
 
+        .password-input-wrap {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .password-toggle svg {
+            width: 19px;
+            height: 19px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .password-toggle .eye-off-icon {
+            display: none;
+        }
+
+        .password-toggle.is-visible .eye-icon {
+            display: none;
+        }
+
+        .password-toggle.is-visible .eye-off-icon {
+            display: block;
+        }
+
+
+        .classification-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .classification-legend-item {
+            font-size: 0.68rem;
+            font-weight: 700;
+            border: 1px solid #dbe4f0;
+            border-left-width: 4px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .classification-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .classification-card {
+            position: relative;
+            border: 1px solid #d8e2f1;
+            border-top-width: 4px;
+            border-radius: 12px;
+            background: #fff;
+            padding: 9px 10px;
+            text-align: left;
+            transition: all 0.2s ease;
+            min-height: 80px;
+            overflow: visible;
+            z-index: 1;
+        }
+
+        .classification-card:hover,
+        .classification-card:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 51, 102, 0.14);
+            z-index: 20;
+        }
+
+        .classification-card.active {
+            border-color: #7aa9ff;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
+        }
+
+        .classification-chip {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: .04em;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background-color: #eef2ff;
+            color: #334155;
+        }
+
+        .classification-subtitle {
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 5px;
+            font-size: 0.86rem;
+            line-height: 1.15;
+        }
+
+        .classification-tooltip {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 8px);
+            transform: translateX(-50%);
+            width: min(260px, 88vw);
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 0.74rem;
+            line-height: 1.3;
+            border-radius: 10px;
+            padding: 8px 10px;
+            box-shadow: 0 12px 24px rgba(2, 6, 23, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 40;
+        }
+
+        .classification-card:hover .classification-tooltip,
+        .classification-card:focus-visible .classification-tooltip {
+            opacity: 1;
+        }
+
+        @media (max-width: 1280px) {
+            .classification-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .classification-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+
         .status-default {
             background-color: #E9EEF5;
             color: var(--text-dark);
@@ -477,7 +631,13 @@
                 </div>
                 <div>
                     <label class="block text-xs uppercase mb-1">Contraseña</label>
-                    <input type="password" id="loginPass" class="w-full p-3 outline-none" placeholder="Tu contraseña" required autocomplete="off">
+                    <div class="password-input-wrap">
+                        <input type="password" id="loginPass" class="w-full p-3 pr-12 outline-none" placeholder="Tu contraseña" required autocomplete="off">
+                        <button type="button" id="toggleLoginPass" class="password-toggle" aria-label="Mostrar contraseña">
+                            <svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <svg class="eye-off-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.2A11 11 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-4.1 4.8"></path><path d="M6.6 6.6C3.8 8.3 2 12 2 12s3.5 7 10 7a10.7 10.7 0 0 0 5.3-1.3"></path></svg>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold transition">Entrar</button>
                 <p class="text-xs text-slate-400 text-center">El rol (Admin o Gestor) se asigna desde el panel administrativo.</p>
@@ -515,60 +675,76 @@
             </div>
             <form id="formIdea" class="p-8 space-y-6" autocomplete="off">
                 <p class="required-hint">Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
-                <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-xs uppercase mb-1">No. Empleado <span class="required-mark">*</span></label>
-                            <div class="relative">
-                                <input type="text" id="idEmpleado" class="w-full p-3 outline-none" readonly required autocomplete="off">
+                <input type="hidden" id="clasificacionIdea" required>
+                <div id="ideadorStep1" class="space-y-6">
+                    <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs uppercase mb-1">No. Empleado <span class="required-mark">*</span></label>
+                                <div class="relative">
+                                    <input type="text" id="idEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase mb-1">Nombre Completo <span class="required-mark">*</span></label>
+                                <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase mb-1">Correo Electrónico <span class="required-mark">*</span></label>
+                                <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
+                                <span class="text-xs text-red-500 hidden" id="emailHint">El correo es obligatorio y debe tener formato válido.</span>
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase mb-1">Dirección / Depto <span class="required-mark">*</span></label>
+                                <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
                             </div>
                         </div>
+                    </div>
+
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-xs uppercase mb-1">Nombre Completo <span class="required-mark">*</span></label>
-                            <input type="text" id="nombreEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Título o nombre de la idea <span class="required-mark">*</span></label>
+                            <textarea id="descIdea" rows="2" class="w-full p-3 outline-none" placeholder="Título corto o resumen de la idea..." required></textarea>
+                            <button type="button" onclick="limpiarCampo('descIdea')" class="btn-inline mt-2">Borrar campo</button>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Correo Electrónico <span class="required-mark">*</span></label>
-                            <input type="email" id="correoEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
-                            <span class="text-xs text-red-500 hidden" id="emailHint">Formato de correo inválido</span>
+                            <label class="block text-xs uppercase mb-1">¿Qué problema buscas resolver con tu idea? <span class="required-mark">*</span></label>
+                            <textarea id="problemaIdea" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema identificado..." required></textarea>
+                            <p class="text-xs text-slate-400 mt-1">Ejemplo: retrasos en un proceso, reprocesos frecuentes o baja satisfacción del usuario interno.</p>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase mb-1">Dirección / Depto <span class="required-mark">*</span></label>
-                            <input type="text" id="direccionEmpleado" class="w-full p-3 bg-slate-200 border border-slate-300 text-slate-600" readonly required autocomplete="off">
+                            <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
+                            <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Describe detalladamente en qué consiste la solución..." required></textarea>
+                            <button type="button" onclick="limpiarCampo('detalleIdea')" class="btn-inline mt-2">Borrar campo</button>
                         </div>
+                        <div>
+                            <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
+                            <select id="ideaInstancia" class="w-full p-3 bg-white text-sm" required>
+                                <option value="">Seleccione una instancia</option>
+                            </select>
+                            <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-slate-100">
+                        <button type="button" onclick="limpiarFormulario()" class="btn-limpiar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">Limpiar Campos</button>
+                        <button type="button" onclick="cancelarProceso()" class="btn-cancelar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">Cancelar</button>
+                        <button type="button" onclick="goToIdeadorClassificationStep()" class="btn-registar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">Siguiente</button>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs uppercase mb-1">Descripción de la Idea <span class="required-mark">*</span></label>
-                        <textarea id="descIdea" rows="2" class="w-full p-3 outline-none" placeholder="Título corto o resumen de la idea..." required></textarea>
-                        <button type="button" onclick="limpiarCampo('descIdea')" class="btn-inline mt-2">Borrar campo</button>
+                <div id="ideadorStep2" class="hidden space-y-4">
+                    <div class="text-center space-y-2">
+                        <h4 class="text-2xl font-bold">Clasifica tu idea</h4>
+                        <p class="text-slate-500">Selecciona el proceso interno del INFOTEP al que aporta tu propuesta.</p>
                     </div>
-                    <div>
-                        <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
-                        <textarea id="detalleIdea" rows="5" class="w-full p-3 outline-none" placeholder="Explica detalladamente en qué consiste..." required></textarea>
-                        <button type="button" onclick="limpiarCampo('detalleIdea')" class="btn-inline mt-2">Borrar campo</button>
+                    <div id="ideadorClassificationBoard" class="space-y-2"></div>
+                    <span class="text-xs text-red-500 hidden" id="ideadorClasifHint">Selecciona un subproceso para continuar.</span>
+                    <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-slate-100">
+                        <button type="button" onclick="showIdeadorStep(1)" class="btn-outline py-3 px-6 rounded-xl font-bold flex-1">Volver</button>
+                        <button type="button" onclick="cancelarProceso()" class="btn-cancelar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">Cancelar</button>
+                        <button id="submitIdeaBtn" type="submit" class="btn-primary py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">Registrar Idea</button>
                     </div>
-                    <div>
-                        <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
-                        <select id="ideaInstancia" class="w-full p-3 bg-white text-sm" required>
-                            <option value="">Seleccione una instancia</option>
-                        </select>
-                        <p class="text-xs text-slate-400 mt-1">Seleccione la instancia regional o centro al que pertenece.</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-slate-100">
-                    <button type="submit" class="btn-registar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">
-                        Registrar Idea
-                    </button>
-                    <button type="button" onclick="limpiarFormulario()" class="btn-limpiar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">
-                        Limpiar Campos
-                    </button>
-                    <button type="button" onclick="cancelarProceso()" class="btn-cancelar py-3 px-6 rounded-xl font-bold flex-1 shadow-md transition-transform active:scale-95">
-                        Cancelar
-                    </button>
                 </div>
             </form>
         </div>
@@ -699,16 +875,20 @@
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase mb-1">Descripción <span class="required-mark">*</span></label>
-                        <textarea id="gestorDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
+                        <label class="block text-xs uppercase mb-1">Título o nombre de la idea <span class="required-mark">*</span></label>
+                        <textarea id="gestorDesc" rows="2" class="w-full p-3 outline-none" placeholder="Título o nombre de la idea..." required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase mb-1">Problema a resolver <span class="required-mark">*</span></label>
+                        <textarea id="gestorProblema" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema identificado..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
-                        <textarea id="gestorDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
+                        <textarea id="gestorDetalle" rows="4" class="w-full p-3 outline-none" placeholder="Describe detalladamente en qué consiste la solución..." required></textarea>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Clasificación</label>
-                        <select id="gestorClasif" class="w-full p-3 bg-white text-sm">
+                        <label class="block text-xs uppercase mb-1">Clasificación <span class="required-mark">*</span></label>
+                        <select id="gestorClasif" class="w-full p-3 bg-white text-sm" required>
                             <option value="">Seleccione una clasificación</option>
                         </select>
                     </div>
@@ -904,6 +1084,7 @@
             </div>
             <form id="formAdminManual" class="p-8 space-y-6" autocomplete="off">
                 <p class="required-hint">Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
+                <input type="hidden" id="adminClasif" required>
                 <div class="bg-[#F0F4FA] p-6 rounded-2xl border border-[#D8E2F1] space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -929,21 +1110,19 @@
                     </div>
                 </div>
 
-                <div class="space-y-4">
+                <div id="adminStep1" class="space-y-4">
                     <div>
-                        <label class="block text-xs uppercase mb-1">Descripción <span class="required-mark">*</span></label>
-                        <textarea id="adminDesc" rows="2" class="w-full p-3 outline-none" required></textarea>
+                        <label class="block text-xs uppercase mb-1">Título o nombre de la idea <span class="required-mark">*</span></label>
+                        <textarea id="adminDesc" rows="2" class="w-full p-3 outline-none" placeholder="Título o nombre de la idea..." required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase mb-1">¿Qué problema busca resolver esta idea? <span class="required-mark">*</span></label>
+                        <textarea id="adminProblema" rows="3" class="w-full p-3 outline-none" placeholder="Describe brevemente el problema identificado..." required></textarea>
+                        <p class="text-xs text-slate-400 mt-1">Describe brevemente el problema operativo o de servicio que motiva esta propuesta.</p>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Detalle <span class="required-mark">*</span></label>
-                        <textarea id="adminDetalle" rows="4" class="w-full p-3 outline-none" required></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase mb-1">Clasificación <span class="required-mark">*</span></label>
-                        <select id="adminClasif" class="w-full p-3 bg-white text-sm" required>
-                            <option value="">Seleccione una clasificación</option>
-                        </select>
-                        <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
+                        <textarea id="adminDetalle" rows="4" class="w-full p-3 outline-none" placeholder="Describe detalladamente en qué consiste la solución..." required></textarea>
                     </div>
                     <div>
                         <label class="block text-xs uppercase mb-1">Instancia <span class="required-mark">*</span></label>
@@ -954,16 +1133,31 @@
                         <span class="text-xs text-red-500 hidden" id="adminInstanciaHint">Instancia requerida</span>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase mb-1">Vía de Registro</label>
-                        <select id="adminVia" class="w-full p-3 bg-white text-sm">
+                        <label class="block text-xs uppercase mb-1">Vía <span class="required-mark">*</span></label>
+                        <select id="adminVia" class="w-full p-3 bg-white text-sm" required>
                             <option value="Sistema">Sistema</option>
+                            <option value="Gestor">Gestor</option>
                             <option value="Correo">Correo</option>
                             <option value="Otro">Otro</option>
                         </select>
                     </div>
+                    <div class="flex flex-col md:flex-row gap-3 pt-2">
+                        <button type="button" onclick="goToAdminClassificationStep()" class="btn-primary py-3 px-6 rounded-lg font-bold flex-1">Siguiente</button>
+                    </div>
                 </div>
 
-                <button id="adminManualSubmit" type="submit" class="w-full btn-primary py-3 rounded-lg font-bold">Registrar Idea Manual</button>
+                <div id="adminStep2" class="hidden space-y-4">
+                    <div class="text-center space-y-2">
+                        <h4 class="text-2xl font-bold">Clasifica la idea por proceso interno</h4>
+                        <p class="text-slate-500">Selecciona el subproceso del INFOTEP al que impacta esta idea.</p>
+                    </div>
+                    <div id="adminClassificationBoard" class="space-y-2"></div>
+                    <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
+                    <div class="flex flex-col md:flex-row gap-3 pt-2">
+                        <button type="button" onclick="showAdminStep(1)" class="btn-outline py-3 px-6 rounded-lg font-bold flex-1">Volver</button>
+                        <button id="adminManualSubmit" type="submit" class="btn-primary py-3 rounded-lg font-bold flex-1">Registrar Idea Manual</button>
+                    </div>
+                </div>
             </form>
         </div>
 
@@ -1053,18 +1247,15 @@
                     <section class="space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <h4 class="text-lg font-bold text-slate-700">🏷️ Clasificaciones</h4>
-                            <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                                <input type="text" id="newClassificationName" class="w-full sm:w-64 p-2 border rounded-lg" placeholder="Nueva clasificación" />
-                                <button onclick="addClassification()" class="btn-action px-4 py-2 rounded-lg text-sm">Agregar</button>
-                            </div>
                         </div>
+                        <p class="text-sm text-slate-500">Las clasificaciones ahora son predefinidas por proceso interno INFOTEP y no se pueden editar desde este panel.</p>
                         <div class="overflow-x-auto">
                             <table class="min-w-full text-left text-sm app-table">
                                 <thead>
                                     <tr>
                                         <th class="p-3">ID</th>
-                                        <th class="p-3">Nombre</th>
-                                        <th class="p-3 text-right">Acciones</th>
+                                        <th class="p-3">Proceso</th>
+                                        <th class="p-3">Subproceso</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaClasificaciones">
@@ -1247,6 +1438,7 @@
         let adminManualAdValid = false;
         let adminManualValidateToken = 0;
         let adminManualValidateTimer = null;
+        let classificationCatalog = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('systemDescription').innerText = systemDescriptionText;
@@ -1290,6 +1482,10 @@
             const commentButton = document.getElementById('mCommentSubmit');
             if (commentButton) {
                 commentButton.addEventListener('click', enviarComentario);
+            }
+            const toggleLoginPass = document.getElementById('toggleLoginPass');
+            if (toggleLoginPass) {
+                toggleLoginPass.addEventListener('click', toggleLoginPasswordVisibility);
             }
             setAdminManualFormEnabled(false);
             bindBrandingPreview('brandingLogo', 'brandingLogoPreview');
@@ -1485,21 +1681,13 @@
         }
 
         function updateClassificationSelects(items) {
-            const adminSelect = document.getElementById('adminClasif');
+            classificationCatalog = Array.isArray(items) ? items : [];
             const modalSelect = document.getElementById('mAdminClasif');
             const gestorSelect = document.getElementById('gestorClasif');
-            if (adminSelect) {
-                adminSelect.innerHTML = '<option value="">Seleccione una clasificación</option>';
-                items.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.nombre;
-                    option.textContent = item.nombre;
-                    adminSelect.appendChild(option);
-                });
-            }
+
             if (modalSelect) {
                 modalSelect.innerHTML = '<option value="">Sin clasificar</option>';
-                items.forEach(item => {
+                classificationCatalog.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item.nombre;
                     option.textContent = item.nombre;
@@ -1508,13 +1696,95 @@
             }
             if (gestorSelect) {
                 gestorSelect.innerHTML = '<option value="">Seleccione una clasificación</option>';
-                items.forEach(item => {
+                classificationCatalog.forEach(item => {
                     const option = document.createElement('option');
                     option.value = item.nombre;
                     option.textContent = item.nombre;
                     gestorSelect.appendChild(option);
                 });
             }
+
+            renderClassificationBoard('ideadorClassificationBoard', 'clasificacionIdea');
+            renderClassificationBoard('adminClassificationBoard', 'adminClasif');
+        }
+
+        function getProcessColor(proceso) {
+            const palette = {
+                'Planear': '#4A90E2',
+                'Prestación del Servicio': '#34BF49',
+                'Control': '#F7931E',
+                'Soporte': '#7C3AED'
+            };
+            return palette[proceso] || '#94A3B8';
+        }
+
+        function renderClassificationBoard(containerId, hiddenInputId) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                return;
+            }
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const selected = hiddenInput?.value || '';
+            container.innerHTML = '';
+
+            const sorted = [...classificationCatalog].sort((a, b) => {
+                const procesoSort = (a.proceso || '').localeCompare(b.proceso || '', 'es');
+                if (procesoSort !== 0) {
+                    return procesoSort;
+                }
+                return (a.subproceso || a.nombre || '').localeCompare(b.subproceso || b.nombre || '', 'es');
+            });
+
+            const grouped = sorted.reduce((acc, item) => {
+                const process = item.proceso || 'General';
+                acc[process] = (acc[process] || 0) + 1;
+                return acc;
+            }, {});
+
+            const legend = document.createElement('div');
+            legend.className = 'classification-legend';
+            Object.entries(grouped).forEach(([process, count]) => {
+                const tag = document.createElement('span');
+                tag.className = 'classification-legend-item';
+                tag.style.borderLeftColor = getProcessColor(process);
+                tag.textContent = `${process} (${count})`;
+                legend.appendChild(tag);
+            });
+            container.appendChild(legend);
+
+            const grid = document.createElement('div');
+            grid.className = 'classification-grid';
+
+            sorted.forEach(item => {
+                const proceso = item.proceso || 'General';
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'classification-card';
+                if (selected === item.nombre) {
+                    card.classList.add('active');
+                }
+                card.style.borderTopColor = getProcessColor(proceso);
+                card.innerHTML = `
+                    <span class="classification-chip">${proceso}</span>
+                    <p class="classification-subtitle">${item.icono || ''} ${item.subproceso || item.nombre}</p>
+                    <div class="classification-tooltip">${item.descripcion || "Sin descripción."}</div>
+                `;
+                card.addEventListener('click', () => selectClassification(hiddenInputId, item.nombre));
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+        }
+
+        function selectClassification(hiddenInputId, value) {
+            const input = document.getElementById(hiddenInputId);
+            if (input) {
+                input.value = value;
+            }
+            renderClassificationBoard('ideadorClassificationBoard', 'clasificacionIdea');
+            renderClassificationBoard('adminClassificationBoard', 'adminClasif');
+            toggleHint('ideadorClasifHint', false);
+            validateAdminManualFields();
         }
 
         function updateInstanceSelects(items) {
@@ -1689,7 +1959,10 @@
                 loadClassifications();
                 loadInstances();
             }
-            if(view === 'registrar') document.getElementById('adminForm').classList.remove('hidden');
+            if(view === 'registrar') {
+                document.getElementById('adminForm').classList.remove('hidden');
+                showAdminStep(1);
+            }
         }
 
         function navGestor(view) {
@@ -1758,8 +2031,8 @@
 
         function setAdminManualFormEnabled(isEnabled) {
             setControlState('adminDesc', isEnabled);
+            setControlState('adminProblema', isEnabled);
             setControlState('adminDetalle', isEnabled);
-            setControlState('adminClasif', isEnabled);
             setControlState('adminInstancia', isEnabled);
             setControlState('adminVia', isEnabled);
             setButtonState('adminManualSubmit', isEnabled);
@@ -1863,8 +2136,13 @@
 
         function limpiarFormulario() {
             document.getElementById('descIdea').value = '';
+            document.getElementById('problemaIdea').value = '';
             document.getElementById('detalleIdea').value = '';
             document.getElementById('ideaInstancia').value = '';
+            const clasificacion = document.getElementById('clasificacionIdea');
+            if (clasificacion) clasificacion.value = '';
+            showIdeadorStep(1);
+            renderClassificationBoard('ideadorClassificationBoard', 'clasificacionIdea');
             const emailHint = document.getElementById('emailHint');
             if (emailHint) {
                 emailHint.classList.add('hidden');
@@ -1878,7 +2156,7 @@
                 return true;
             }
             const value = input.value.trim();
-            const isValid = value === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            const isValid = value !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
             hint.classList.toggle('hidden', isValid);
             return isValid;
         }
@@ -1891,27 +2169,82 @@
             element.classList.toggle('hidden', !isVisible);
         }
 
-        function validateAdminManualFields() {
+        function validateAdminManualFields(requireClassification = false) {
             const nombre = document.getElementById('adminNomEmp')?.value.trim() ?? '';
             const correo = document.getElementById('adminMailEmp')?.value.trim() ?? '';
             const departamento = document.getElementById('adminDirEmp')?.value.trim() ?? '';
+            const descripcion = document.getElementById('adminDesc')?.value.trim() ?? '';
+            const problema = document.getElementById('adminProblema')?.value.trim() ?? '';
+            const detalle = document.getElementById('adminDetalle')?.value.trim() ?? '';
             const clasificacion = document.getElementById('adminClasif')?.value.trim() ?? '';
             const instancia = document.getElementById('adminInstancia')?.value.trim() ?? '';
 
-            const correoValido = correo === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+            const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 
             toggleHint('adminNomEmpHint', nombre === '');
             toggleHint('adminDirEmpHint', departamento === '');
-            toggleHint('adminClasifHint', clasificacion === '');
+            toggleHint('adminClasifHint', requireClassification && clasificacion === '');
             toggleHint('adminInstanciaHint', instancia === '');
             toggleHint('adminMailEmpHint', correo === '' || !correoValido);
 
             return nombre !== ''
                 && departamento !== ''
-                && clasificacion !== ''
+                && descripcion !== ''
+                && problema !== ''
+                && detalle !== ''
                 && instancia !== ''
+                && (!requireClassification || clasificacion !== '')
                 && correo !== ''
                 && correoValido;
+        }
+
+        function showIdeadorStep(step) {
+            document.getElementById('ideadorStep1')?.classList.toggle('hidden', step !== 1);
+            document.getElementById('ideadorStep2')?.classList.toggle('hidden', step !== 2);
+            if (step === 2) {
+                renderClassificationBoard('ideadorClassificationBoard', 'clasificacionIdea');
+            }
+        }
+
+        function goToIdeadorClassificationStep() {
+            const desc = document.getElementById('descIdea')?.value.trim() ?? '';
+            const problema = document.getElementById('problemaIdea')?.value.trim() ?? '';
+            const detalle = document.getElementById('detalleIdea')?.value.trim() ?? '';
+            const instancia = document.getElementById('ideaInstancia')?.value.trim() ?? '';
+            const correoValido = validateCorreoEmpleado();
+            if (!desc || !problema || !detalle || !instancia || !correoValido) {
+                showError('Validación requerida', 'Completa los campos obligatorios antes de continuar.');
+                return;
+            }
+            showIdeadorStep(2);
+        }
+
+        function showAdminStep(step) {
+            document.getElementById('adminStep1')?.classList.toggle('hidden', step !== 1);
+            document.getElementById('adminStep2')?.classList.toggle('hidden', step !== 2);
+            if (step === 2) {
+                renderClassificationBoard('adminClassificationBoard', 'adminClasif');
+            }
+        }
+
+        function goToAdminClassificationStep() {
+            if (!validateAdminManualFields(false)) {
+                showError('Validación requerida', 'Completa los campos obligatorios antes de continuar.');
+                return;
+            }
+            showAdminStep(2);
+        }
+
+        function toggleLoginPasswordVisibility() {
+            const input = document.getElementById('loginPass');
+            const toggle = document.getElementById('toggleLoginPass');
+            if (!input || !toggle) {
+                return;
+            }
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            toggle.classList.toggle('is-visible', isPassword);
+            toggle.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
         }
 
         function cancelarProceso() {
@@ -1939,11 +2272,20 @@
                 return;
             }
             const desc = document.getElementById('descIdea').value.trim();
+            const problema = document.getElementById('problemaIdea').value.trim();
             const detalle = document.getElementById('detalleIdea').value.trim();
+            const clasificacion = document.getElementById('clasificacionIdea').value.trim();
+            if (!clasificacion) {
+                showIdeadorStep(2);
+                toggleHint('ideadorClasifHint', true);
+                return;
+            }
 
             const payload = {
                 descripcion: desc,
+                problema,
                 detalle,
+                clasificacion,
                 instancia: document.getElementById('ideaInstancia').value,
                 nombreCompleto: document.getElementById('nombreEmpleado').value.trim(),
                 email: document.getElementById('correoEmpleado').value.trim(),
@@ -1971,13 +2313,14 @@
                 showError('Validación requerida', 'Debes validar el colaborador en Active Directory antes de registrar la idea.');
                 return;
             }
-            if (!validateAdminManualFields()) {
-                showError('Error', 'Completa los campos requeridos con un correo válido.');
+            if (!validateAdminManualFields(true)) {
+                showError('Error', 'Completa los campos requeridos con un correo válido y una clasificación.');
                 return;
             }
             const payload = {
                 codigoEmpleado: document.getElementById('adminIdEmp').value.trim(),
                 descripcion: document.getElementById('adminDesc').value.trim(),
+                problema: document.getElementById('adminProblema').value.trim(),
                 detalle: document.getElementById('adminDetalle').value.trim(),
                 via: document.getElementById('adminVia').value,
                 adminComment: 'Carga manual',
@@ -2000,6 +2343,9 @@
 
             showSuccess('Registrada', 'La idea se guardó con estatus Revisada.');
             document.getElementById('formAdminManual').reset();
+            document.getElementById('adminClasif').value = '';
+            showAdminStep(1);
+            renderClassificationBoard('adminClassificationBoard', 'adminClasif');
             adminManualAdValid = false;
             setAdminManualFormEnabled(false);
             setAdminManualHint('', false);
@@ -2474,7 +2820,7 @@
         }
 
         function limpiarFormularioGestor() {
-            const ids = ['gestorIdEmp', 'gestorMailEmpSearch', 'gestorNomEmp', 'gestorMailEmp', 'gestorDirEmp', 'gestorDesc', 'gestorDetalle'];
+            const ids = ['gestorIdEmp', 'gestorMailEmpSearch', 'gestorNomEmp', 'gestorMailEmp', 'gestorDirEmp', 'gestorDesc', 'gestorProblema', 'gestorDetalle'];
             ids.forEach(id => {
                 const input = document.getElementById(id);
                 if (input) input.value = '';
@@ -2540,14 +2886,20 @@
         async function handleGestorManualSubmit(event) {
             event.preventDefault();
             const descripcion = document.getElementById('gestorDesc').value.trim();
+            const problema = document.getElementById('gestorProblema').value.trim();
             const detalle = document.getElementById('gestorDetalle').value.trim();
             const codigoEmpleado = document.getElementById('gestorIdEmp').value.trim();
             const email = document.getElementById('gestorMailEmpSearch').value.trim() || document.getElementById('gestorMailEmp').value.trim();
             const nombreCompleto = document.getElementById('gestorNomEmp').value.trim();
             const departamento = document.getElementById('gestorDirEmp').value.trim();
+            const clasificacion = document.getElementById('gestorClasif').value.trim();
 
-            if (!descripcion || !detalle) {
-                showError('Campos requeridos', 'Descripción y detalle son obligatorios.');
+            if (!descripcion || !problema || !detalle) {
+                showError('Campos requeridos', 'Descripción, problema y detalle son obligatorios.');
+                return;
+            }
+            if (!clasificacion) {
+                showError('Clasificación requerida', 'Selecciona una clasificación para continuar.');
                 return;
             }
             if (!codigoEmpleado && !email) {
@@ -2565,8 +2917,9 @@
                 nombreCompleto,
                 departamento,
                 descripcion,
+                problema,
                 detalle,
-                clasificacion: document.getElementById('gestorClasif').value,
+                clasificacion,
                 via: document.getElementById('gestorVia').value
             };
 
@@ -2908,60 +3261,19 @@
                 idCell.className = 'p-3 text-slate-500';
                 idCell.textContent = item.id;
 
+                const procesoCell = document.createElement('td');
+                procesoCell.className = 'p-3 text-slate-700';
+                procesoCell.textContent = item.proceso;
+
                 const nameCell = document.createElement('td');
                 nameCell.className = 'p-3 text-slate-700';
-                nameCell.textContent = item.nombre;
+                nameCell.textContent = item.subproceso || item.nombre;
 
-                const actionCell = document.createElement('td');
-                actionCell.className = 'p-3 text-right';
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700';
-                deleteButton.textContent = 'Eliminar';
-                deleteButton.addEventListener('click', () => deleteClassification(item.id, item.nombre));
-
-                actionCell.appendChild(deleteButton);
                 row.appendChild(idCell);
+                row.appendChild(procesoCell);
                 row.appendChild(nameCell);
-                row.appendChild(actionCell);
                 tbody.appendChild(row);
             });
-        }
-
-        async function addClassification() {
-            const input = document.getElementById('newClassificationName');
-            const nombre = input.value.trim();
-            if (!nombre) {
-                showError('Error', 'El nombre de la clasificación es requerido.');
-                return;
-            }
-            const response = await apiFetch('/api/config/classifications', {
-                method: 'POST',
-                body: JSON.stringify({ nombre })
-            });
-            if (!response.ok) {
-                showError('Error', 'No fue posible crear la clasificación.');
-                return;
-            }
-            input.value = '';
-            await loadClassifications();
-            await loadCatalogs();
-        }
-
-        async function deleteClassification(id, nombre) {
-            const confirmed = await showConfirm(
-                'Eliminar clasificación',
-                `¿Deseas eliminar la clasificación "${nombre}"?`
-            );
-            if (!confirmed) {
-                return;
-            }
-            const response = await apiFetch(`/api/config/classifications/${id}`, { method: 'DELETE' });
-            if (!response.ok) {
-                showError('Error', 'No fue posible eliminar la clasificación.');
-                return;
-            }
-            await loadClassifications();
-            await loadCatalogs();
         }
 
         async function loadInstances() {

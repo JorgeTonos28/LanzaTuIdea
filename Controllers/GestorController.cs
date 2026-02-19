@@ -129,6 +129,7 @@ public class GestorController : ControllerBase
             idea.Id,
             idea.CreatedAt,
             idea.Descripcion,
+            idea.Problema,
             idea.Detalle,
             idea.Status,
             idea.Clasificacion,
@@ -181,14 +182,16 @@ public class GestorController : ControllerBase
     public async Task<IActionResult> ManualIdea([FromBody] GestorIdeaManualRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Descripcion)
-            || string.IsNullOrWhiteSpace(request.Detalle))
+            || string.IsNullOrWhiteSpace(request.Problema)
+            || string.IsNullOrWhiteSpace(request.Detalle)
+            || string.IsNullOrWhiteSpace(request.Clasificacion))
         {
-            return BadRequest(new { message = "Descripción y detalle son requeridos." });
+            return BadRequest(new { message = "Descripción, problema, detalle y clasificación son requeridos." });
         }
 
-        if (request.Descripcion.Length > 500 || request.Detalle.Length > 4000)
+        if (request.Descripcion.Length > 500 || request.Problema.Length > 1000 || request.Detalle.Length > 4000)
         {
-            return BadRequest(new { message = "Descripción o detalle exceden el límite permitido." });
+            return BadRequest(new { message = "Descripción, problema o detalle exceden el límite permitido." });
         }
 
         var gestor = await GetCurrentUserAsync(cancellationToken);
@@ -262,15 +265,24 @@ public class GestorController : ControllerBase
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
+            var clasificacion = await _context.Classifications
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Activo && c.Nombre == request.Clasificacion.Trim(), cancellationToken);
+            if (clasificacion is null)
+            {
+                return BadRequest(new { message = "La clasificación seleccionada no es válida." });
+            }
+
             var idea = new Idea
             {
                 CreatedAt = DateTime.UtcNow,
                 CreatedByUserId = targetUser.Id,
                 CodigoEmpleado = codigoEmpleado,
                 Descripcion = TrimTo(request.Descripcion, 500) ?? string.Empty,
+                Problema = TrimTo(request.Problema, 1000) ?? string.Empty,
                 Detalle = TrimTo(request.Detalle, 4000) ?? string.Empty,
                 Status = AppConstants.Status.Registrada,
-                Clasificacion = TrimTo(request.Clasificacion, 200),
+                Clasificacion = clasificacion.Nombre,
                 Via = TrimTo(request.Via, 100) ?? "Gestor",
                 AssignedToUserId = gestor.Id
             };

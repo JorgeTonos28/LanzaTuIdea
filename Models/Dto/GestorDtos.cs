@@ -32,6 +32,7 @@ public record GestorIdeaManualRequest(
     string? NombreCompleto,
     string? Departamento,
     string Descripcion,
+    string Problema,
     string Detalle,
     string? Clasificacion,
     string? Via
