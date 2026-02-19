@@ -440,19 +440,64 @@
             top: 50%;
             transform: translateY(-50%);
             color: #64748b;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .classification-process-title {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--infotep-blue);
-            margin-bottom: 8px;
+        .password-toggle:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .password-toggle svg {
+            width: 19px;
+            height: 19px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .password-toggle .eye-off-icon {
+            display: none;
+        }
+
+        .password-toggle.is-visible .eye-icon {
+            display: none;
+        }
+
+        .password-toggle.is-visible .eye-off-icon {
+            display: block;
+        }
+
+
+        .classification-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .classification-legend-item {
+            font-size: 0.68rem;
+            font-weight: 700;
+            border: 1px solid #dbe4f0;
+            border-left-width: 4px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: #f8fafc;
+            color: #334155;
         }
 
         .classification-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
+            gap: 9px;
         }
 
         .classification-card {
@@ -461,16 +506,19 @@
             border-top-width: 4px;
             border-radius: 12px;
             background: #fff;
-            padding: 10px 12px;
+            padding: 9px 10px;
             text-align: left;
             transition: all 0.2s ease;
-            min-height: 88px;
+            min-height: 80px;
+            overflow: visible;
+            z-index: 1;
         }
 
         .classification-card:hover,
         .classification-card:focus-visible {
             transform: translateY(-1px);
             box-shadow: 0 8px 18px rgba(0, 51, 102, 0.14);
+            z-index: 20;
         }
 
         .classification-card.active {
@@ -481,11 +529,11 @@
         .classification-chip {
             display: inline-flex;
             align-items: center;
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: .04em;
-            padding: 3px 7px;
+            padding: 2px 7px;
             border-radius: 999px;
             background-color: #eef2ff;
             color: #334155;
@@ -494,28 +542,28 @@
         .classification-subtitle {
             font-weight: 700;
             color: #1e293b;
-            margin-top: 6px;
-            font-size: 0.88rem;
-            line-height: 1.2;
+            margin-top: 5px;
+            font-size: 0.86rem;
+            line-height: 1.15;
         }
 
         .classification-tooltip {
             position: absolute;
             left: 50%;
-            top: calc(100% + 8px);
+            bottom: calc(100% + 8px);
             transform: translateX(-50%);
-            width: min(260px, 92vw);
+            width: min(260px, 88vw);
             background: #0f172a;
             color: #e2e8f0;
-            font-size: 0.75rem;
-            line-height: 1.35;
+            font-size: 0.74rem;
+            line-height: 1.3;
             border-radius: 10px;
             padding: 8px 10px;
             box-shadow: 0 12px 24px rgba(2, 6, 23, 0.35);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s ease;
-            z-index: 30;
+            z-index: 40;
         }
 
         .classification-card:hover .classification-tooltip,
@@ -585,7 +633,10 @@
                     <label class="block text-xs uppercase mb-1">Contraseña</label>
                     <div class="password-input-wrap">
                         <input type="password" id="loginPass" class="w-full p-3 pr-12 outline-none" placeholder="Tu contraseña" required autocomplete="off">
-                        <button type="button" id="toggleLoginPass" class="password-toggle" aria-label="Mostrar contraseña">👁️</button>
+                        <button type="button" id="toggleLoginPass" class="password-toggle" aria-label="Mostrar contraseña">
+                            <svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <svg class="eye-off-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.2A11 11 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-4.1 4.8"></path><path d="M6.6 6.6C3.8 8.3 2 12 2 12s3.5 7 10 7a10.7 10.7 0 0 0 5.3-1.3"></path></svg>
+                        </button>
                     </div>
                 </div>
                 <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold transition">Entrar</button>
@@ -687,7 +738,7 @@
                         <h4 class="text-2xl font-bold">Clasifica tu idea</h4>
                         <p class="text-slate-500">Selecciona el proceso interno del INFOTEP al que aporta tu propuesta.</p>
                     </div>
-                    <div id="ideadorClassificationBoard" class="space-y-6"></div>
+                    <div id="ideadorClassificationBoard" class="space-y-2"></div>
                     <span class="text-xs text-red-500 hidden" id="ideadorClasifHint">Selecciona un subproceso para continuar.</span>
                     <div class="flex flex-col md:flex-row gap-4 pt-4 border-t border-slate-100">
                         <button type="button" onclick="showIdeadorStep(1)" class="btn-outline py-3 px-6 rounded-xl font-bold flex-1">Volver</button>
@@ -1100,7 +1151,7 @@
                         <h4 class="text-2xl font-bold">Clasifica la idea por proceso interno</h4>
                         <p class="text-slate-500">Selecciona el subproceso del INFOTEP al que impacta esta idea.</p>
                     </div>
-                    <div id="adminClassificationBoard" class="space-y-6"></div>
+                    <div id="adminClassificationBoard" class="space-y-2"></div>
                     <span class="text-xs text-red-500 hidden" id="adminClasifHint">Clasificación requerida</span>
                     <div class="flex flex-col md:flex-row gap-3 pt-2">
                         <button type="button" onclick="showAdminStep(1)" class="btn-outline py-3 px-6 rounded-lg font-bold flex-1">Volver</button>
@@ -1676,45 +1727,53 @@
             const selected = hiddenInput?.value || '';
             container.innerHTML = '';
 
-            const grouped = classificationCatalog.reduce((acc, item) => {
-                const key = item.proceso || 'General';
-                if (!acc[key]) {
-                    acc[key] = [];
+            const sorted = [...classificationCatalog].sort((a, b) => {
+                const procesoSort = (a.proceso || '').localeCompare(b.proceso || '', 'es');
+                if (procesoSort !== 0) {
+                    return procesoSort;
                 }
-                acc[key].push(item);
+                return (a.subproceso || a.nombre || '').localeCompare(b.subproceso || b.nombre || '', 'es');
+            });
+
+            const grouped = sorted.reduce((acc, item) => {
+                const process = item.proceso || 'General';
+                acc[process] = (acc[process] || 0) + 1;
                 return acc;
             }, {});
 
-            Object.entries(grouped).forEach(([proceso, items]) => {
-                const section = document.createElement('section');
-                const title = document.createElement('h5');
-                title.className = 'classification-process-title';
-                title.textContent = proceso;
-                section.appendChild(title);
-
-                const grid = document.createElement('div');
-                grid.className = 'classification-grid';
-
-                items.forEach(item => {
-                    const card = document.createElement('button');
-                    card.type = 'button';
-                    card.className = 'classification-card';
-                    if (selected === item.nombre) {
-                        card.classList.add('active');
-                    }
-                    card.style.borderTopColor = getProcessColor(proceso);
-                    card.innerHTML = `
-                        <span class="classification-chip">${proceso}</span>
-                        <p class="classification-subtitle">${item.icono || ''} ${item.subproceso || item.nombre}</p>
-                        <div class="classification-tooltip">${item.descripcion || "Sin descripción."}</div>
-                    `;
-                    card.addEventListener('click', () => selectClassification(hiddenInputId, item.nombre));
-                    grid.appendChild(card);
-                });
-
-                section.appendChild(grid);
-                container.appendChild(section);
+            const legend = document.createElement('div');
+            legend.className = 'classification-legend';
+            Object.entries(grouped).forEach(([process, count]) => {
+                const tag = document.createElement('span');
+                tag.className = 'classification-legend-item';
+                tag.style.borderLeftColor = getProcessColor(process);
+                tag.textContent = `${process} (${count})`;
+                legend.appendChild(tag);
             });
+            container.appendChild(legend);
+
+            const grid = document.createElement('div');
+            grid.className = 'classification-grid';
+
+            sorted.forEach(item => {
+                const proceso = item.proceso || 'General';
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'classification-card';
+                if (selected === item.nombre) {
+                    card.classList.add('active');
+                }
+                card.style.borderTopColor = getProcessColor(proceso);
+                card.innerHTML = `
+                    <span class="classification-chip">${proceso}</span>
+                    <p class="classification-subtitle">${item.icono || ''} ${item.subproceso || item.nombre}</p>
+                    <div class="classification-tooltip">${item.descripcion || "Sin descripción."}</div>
+                `;
+                card.addEventListener('click', () => selectClassification(hiddenInputId, item.nombre));
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
         }
 
         function selectClassification(hiddenInputId, value) {
@@ -2184,7 +2243,7 @@
             }
             const isPassword = input.type === 'password';
             input.type = isPassword ? 'text' : 'password';
-            toggle.textContent = isPassword ? '🙈' : '👁️';
+            toggle.classList.toggle('is-visible', isPassword);
             toggle.setAttribute('aria-label', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
         }
 
